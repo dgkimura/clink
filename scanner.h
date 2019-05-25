@@ -2,4 +2,5 @@ struct token
 {
 };
 
-struct token *scan_file(char *file, int *total_tokens);
+void do_preprocessing(char *infile, char *outfile);
+struct token *do_tokenizing(char *file, int *total_tokens);
