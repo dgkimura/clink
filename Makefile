@@ -9,7 +9,7 @@ endif
 all: scc
 
 scc:
-	$(CC) -g main.c scanner.c -o $@ ${LIBS}
+	$(CC) -g main.c scanner.c list.c -o $@ ${LIBS}
 
 clean:
 	rm -f scc *.o *.a
