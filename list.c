@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "list.h"
 
@@ -19,4 +20,20 @@ list_prepend(
     t->data = data;
     t->next = *head;
     *head = t;
+}
+
+struct listnode *
+list_findkey(struct listnode *head, char *key)
+{
+    struct listnode *current = head;
+
+    while (current != NULL)
+    {
+        if (strcmp(key, ((struct pair *)current->data)->key) == 0)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+    return current;
 }
