@@ -4,10 +4,10 @@ int
 main(int argc, char *agv[])
 {
     int total_tokens;
-    struct token *tokens;
+    struct listnode *tokens;
 
     do_preprocessing("test.c", "_test.c");
-    tokens = do_tokenizing("_test.c", &total_tokens);
+    do_tokenizing("_test.c", &tokens);
 
     return 0;
 }

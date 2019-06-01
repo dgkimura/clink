@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 
 #include "list.h"
 
@@ -28,8 +29,35 @@ do_preprocessing(char *infile, char *outfile)
     }
 }
 
-struct token *
-do_tokenizing(char *file, int *total_tokens)
+void
+do_tokenizing(char *file, struct listnode **tokens)
 {
-    return NULL;
+    char *content;
+    size_t i, tok_start, tok_end, content_len;
+
+    for (i=0; i<content_len; i++)
+    {
+        if (isalpha(content[i]))
+        {
+            tok_start = i;
+
+            /* consume characters */
+            while (isalpha(content[i]) || isdigit(content[i]))
+            {
+                i += 1;
+            }
+            tok_end = i;
+        }
+        else if (isdigit(content[i]))
+        {
+            tok_start = i;
+
+            /* consume digits */
+            while (isdigit(content[i]))
+            {
+                i += 1;
+            }
+            tok_end = i;
+        }
+    }
 }
