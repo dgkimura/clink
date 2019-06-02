@@ -1,7 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 #include "list.h"
+#include "scanner.h"
 
 struct transform
 {
@@ -33,6 +36,7 @@ void
 do_tokenizing(char *file, struct listnode **tokens)
 {
     char *content;
+    struct token *tok;
     size_t i, tok_start, tok_end, content_len;
 
     for (i=0; i<content_len; i++)
@@ -47,6 +51,13 @@ do_tokenizing(char *file, struct listnode **tokens)
                 i += 1;
             }
             tok_end = i;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+
+            tok->type = TOK_STRING;
+            strncpy(tok->value, content + tok_start, tok_end - tok_start);
+
+            list_prepend(tokens, tok);
         }
         else if (isdigit(content[i]))
         {
