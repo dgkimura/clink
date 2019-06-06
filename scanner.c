@@ -69,6 +69,12 @@ do_tokenizing(char *file, struct listnode **tokens)
                 i += 1;
             }
             tok_end = i;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_INTEGER;
+            strncpy(tok->value, content + tok_start, tok_end - tok_start);
+
+            list_prepend(tokens, tok);
         }
     }
 }
