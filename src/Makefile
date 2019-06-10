@@ -1,9 +1,9 @@
-SRCS = $(wildcard *.c)
+SRCS = $(filter-out main.c, $(wildcard *.c))
 OBJS = $(SRCS:.c=.o)
 
 all: scc
 
-scc: $(OBJS)
+scc: main.o $(OBJS)
 	$(CC) -o $@ $^
 
 .PHONY: clean
