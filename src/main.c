@@ -7,7 +7,7 @@ main(int argc, char *agv[])
     struct listnode *tokens;
 
     do_preprocessing("test.c", "_test.c");
-    do_tokenizing("_test.c", &tokens);
+    do_tokenizing("_test.c", 0, &tokens);
 
     return 0;
 }

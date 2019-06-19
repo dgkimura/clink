@@ -1,3 +1,5 @@
+#include <ctype.h>
+
 #include "list.h"
 
 enum token_t
@@ -15,4 +17,4 @@ struct token
 };
 
 void do_preprocessing(char *infile, char *outfile);
-void do_tokenizing(char *file, struct listnode **tokens);
+void do_tokenizing(char *content, size_t content_len, struct listnode **tokens);

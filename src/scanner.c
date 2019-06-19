@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include "list.h"
 #include "scanner.h"
@@ -33,11 +32,10 @@ do_preprocessing(char *infile, char *outfile)
 }
 
 void
-do_tokenizing(char *file, struct listnode **tokens)
+do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 {
-    char *content;
     struct token *tok;
-    size_t i, tok_start, tok_end, content_len;
+    size_t i, tok_start, tok_end;
 
     for (i=0; i<content_len; i++)
     {
