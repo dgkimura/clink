@@ -8,12 +8,10 @@ enum token_t
     TOK_STRING
 };
 
-#define MAX_TOKEN_SIZE 256
-
 struct token
 {
     enum token_t type;
-    char value[MAX_TOKEN_SIZE];
+    char *value;
 };
 
 void do_preprocessing(char *infile, char *outfile);

@@ -35,7 +35,7 @@ void
 do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 {
     struct token *tok;
-    size_t i, tok_start, tok_end;
+    size_t i, tok_start, tok_end, tok_size;
 
     for (i=0; i<content_len; i++)
     {
@@ -49,11 +49,14 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
                 i += 1;
             }
             tok_end = i;
+            tok_size = tok_end - tok_start + 1;
 
             tok = (struct token *)malloc(sizeof(struct token));
 
             tok->type = TOK_STRING;
-            strncpy(tok->value, content + tok_start, tok_end - tok_start);
+            tok->value = (char *)malloc(sizeof(char) * tok_size);
+            strncpy(tok->value, content + tok_start, tok_size);
+            tok->value[tok_size] = '\0';
 
             list_prepend(tokens, tok);
         }
@@ -67,10 +70,14 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
                 i += 1;
             }
             tok_end = i;
+            tok_size = tok_end - tok_start + 1;
 
             tok = (struct token *)malloc(sizeof(struct token));
+
             tok->type = TOK_INTEGER;
-            strncpy(tok->value, content + tok_start, tok_end - tok_start);
+            tok->value = (char *)malloc(sizeof(char) * tok_size);
+            strncpy(tok->value, content + tok_start, tok_size);
+            tok->value[tok_size] = '\0';
 
             list_prepend(tokens, tok);
         }

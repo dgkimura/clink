@@ -12,6 +12,7 @@ START_TEST(test_scanner_can_parse_integer_token)
     do_tokenizing(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_INTEGER, ((struct token *)tokens->data)->type);
+    ck_assert_str_eq("1234", ((struct token *)tokens->data)->value);
 }
 END_TEST
 
@@ -24,6 +25,7 @@ START_TEST(test_scanner_can_parse_string_token)
     do_tokenizing(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_STRING, ((struct token *)tokens->data)->type);
+    ck_assert_str_eq("abcd", ((struct token *)tokens->data)->value);
 }
 END_TEST
 
@@ -36,6 +38,7 @@ START_TEST(test_scanner_can_parse_string_token_with_integers)
     do_tokenizing(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_STRING, ((struct token *)tokens->data)->type);
+    ck_assert_str_eq("abc123", ((struct token *)tokens->data)->value);
 }
 END_TEST
 
