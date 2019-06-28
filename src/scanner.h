@@ -5,7 +5,9 @@
 enum token_t
 {
     TOK_INTEGER,
-    TOK_STRING
+    TOK_STRING,
+    TOK_LPAREN,
+    TOK_RPAREN
 };
 
 struct token

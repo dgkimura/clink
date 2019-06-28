@@ -42,6 +42,30 @@ START_TEST(test_scanner_can_parse_string_token_with_integers)
 }
 END_TEST
 
+START_TEST(test_scanner_can_parse_lparen)
+{
+    char *content = "(";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_LPAREN, ((struct token *)tokens->data)->type);
+}
+END_TEST
+
+START_TEST(test_scanner_can_parse_rparen)
+{
+    char *content = ")";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_RPAREN, ((struct token *)tokens->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -53,6 +77,8 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token_with_integers);
+    tcase_add_test(testcase, test_scanner_can_parse_lparen);
+    tcase_add_test(testcase, test_scanner_can_parse_rparen);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
