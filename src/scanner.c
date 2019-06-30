@@ -37,7 +37,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
     struct token *tok;
     size_t i, tok_start, tok_end, tok_size;
 
-    for (i=0; i<content_len; i++)
+    for (i=0; i<content_len;)
     {
         if (isalpha(content[i]))
         {
