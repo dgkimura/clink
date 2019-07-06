@@ -74,8 +74,8 @@ START_TEST(test_scanner_can_parse_two_parens)
 
     do_tokenizing(content, strlen(content), &tokens);
 
-    ck_assert_int_eq(TOK_LPAREN, ((struct token *)tokens->next->data)->type);
-    ck_assert_int_eq(TOK_RPAREN, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_LBRACE, ((struct token *)tokens->next->data)->type);
+    ck_assert_int_eq(TOK_RBRACE, ((struct token *)tokens->data)->type);
 }
 END_TEST
 
