@@ -66,7 +66,7 @@ START_TEST(test_scanner_can_parse_rparen)
 }
 END_TEST
 
-START_TEST(test_scanner_can_parse_two_parens)
+START_TEST(test_scanner_can_parse_two_braces)
 {
     char *content = "{}";
     struct listnode *tokens;
@@ -76,6 +76,19 @@ START_TEST(test_scanner_can_parse_two_parens)
 
     ck_assert_int_eq(TOK_LBRACE, ((struct token *)tokens->next->data)->type);
     ck_assert_int_eq(TOK_RBRACE, ((struct token *)tokens->data)->type);
+}
+END_TEST
+
+START_TEST(test_scanner_can_parse_two_brackets)
+{
+    char *content = "[]";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_LBRACKET, ((struct token *)tokens->next->data)->type);
+    ck_assert_int_eq(TOK_RBRACKET, ((struct token *)tokens->data)->type);
 }
 END_TEST
 
@@ -92,7 +105,8 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_string_token_with_integers);
     tcase_add_test(testcase, test_scanner_can_parse_lparen);
     tcase_add_test(testcase, test_scanner_can_parse_rparen);
-    tcase_add_test(testcase, test_scanner_can_parse_two_parens);
+    tcase_add_test(testcase, test_scanner_can_parse_two_braces);
+    tcase_add_test(testcase, test_scanner_can_parse_two_brackets);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

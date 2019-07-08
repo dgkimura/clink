@@ -99,6 +99,24 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             list_prepend(tokens, tok);
         }
+        else if (content[i] == '[')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_LBRACKET;
+
+            list_prepend(tokens, tok);
+        }
+        else if (content[i] == ']')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_RBRACKET;
+
+            list_prepend(tokens, tok);
+        }
         else if (content[i] == '{')
         {
             i += 1;

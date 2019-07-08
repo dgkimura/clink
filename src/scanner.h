@@ -8,6 +8,8 @@ enum token_t
     TOK_STRING,
     TOK_LPAREN,
     TOK_RPAREN,
+    TOK_LBRACKET,
+    TOK_RBRACKET,
     TOK_LBRACE,
     TOK_RBRACE
 };
