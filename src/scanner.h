@@ -11,7 +11,8 @@ enum token_t
     TOK_LBRACKET,
     TOK_RBRACKET,
     TOK_LBRACE,
-    TOK_RBRACE
+    TOK_RBRACE,
+    TOK_SEMICOLON
 };
 
 struct token

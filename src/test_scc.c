@@ -92,6 +92,18 @@ START_TEST(test_scanner_can_parse_two_brackets)
 }
 END_TEST
 
+START_TEST(test_scanner_can_parse_semicolon)
+{
+    char *content = ";";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_SEMICOLON, ((struct token *)tokens->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -107,6 +119,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_rparen);
     tcase_add_test(testcase, test_scanner_can_parse_two_braces);
     tcase_add_test(testcase, test_scanner_can_parse_two_brackets);
+    tcase_add_test(testcase, test_scanner_can_parse_semicolon);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
