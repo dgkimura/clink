@@ -8,7 +8,6 @@ list_init(
     struct listnode **head)
 {
     *head = NULL;
-    list_prepend(head, NULL);
 }
 
 void
@@ -19,7 +18,34 @@ list_prepend(
     struct listnode *t = malloc(sizeof(struct listnode));
     t->data = data;
     t->next = *head;
+
+    if (*head != NULL)
+    {
+        t->tail = (*head)->tail;
+    }
+
     *head = t;
+}
+
+void
+list_append(
+    struct listnode **head,
+    void *data)
+{
+    struct listnode *t = malloc(sizeof(struct listnode));
+    t->data = data;
+    t->next = *head;
+
+    if (*head != NULL)
+    {
+        (*head)->tail->next = t;
+        (*head)->tail = t;
+    }
+    else
+    {
+        (*head) = t;
+        (*head)->tail = t;
+    }
 }
 
 struct listnode *

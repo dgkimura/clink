@@ -3,6 +3,20 @@
 #include "list.h"
 #include "scanner.h"
 
+START_TEST(test_list_append)
+{
+    struct listnode *a_list;
+    char *e1 = "123";
+    char *e2 = "456";
+
+    list_init(&a_list);
+    list_append(&a_list, e1);
+    list_append(&a_list, e2);
+
+    ck_assert_str_eq("123", a_list->data);
+}
+END_TEST
+
 START_TEST(test_scanner_can_parse_integer_token)
 {
     char *content = "1234";
@@ -125,6 +139,7 @@ main(void)
     SRunner *runner = srunner_create(suite);
 
     suite_add_tcase(suite, testcase);
+    tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token_with_integers);
