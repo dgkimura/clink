@@ -104,6 +104,19 @@ START_TEST(test_scanner_can_parse_semicolon)
 }
 END_TEST
 
+START_TEST(test_scanner_ignores_comment_contents)
+{
+    char *content = "123/*456*/";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_INTEGER, ((struct token *)tokens->data)->type);
+    ck_assert_str_eq("123", ((struct token *)tokens->data)->value);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -120,6 +133,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_two_braces);
     tcase_add_test(testcase, test_scanner_can_parse_two_brackets);
     tcase_add_test(testcase, test_scanner_can_parse_semicolon);
+    tcase_add_test(testcase, test_scanner_ignores_comment_contents);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

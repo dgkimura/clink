@@ -70,7 +70,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
                 i += 1;
             }
             tok_end = i;
-            tok_size = tok_end - tok_start + 1;
+            tok_size = tok_end - tok_start;
 
             tok = (struct token *)malloc(sizeof(struct token));
 
@@ -143,6 +143,22 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok->type = TOK_SEMICOLON;
 
             list_prepend(tokens, tok);
+        }
+        else if (content[i] == '/' && i+1 < content_len)
+        {
+            i += 2;
+
+            /* skip over comment contents */
+            while (i + 1 < content_len &&
+                   content[i] != '*' && content[i+1] != '/')
+            {
+                i += 1;
+            }
+            /* consume the ending '*' and '/' characters */
+            if (i < content_len)
+            {
+                i += 2;
+            }
         }
     }
 }
