@@ -58,7 +58,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             strncpy(tok->value, content + tok_start, tok_size);
             tok->value[tok_size] = '\0';
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (isdigit(content[i]))
         {
@@ -79,7 +79,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             strncpy(tok->value, content + tok_start, tok_size);
             tok->value[tok_size] = '\0';
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == '(')
         {
@@ -88,7 +88,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_LPAREN;
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == ')')
         {
@@ -97,7 +97,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_RPAREN;
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == '[')
         {
@@ -106,7 +106,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_LBRACKET;
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == ']')
         {
@@ -115,7 +115,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_RBRACKET;
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == '{')
         {
@@ -124,7 +124,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_LBRACE;
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == '}')
         {
@@ -133,7 +133,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_RBRACE;
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == ';')
         {
@@ -142,7 +142,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_SEMICOLON;
 
-            list_prepend(tokens, tok);
+            list_append(tokens, tok);
         }
         else if (content[i] == '/' && i+1 < content_len)
         {

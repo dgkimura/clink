@@ -88,8 +88,8 @@ START_TEST(test_scanner_can_parse_two_braces)
 
     do_tokenizing(content, strlen(content), &tokens);
 
-    ck_assert_int_eq(TOK_LBRACE, ((struct token *)tokens->next->data)->type);
-    ck_assert_int_eq(TOK_RBRACE, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_LBRACE, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_RBRACE, ((struct token *)tokens->next->data)->type);
 }
 END_TEST
 
@@ -101,8 +101,8 @@ START_TEST(test_scanner_can_parse_two_brackets)
 
     do_tokenizing(content, strlen(content), &tokens);
 
-    ck_assert_int_eq(TOK_LBRACKET, ((struct token *)tokens->next->data)->type);
-    ck_assert_int_eq(TOK_RBRACKET, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_LBRACKET, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_RBRACKET, ((struct token *)tokens->next->data)->type);
 }
 END_TEST
 
