@@ -49,7 +49,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
                 i += 1;
             }
             tok_end = i;
-            tok_size = tok_end - tok_start + 1;
+            tok_size = tok_end - tok_start;
 
             tok = (struct token *)malloc(sizeof(struct token));
 

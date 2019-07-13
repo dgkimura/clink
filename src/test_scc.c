@@ -120,7 +120,7 @@ END_TEST
 
 START_TEST(test_scanner_ignores_comment_contents)
 {
-    char *content = "123/*456*/";
+    char *content = "123/*456*/789";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -128,6 +128,21 @@ START_TEST(test_scanner_ignores_comment_contents)
 
     ck_assert_int_eq(TOK_INTEGER, ((struct token *)tokens->data)->type);
     ck_assert_str_eq("123", ((struct token *)tokens->data)->value);
+    ck_assert_str_eq("789", ((struct token *)tokens->next->data)->value);
+}
+END_TEST
+
+START_TEST(test_scanner_ignores_comment_contents_around_strings)
+{
+    char *content = "abc/*def*/ghi";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_STRING, ((struct token *)tokens->data)->type);
+    ck_assert_str_eq("abc", ((struct token *)tokens->data)->value);
+    ck_assert_str_eq("ghi", ((struct token *)tokens->next->data)->value);
 }
 END_TEST
 
@@ -149,6 +164,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_two_brackets);
     tcase_add_test(testcase, test_scanner_can_parse_semicolon);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents);
+    tcase_add_test(testcase, test_scanner_ignores_comment_contents_around_strings);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
