@@ -146,6 +146,19 @@ START_TEST(test_scanner_ignores_comment_contents_around_strings)
 }
 END_TEST
 
+START_TEST(test_scanner_can_parse_reserved_words)
+{
+    char *content = "int main(){}";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_INT, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_MAIN, ((struct token *)tokens->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -165,6 +178,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_semicolon);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents_around_strings);
+    tcase_add_test(testcase, test_scanner_can_parse_reserved_words);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

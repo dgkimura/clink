@@ -4,6 +4,7 @@
 
 enum token_t
 {
+    TOK_INVALID = -1,
     TOK_INTEGER,
     TOK_STRING,
     TOK_LPAREN,
@@ -12,7 +13,10 @@ enum token_t
     TOK_RBRACKET,
     TOK_LBRACE,
     TOK_RBRACE,
-    TOK_SEMICOLON
+    TOK_SEMICOLON,
+    TOK_MAIN,
+    TOK_INT,
+    TOK_CHAR
 };
 
 struct token

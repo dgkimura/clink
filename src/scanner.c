@@ -5,11 +5,37 @@
 #include "list.h"
 #include "scanner.h"
 
-struct transform
+static enum token_t reserved_word_token(char *str, size_t len);
+
+struct token reserved_map[] =
 {
-    char *input;
-    char *output;
+    { TOK_MAIN, "main" },
+    { TOK_INT, "int" },
+    { TOK_CHAR, "char" },
+    { TOK_INVALID, "" } /* must be last entry */
 };
+
+static enum token_t
+reserved_word_token(char *str, size_t len)
+{
+    enum token_t t = TOK_INVALID;
+    int i;
+
+    for (i = 0; reserved_map[i].type != TOK_INVALID; i++)
+    {
+        if (len != strlen(reserved_map[i].value))
+        {
+            continue;
+        }
+        if (strncmp(str, reserved_map[i].value, len) == 0)
+        {
+            t = reserved_map[i].type;
+            break;
+        }
+    }
+
+    return t;
+}
 
 void
 do_preprocessing(char *infile, char *outfile)
@@ -53,10 +79,14 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             tok = (struct token *)malloc(sizeof(struct token));
 
-            tok->type = TOK_STRING;
-            tok->value = (char *)malloc(sizeof(char) * tok_size);
-            strncpy(tok->value, content + tok_start, tok_size);
-            tok->value[tok_size] = '\0';
+            tok->type = reserved_word_token(&content[tok_start], tok_size);
+            if (tok->type == TOK_INVALID)
+            {
+                tok->type = TOK_STRING;
+                tok->value = (char *)malloc(sizeof(char) * tok_size);
+                strncpy(tok->value, content + tok_start, tok_size);
+                tok->value[tok_size] = '\0';
+            }
 
             list_append(tokens, tok);
         }
@@ -159,6 +189,10 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             {
                 i += 2;
             }
+        }
+        else if (isspace(content[i]))
+        {
+            i += 1;
         }
     }
 }
