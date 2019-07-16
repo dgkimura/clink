@@ -14,7 +14,6 @@ enum token_t
     TOK_LBRACE,
     TOK_RBRACE,
     TOK_SEMICOLON,
-    TOK_MAIN,
     TOK_INT,
     TOK_CHAR
 };

@@ -155,7 +155,7 @@ START_TEST(test_scanner_can_parse_reserved_words)
     do_tokenizing(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_INT, ((struct token *)tokens->data)->type);
-    ck_assert_int_eq(TOK_MAIN, ((struct token *)tokens->next->data)->type);
+    ck_assert_int_eq(TOK_STRING, ((struct token *)tokens->next->data)->type);
 }
 END_TEST
 

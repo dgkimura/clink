@@ -9,10 +9,9 @@ static enum token_t reserved_word_token(char *str, size_t len);
 
 struct token reserved_map[] =
 {
-    { TOK_MAIN, "main" },
     { TOK_INT, "int" },
     { TOK_CHAR, "char" },
-    { TOK_INVALID, "" } /* must be last entry */
+    { TOK_INVALID, "" } /* TOK_INVALID must be last entry */
 };
 
 static enum token_t
