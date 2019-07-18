@@ -14,6 +14,13 @@ enum token_t
     TOK_LBRACE,
     TOK_RBRACE,
     TOK_SEMICOLON,
+    TOK_EQUAL,
+    TOK_BANG,
+    TOK_PLUS,
+    TOK_MINUS,
+    TOK_ASTERICKS,
+    TOK_SINGLEQUOTE,
+    TOK_DOUBLEQUOTE,
     TOK_INT,
     TOK_CHAR
 };

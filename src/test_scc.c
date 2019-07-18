@@ -56,27 +56,16 @@ START_TEST(test_scanner_can_parse_string_token_with_integers)
 }
 END_TEST
 
-START_TEST(test_scanner_can_parse_lparen)
+START_TEST(test_scanner_can_parse_paren)
 {
-    char *content = "(";
+    char *content = "()";
     struct listnode *tokens;
     list_init(&tokens);
 
     do_tokenizing(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_LPAREN, ((struct token *)tokens->data)->type);
-}
-END_TEST
-
-START_TEST(test_scanner_can_parse_rparen)
-{
-    char *content = ")";
-    struct listnode *tokens;
-    list_init(&tokens);
-
-    do_tokenizing(content, strlen(content), &tokens);
-
-    ck_assert_int_eq(TOK_RPAREN, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_RPAREN, ((struct token *)tokens->next->data)->type);
 }
 END_TEST
 
@@ -106,15 +95,20 @@ START_TEST(test_scanner_can_parse_two_brackets)
 }
 END_TEST
 
-START_TEST(test_scanner_can_parse_semicolon)
+START_TEST(test_scanner_can_parse_special_characters)
 {
-    char *content = ";";
+    char *content = ";=+*'\"";
     struct listnode *tokens;
     list_init(&tokens);
 
     do_tokenizing(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_SEMICOLON, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_EQUAL, ((struct token *)tokens->next->data)->type);
+    ck_assert_int_eq(TOK_PLUS, ((struct token *)tokens->next->next->data)->type);
+    ck_assert_int_eq(TOK_ASTERICKS, ((struct token *)tokens->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_SINGLEQUOTE, ((struct token *)tokens->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_DOUBLEQUOTE, ((struct token *)tokens->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -148,14 +142,14 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_reserved_words)
 {
-    char *content = "int main(){}";
+    char *content = "int char";
     struct listnode *tokens;
     list_init(&tokens);
 
     do_tokenizing(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_INT, ((struct token *)tokens->data)->type);
-    ck_assert_int_eq(TOK_STRING, ((struct token *)tokens->next->data)->type);
+    ck_assert_int_eq(TOK_CHAR, ((struct token *)tokens->next->data)->type);
 }
 END_TEST
 
@@ -171,11 +165,10 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token_with_integers);
-    tcase_add_test(testcase, test_scanner_can_parse_lparen);
-    tcase_add_test(testcase, test_scanner_can_parse_rparen);
+    tcase_add_test(testcase, test_scanner_can_parse_paren);
     tcase_add_test(testcase, test_scanner_can_parse_two_braces);
     tcase_add_test(testcase, test_scanner_can_parse_two_brackets);
-    tcase_add_test(testcase, test_scanner_can_parse_semicolon);
+    tcase_add_test(testcase, test_scanner_can_parse_special_characters);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents_around_strings);
     tcase_add_test(testcase, test_scanner_can_parse_reserved_words);

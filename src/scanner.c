@@ -78,6 +78,10 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             tok = (struct token *)malloc(sizeof(struct token));
 
+            /*
+             * Check if this token is a reserved word. If not then consider it
+             * a label.
+             */
             tok->type = reserved_word_token(&content[tok_start], tok_size);
             if (tok->type == TOK_INVALID)
             {
@@ -170,6 +174,69 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_SEMICOLON;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '=')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_EQUAL;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '!')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_BANG;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '+')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_PLUS;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '-')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_MINUS;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '*')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_ASTERICKS;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '\'')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_SINGLEQUOTE;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '"')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_DOUBLEQUOTE;
 
             list_append(tokens, tok);
         }
