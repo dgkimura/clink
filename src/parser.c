@@ -5,5 +5,13 @@
 struct astnode *
 do_parsing(struct listnode *tokens)
 {
-    return NULL;
+    struct astnode *result;
+    struct listnode *current = tokens;
+
+    do
+    {
+    }
+    while (current != NULL);
+
+    return result;
 }
