@@ -7,7 +7,14 @@ enum astnode_t
 
 struct astnode
 {
-    enum token_t type;
+    enum astnode_t type;
+    union
+    {
+        struct
+        {
+            struct token *constant;
+        };
+    };
 };
 
 struct astnode *
