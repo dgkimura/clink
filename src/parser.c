@@ -8,6 +8,9 @@ do_parsing(struct listnode *tokens)
     struct astnode *result, *ast_current;
     struct token *tok_current;
     struct listnode *current = tokens;
+    struct listnode *stack;
+
+    list_init(&stack);
 
     for(current = tokens; current != NULL; current = current->next)
     {
@@ -18,6 +21,7 @@ do_parsing(struct listnode *tokens)
             ast_current = malloc(sizeof(struct astnode));
             ast_current->type = AST_CONSTANT;
             ast_current->constant = tok_current;
+            list_append(&stack, ast_current);
         }
     }
 
