@@ -1,3 +1,6 @@
+#ifndef __PARSER_H__
+#define __PARSER_H__
+
 #include "scanner.h"
 
 enum astnode_t
@@ -19,3 +22,5 @@ struct astnode
 
 struct astnode *
 do_parsing(struct listnode *tokens);
+
+#endif

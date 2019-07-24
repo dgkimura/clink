@@ -1,3 +1,6 @@
+#ifndef __SCANNER_H__
+#define __SCANNER_H__
+
 #include <ctype.h>
 
 #include "list.h"
@@ -32,4 +35,10 @@ struct token
 };
 
 void do_preprocessing(char *infile, char *outfile);
+
+/*
+ * Given a string of code, constructs a list of tokens
+ */
 void do_tokenizing(char *content, size_t content_len, struct listnode **tokens);
+
+#endif
