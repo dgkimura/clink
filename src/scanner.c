@@ -218,7 +218,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             i += 1;
 
             tok = (struct token *)malloc(sizeof(struct token));
-            tok->type = TOK_ASTERICKS;
+            tok->type = TOK_ASTERISK;
 
             list_append(tokens, tok);
         }

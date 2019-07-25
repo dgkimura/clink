@@ -21,7 +21,7 @@ enum token_t
     TOK_BANG,
     TOK_PLUS,
     TOK_MINUS,
-    TOK_ASTERICKS,
+    TOK_ASTERISK,
     TOK_SINGLEQUOTE,
     TOK_DOUBLEQUOTE,
     TOK_INT,
