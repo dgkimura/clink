@@ -2,6 +2,14 @@
 
 #include "parser.h"
 
+#define NUM_RULES 3
+#define MAX_ASTNODES 5
+
+enum astnode_t grammer_rules[NUM_RULES][MAX_ASTNODES] =
+{
+    { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID },
+};
+
 struct astnode *
 do_parsing(struct listnode *tokens)
 {

@@ -5,6 +5,7 @@
 
 enum astnode_t
 {
+    AST_INVALID = -1,
     AST_CONSTANT
 };
 
