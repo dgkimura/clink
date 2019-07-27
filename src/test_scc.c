@@ -112,6 +112,21 @@ START_TEST(test_scanner_can_parse_special_characters)
 }
 END_TEST
 
+START_TEST(test_scanner_can_parse_combination_tokens)
+{
+    char *content = "+++=---=";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_PLUS_PLUS, ((struct token *)tokens->data)->type);
+    ck_assert_int_eq(TOK_PLUS_EQUAL, ((struct token *)tokens->next->data)->type);
+    ck_assert_int_eq(TOK_MINUS_MINUS, ((struct token *)tokens->next->next->data)->type);
+    ck_assert_int_eq(TOK_MINUS_EQUAL, ((struct token *)tokens->next->next->next->data)->type);
+}
+END_TEST
+
 START_TEST(test_scanner_ignores_comment_contents)
 {
     char *content = "123/*456*/789";
@@ -169,6 +184,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_two_braces);
     tcase_add_test(testcase, test_scanner_can_parse_two_brackets);
     tcase_add_test(testcase, test_scanner_can_parse_special_characters);
+    tcase_add_test(testcase, test_scanner_can_parse_combination_tokens);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents_around_strings);
     tcase_add_test(testcase, test_scanner_can_parse_reserved_words);
