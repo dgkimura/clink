@@ -232,6 +232,11 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
                 i += 1;
                 tok->type = TOK_MINUS_EQUAL;
             }
+            else if (content[i] == '>')
+            {
+                i += 1;
+                tok->type = TOK_ARROW;
+            }
 
             list_append(tokens, tok);
         }
