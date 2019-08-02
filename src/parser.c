@@ -5,9 +5,15 @@
 #define NUM_RULES 3
 #define MAX_ASTNODES 5
 
-enum astnode_t grammer_rules[NUM_RULES][MAX_ASTNODES] =
+struct rule
 {
-    { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID },
+    int length;
+    enum astnode_t nodes[MAX_ASTNODES];
+};
+
+struct rule grammer[NUM_RULES] =
+{
+    { 1, { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID } },
 };
 
 struct astnode *
