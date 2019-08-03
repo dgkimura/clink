@@ -6,7 +6,8 @@
 enum astnode_t
 {
     AST_INVALID = -1,
-    AST_CONSTANT
+    AST_CONSTANT,
+    AST_PRIMARY_EXPRESSION
 };
 
 struct astnode
