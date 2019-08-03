@@ -9,7 +9,7 @@ enum token_t
 {
     TOK_INVALID = -1,
     TOK_INTEGER,
-    TOK_STRING,
+    TOK_IDENTIFIER,
     TOK_LPAREN,
     TOK_RPAREN,
     TOK_LBRACKET,

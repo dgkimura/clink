@@ -85,7 +85,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok->type = reserved_word_token(&content[tok_start], tok_size);
             if (tok->type == TOK_INVALID)
             {
-                tok->type = TOK_STRING;
+                tok->type = TOK_IDENTIFIER;
                 tok->value = (char *)malloc(sizeof(char) * tok_size);
                 strncpy(tok->value, content + tok_start, tok_size);
                 tok->value[tok_size] = '\0';

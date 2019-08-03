@@ -39,7 +39,7 @@ do_parsing(struct listnode *tokens)
             ast_current->constant = tok_current;
             list_append(&stack, ast_current);
         }
-        if (tok_current->type == TOK_STRING)
+        if (tok_current->type == TOK_IDENTIFIER)
         {
             ast_current = malloc(sizeof(struct astnode));
             ast_current->type = AST_PRIMARY_EXPRESSION;
