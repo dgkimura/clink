@@ -2,21 +2,51 @@
 
 #include "parser.h"
 
-#define NUM_RULES 3
+#define NUM_RULES 6
 #define MAX_ASTNODES 5
 
 struct rule
 {
+    enum astnode_t type;
     int length;
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
 struct rule grammer[NUM_RULES] =
 {
+    /* postfix-expression: */
+    {
+        AST_POSTFIX_EXPRESSION,
+        1,
+        { AST_PRIMARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        3,
+        { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        2,
+        { AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        2,
+        { AST_POSTFIX_EXPRESSION, AST_MINUS_MINUS, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* primary-expression: */
-    { 1, { AST_PRIMARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID } },
+    {
+        AST_PRIMARY_EXPRESSION,
+        1,
+        { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* constant: */
-    { 1, { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID } },
+    {
+        AST_CONSTANT,
+        1,
+        { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
 };
 
 struct astnode *
