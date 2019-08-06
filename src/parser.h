@@ -27,6 +27,7 @@ struct astnode
             struct token *constant;
         };
     };
+    struct listnode *children;
 };
 
 struct astnode *

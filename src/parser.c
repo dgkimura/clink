@@ -8,11 +8,11 @@
 struct rule
 {
     enum astnode_t type;
-    int length;
+    int length_of_nodes;
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
-struct rule grammer[NUM_RULES] =
+struct rule grammar[NUM_RULES] =
 {
     /* postfix-expression: */
     {
@@ -49,11 +49,86 @@ struct rule grammer[NUM_RULES] =
     },
 };
 
+static struct astnode *
+shift(struct token * token)
+{
+    struct astnode *node;
+    if (token->type == TOK_INTEGER)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_CONSTANT;
+        node->constant = token;
+    }
+    if (token->type == TOK_IDENTIFIER)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_PRIMARY_EXPRESSION;
+        node->constant = token;
+    }
+
+    return node;
+}
+
+static struct astnode *
+reduce(struct astnode *node, struct listnode **stack)
+{
+    int i, j, skip;
+    struct astnode *result, *inode;
+    struct listnode *iterator;
+
+    /*
+     * Look through the grammar rules and check if astnode completes a rule.
+     */
+    for (i=0; i<NUM_RULES; i++)
+    {
+        if (grammar[i].type != node->type)
+        {
+            /* It doesn't complete a rule. */
+            continue;
+        }
+
+        /*
+         * Peek through the stack and check if rules match
+         */
+        skip = 0;
+        iterator = *stack;
+        for (j=grammar[i].length_of_nodes-1; j>1; j--)
+        {
+            inode = iterator->data;
+            if (inode->type == grammar[i].nodes[j])
+            {
+                skip = 1;
+                break;
+            }
+            iterator = iterator->next;
+        }
+        if (skip)
+        {
+            continue;
+        }
+
+        /* Create the new rule. */
+        result = malloc(sizeof(struct astnode));
+        result->type = grammar[i].type;
+        list_init(&result->children);
+
+        /* Remove reduced rules from the stack. */
+        for (j=0; j<grammar[i].length_of_nodes; j++)
+        {
+            list_append(&result->children, *stack);
+            *stack = (*stack)->next;
+        }
+
+        break;
+    }
+
+    return result;
+}
+
 struct astnode *
 do_parsing(struct listnode *tokens)
 {
-    struct astnode *result, *ast_current;
-    struct token *tok_current;
+    struct astnode *result, *ast_current, *ast_next;
     struct listnode *current = tokens;
     struct listnode *stack;
 
@@ -61,21 +136,10 @@ do_parsing(struct listnode *tokens)
 
     for(current = tokens; current != NULL; current = current->next)
     {
-        tok_current = (struct token *)current->data;
-        if (tok_current->type == TOK_INTEGER)
-        {
-            ast_current = malloc(sizeof(struct astnode));
-            ast_current->type = AST_CONSTANT;
-            ast_current->constant = tok_current;
-            list_append(&stack, ast_current);
-        }
-        if (tok_current->type == TOK_IDENTIFIER)
-        {
-            ast_current = malloc(sizeof(struct astnode));
-            ast_current->type = AST_PRIMARY_EXPRESSION;
-            ast_current->constant = tok_current;
-            list_append(&stack, ast_current);
-        }
+        ast_current = shift((struct token *)current->data);
+        ast_next = reduce(ast_current, &stack);
+
+        list_append(&stack, ast_next);
     }
 
     return result;
