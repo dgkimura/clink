@@ -50,7 +50,7 @@ struct rule grammar[NUM_RULES] =
 };
 
 struct astnode *
-shift(struct token * token)
+shift(struct token *token)
 {
     struct astnode *node;
     if (token->type == TOK_INTEGER)
@@ -83,7 +83,7 @@ reduce(struct astnode *node, struct listnode **stack)
      */
     for (i=0; i<NUM_RULES; i++)
     {
-        if (grammar[i].type != node->type)
+        if (grammar[i].nodes[grammar[i].length_of_nodes-1] != node->type)
         {
             /* It doesn't complete a rule. */
             continue;

@@ -2,6 +2,7 @@
 
 #include "list.h"
 #include "scanner.h"
+#include "parser.h"
 
 START_TEST(test_list_append)
 {
@@ -169,6 +170,29 @@ START_TEST(test_scanner_can_parse_reserved_words)
 }
 END_TEST
 
+START_TEST(test_parser_constant_reduces_into_primary_expression)
+{
+    char *content = "32";
+    struct listnode *tokens, *stack;
+    struct astnode *node;
+
+    list_init(&tokens);
+    list_init(&stack);
+
+    /* tokenize input string */
+    do_tokenizing(content, strlen(content), &tokens);
+
+    /* construct astnode from tokens  */
+    node = shift(tokens->data);
+    list_append(&stack, node);
+
+    /* perform single reduction on astnode */
+    node = reduce(node, &stack);
+
+    ck_assert_int_eq(AST_PRIMARY_EXPRESSION, node->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -189,6 +213,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_ignores_comment_contents);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents_around_strings);
     tcase_add_test(testcase, test_scanner_can_parse_reserved_words);
+    tcase_add_test(testcase, test_parser_constant_reduces_into_primary_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
