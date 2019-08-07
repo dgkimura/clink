@@ -31,6 +31,12 @@ struct astnode
 };
 
 struct astnode *
+shift(struct token * token);
+
+struct astnode *
+reduce(struct astnode *node, struct listnode **stack);
+
+struct astnode *
 do_parsing(struct listnode *tokens);
 
 #endif

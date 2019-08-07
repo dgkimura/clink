@@ -49,7 +49,7 @@ struct rule grammar[NUM_RULES] =
     },
 };
 
-static struct astnode *
+struct astnode *
 shift(struct token * token)
 {
     struct astnode *node;
@@ -69,12 +69,14 @@ shift(struct token * token)
     return node;
 }
 
-static struct astnode *
+struct astnode *
 reduce(struct astnode *node, struct listnode **stack)
 {
     int i, j, skip;
     struct astnode *result, *inode;
     struct listnode *iterator;
+
+    result = node;
 
     /*
      * Look through the grammar rules and check if astnode completes a rule.
