@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <check.h>
 
 #include "list.h"
@@ -193,6 +195,24 @@ START_TEST(test_parser_constant_reduces_into_primary_expression)
 }
 END_TEST
 
+START_TEST(test_parser_primary_expression_reduces_into_postfix_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    node = malloc(sizeof(struct astnode));
+    node->type = AST_PRIMARY_EXPRESSION;
+
+    list_init(&stack);
+    list_append(&stack, node);
+
+    /* perform next reduction on astnode */
+    node = reduce(node, &stack);
+
+    ck_assert_int_eq(AST_POSTFIX_EXPRESSION, node->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -214,6 +234,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_ignores_comment_contents_around_strings);
     tcase_add_test(testcase, test_scanner_can_parse_reserved_words);
     tcase_add_test(testcase, test_parser_constant_reduces_into_primary_expression);
+    tcase_add_test(testcase, test_parser_primary_expression_reduces_into_postfix_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
