@@ -100,7 +100,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_special_characters)
 {
-    char *content = ";=+*'\"";
+    char *content = ";=+*&'\"";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -110,8 +110,9 @@ START_TEST(test_scanner_can_parse_special_characters)
     ck_assert_int_eq(TOK_EQUAL, ((struct token *)tokens->next->data)->type);
     ck_assert_int_eq(TOK_PLUS, ((struct token *)tokens->next->next->data)->type);
     ck_assert_int_eq(TOK_ASTERISK, ((struct token *)tokens->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_SINGLEQUOTE, ((struct token *)tokens->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_DOUBLEQUOTE, ((struct token *)tokens->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_AMPERSAND, ((struct token *)tokens->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_SINGLEQUOTE, ((struct token *)tokens->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_DOUBLEQUOTE, ((struct token *)tokens->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
