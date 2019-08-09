@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 6
+#define NUM_RULES 9
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,6 +14,22 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* unary-expression: */
+    {
+        AST_UNARY_EXPRESSION,
+        1,
+        { AST_POSTFIX_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_UNARY_EXPRESSION,
+        2,
+        { AST_PLUS_PLUS, AST_UNARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_UNARY_EXPRESSION,
+        2,
+        { AST_MINUS_MINUS, AST_UNARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* postfix-expression: */
     {
         AST_POSTFIX_EXPRESSION,
@@ -59,10 +75,22 @@ shift(struct token *token)
         node->type = AST_CONSTANT;
         node->constant = token;
     }
-    if (token->type == TOK_IDENTIFIER)
+    else if (token->type == TOK_IDENTIFIER)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_PRIMARY_EXPRESSION;
+        node->constant = token;
+    }
+    else if (token->type == TOK_PLUS)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_PLUS;
+        node->constant = token;
+    }
+    else if (token->type == TOK_MINUS)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_MINUS;
         node->constant = token;
     }
 
