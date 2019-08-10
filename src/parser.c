@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 9
+#define NUM_RULES 14
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,6 +14,12 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* cast-expression: */
+    {
+        AST_CAST_EXPRESSION,
+        1,
+        { AST_UNARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* unary-expression: */
     {
         AST_UNARY_EXPRESSION,
@@ -29,6 +35,26 @@ struct rule grammar[NUM_RULES] =
         AST_UNARY_EXPRESSION,
         2,
         { AST_MINUS_MINUS, AST_UNARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_UNARY_EXPRESSION,
+        2,
+        { AST_AMPERSAND, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_UNARY_EXPRESSION,
+        2,
+        { AST_ASTERISK, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_UNARY_EXPRESSION,
+        2,
+        { AST_PLUS, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_UNARY_EXPRESSION,
+        2,
+        { AST_MINUS, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     /* postfix-expression: */
     {
@@ -91,6 +117,18 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MINUS;
+        node->constant = token;
+    }
+    else if (token->type == TOK_AMPERSAND)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_AMPERSAND;
+        node->constant = token;
+    }
+    else if (token->type == TOK_ASTERISK)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_ASTERISK;
         node->constant = token;
     }
 

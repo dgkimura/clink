@@ -10,6 +10,7 @@ enum astnode_t
     AST_PRIMARY_EXPRESSION,
     AST_POSTFIX_EXPRESSION,
     AST_UNARY_EXPRESSION,
+    AST_CAST_EXPRESSION,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,
@@ -17,7 +18,9 @@ enum astnode_t
     AST_PLUS_PLUS,
     AST_MINUS_MINUS,
     AST_PLUS,
-    AST_MINUS
+    AST_MINUS,
+    AST_AMPERSAND,
+    AST_ASTERISK
 };
 
 struct astnode
