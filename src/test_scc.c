@@ -271,6 +271,24 @@ START_TEST(test_parser_unary_expression_reduces_into_cast_expression)
 }
 END_TEST
 
+START_TEST(test_parser_cast_expression_reduces_into_multiplicative_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    node = malloc(sizeof(struct astnode));
+    node->type = AST_CAST_EXPRESSION;
+
+    list_init(&stack);
+    list_append(&stack, node);
+
+    /* perform next reduction on astnode */
+    node = reduce(node, &stack);
+
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -296,6 +314,7 @@ main(void)
     tcase_add_test(testcase, test_parser_postfix_expression_reduces_into_unary_expression);
     tcase_add_test(testcase, test_parser_postfix_expression_and_plus_plus_reduces_into_postfix_expression);
     tcase_add_test(testcase, test_parser_unary_expression_reduces_into_cast_expression);
+    tcase_add_test(testcase, test_parser_cast_expression_reduces_into_multiplicative_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

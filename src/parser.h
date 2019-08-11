@@ -11,6 +11,7 @@ enum astnode_t
     AST_POSTFIX_EXPRESSION,
     AST_UNARY_EXPRESSION,
     AST_CAST_EXPRESSION,
+    AST_MULTIPLICATIVE_EXPRESSION,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,

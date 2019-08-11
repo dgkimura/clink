@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 14
+#define NUM_RULES 15
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,6 +14,12 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* multplicative-expression: */
+    {
+        AST_MULTIPLICATIVE_EXPRESSION,
+        1,
+        { AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* cast-expression: */
     {
         AST_CAST_EXPRESSION,
