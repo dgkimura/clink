@@ -181,7 +181,7 @@ reduce(struct astnode *node, struct listnode **stack)
         list_init(&result->children);
 
         /* Remove reduced rules from the stack. */
-        for (j=0; j<grammar[i].length_of_nodes; j++)
+        for (j=0; j<grammar[i].length_of_nodes-1; j++)
         {
             list_append(&result->children, *stack);
             *stack = (*stack)->next;
