@@ -276,21 +276,42 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             list_append(tokens, tok);
         }
-        else if (content[i] == '/' && i+1 < content_len)
+        else if (content[i] == '/')
         {
-            i += 2;
+            i += 1;
 
-            /* skip over comment contents */
-            while (i + 1 < content_len &&
-                   content[i] != '*' && content[i+1] != '/')
+            if (i < content_len && content[i] == '*')
             {
                 i += 1;
+
+                /* skip over comment contents */
+                while (i + 1 < content_len &&
+                       content[i] != '*' && content[i+1] != '/')
+                {
+                    i += 1;
+                }
+                /* consume the ending '*' and '/' characters */
+                if (i < content_len)
+                {
+                    i += 2;
+                }
             }
-            /* consume the ending '*' and '/' characters */
-            if (i < content_len)
+            else
             {
-                i += 2;
+                tok = (struct token *)malloc(sizeof(struct token));
+                tok->type = TOK_BACKSLASH;
+
+                list_append(tokens, tok);
             }
+        }
+        else if (content[i] == '%')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_MOD;
+
+            list_append(tokens, tok);
         }
         else if (isspace(content[i]))
         {

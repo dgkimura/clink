@@ -18,6 +18,8 @@ enum token_t
     TOK_RBRACE,
     TOK_SEMICOLON,
     TOK_EQUAL,
+    TOK_BACKSLASH,
+    TOK_MOD,
     TOK_BANG,
     TOK_PLUS,
     TOK_PLUS_PLUS,
