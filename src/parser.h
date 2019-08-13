@@ -12,6 +12,7 @@ enum astnode_t
     AST_UNARY_EXPRESSION,
     AST_CAST_EXPRESSION,
     AST_MULTIPLICATIVE_EXPRESSION,
+    AST_ADDITIVE_EXPRESSION,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,
@@ -43,7 +44,7 @@ struct astnode *
 shift(struct token * token);
 
 struct astnode *
-reduce(struct astnode *node, struct listnode **stack);
+reduce(struct listnode **stack);
 
 struct astnode *
 do_parsing(struct listnode *tokens);

@@ -6,6 +6,17 @@
 #include "scanner.h"
 #include "parser.h"
 
+static void
+push_node_type_onto_stack(enum astnode_t type, struct listnode **stack)
+{
+    struct astnode *node;
+
+    node = malloc(sizeof(struct astnode));
+    node->type = type;
+
+    list_prepend(stack, node);
+}
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -192,7 +203,7 @@ START_TEST(test_parser_constant_reduces_into_primary_expression)
     list_append(&stack, node);
 
     /* perform single reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_PRIMARY_EXPRESSION, node->type);
 }
@@ -210,7 +221,7 @@ START_TEST(test_parser_primary_expression_reduces_into_postfix_expression)
     list_append(&stack, node);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_POSTFIX_EXPRESSION, node->type);
 }
@@ -221,19 +232,18 @@ START_TEST(test_parser_postfix_expression_and_plus_plus_reduces_into_postfix_exp
     struct astnode *node;
     struct listnode *stack;
 
-    node = malloc(sizeof(struct astnode));
-    node->type = AST_POSTFIX_EXPRESSION;
-
     list_init(&stack);
-    list_append(&stack, node);
 
-    node = malloc(sizeof(struct astnode));
-    node->type = AST_PLUS_PLUS;
+    push_node_type_onto_stack(AST_POSTFIX_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_PLUS_PLUS, &stack);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_POSTFIX_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_POSTFIX_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_PLUS_PLUS, ((struct astnode *)node->children->next->data)->type);
 }
 END_TEST
 
@@ -249,7 +259,7 @@ START_TEST(test_parser_postfix_expression_reduces_into_unary_expression)
     list_append(&stack, node);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_UNARY_EXPRESSION, node->type);
 }
@@ -267,7 +277,7 @@ START_TEST(test_parser_unary_expression_reduces_into_cast_expression)
     list_append(&stack, node);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_CAST_EXPRESSION, node->type);
 }
@@ -285,23 +295,11 @@ START_TEST(test_parser_cast_expression_reduces_into_multiplicative_expression)
     list_append(&stack, node);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
 }
 END_TEST
-
-static struct astnode *
-push_node_type_onto_stack(enum astnode_t type, struct listnode **stack)
-{
-    struct astnode *node;
-
-    node = malloc(sizeof(struct astnode));
-    node->type = type;
-
-    list_append(stack, node);
-    return node;
-}
 
 START_TEST(test_parser_multiplicative_expression_asterisk_cast_expression_reduces_into_multiplicative_expression)
 {
@@ -312,14 +310,16 @@ START_TEST(test_parser_multiplicative_expression_asterisk_cast_expression_reduce
 
     push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
     push_node_type_onto_stack(AST_ASTERISK, &stack);
-
-    node = malloc(sizeof(struct astnode));
-    node->type = AST_CAST_EXPRESSION;
+    push_node_type_onto_stack(AST_CAST_EXPRESSION, &stack);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_ASTERISK, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_CAST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
 }
 END_TEST
 
@@ -332,14 +332,16 @@ START_TEST(test_parser_multiplicative_expression_backslash_cast_expression_reduc
 
     push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
     push_node_type_onto_stack(AST_BACKSLASH, &stack);
-
-    node = malloc(sizeof(struct astnode));
-    node->type = AST_CAST_EXPRESSION;
+    push_node_type_onto_stack(AST_CAST_EXPRESSION, &stack);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_BACKSLASH, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_CAST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
 }
 END_TEST
 
@@ -351,15 +353,55 @@ START_TEST(test_parser_multiplicative_expression_mod_cast_expression_reduces_int
     list_init(&stack);
 
     push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
-    push_node_type_onto_stack(AST_BACKSLASH, &stack);
-
-    node = malloc(sizeof(struct astnode));
-    node->type = AST_CAST_EXPRESSION;
+    push_node_type_onto_stack(AST_MOD, &stack);
+    push_node_type_onto_stack(AST_CAST_EXPRESSION, &stack);
 
     /* perform next reduction on astnode */
-    node = reduce(node, &stack);
+    node = reduce(&stack);
 
     ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_MOD, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_CAST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_multiplicative_expression_reduces_into_additive_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ADDITIVE_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_additive_expression_plus_multiplicative_expression_reduces_into_additive_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_ADDITIVE_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_PLUS, &stack);
+    push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ADDITIVE_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_ADDITIVE_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_PLUS, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
 }
 END_TEST
 
@@ -392,6 +434,8 @@ main(void)
     tcase_add_test(testcase, test_parser_multiplicative_expression_asterisk_cast_expression_reduces_into_multiplicative_expression);
     tcase_add_test(testcase, test_parser_multiplicative_expression_backslash_cast_expression_reduces_into_multiplicative_expression);
     tcase_add_test(testcase, test_parser_multiplicative_expression_mod_cast_expression_reduces_into_multiplicative_expression);
+    tcase_add_test(testcase, test_parser_multiplicative_expression_reduces_into_additive_expression);
+    tcase_add_test(testcase, test_parser_additive_expression_plus_multiplicative_expression_reduces_into_additive_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

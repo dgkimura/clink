@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 18
+#define NUM_RULES 20
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,12 +14,18 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
-    /* multplicative-expression: */
+    /* additive-expression: */
     {
-        AST_MULTIPLICATIVE_EXPRESSION,
-        1,
-        { AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        AST_ADDITIVE_EXPRESSION,
+        3,
+        { AST_ADDITIVE_EXPRESSION, AST_PLUS, AST_MULTIPLICATIVE_EXPRESSION, AST_INVALID, AST_INVALID }
     },
+    {
+        AST_ADDITIVE_EXPRESSION,
+        1,
+        { AST_MULTIPLICATIVE_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* multplicative-expression: */
     {
         AST_MULTIPLICATIVE_EXPRESSION,
         3,
@@ -35,6 +41,11 @@ struct rule grammar[NUM_RULES] =
         3,
         { AST_MULTIPLICATIVE_EXPRESSION, AST_MOD, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID }
     },
+    {
+        AST_MULTIPLICATIVE_EXPRESSION,
+        1,
+        { AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* cast-expression: */
     {
         AST_CAST_EXPRESSION,
@@ -42,11 +53,6 @@ struct rule grammar[NUM_RULES] =
         { AST_UNARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     /* unary-expression: */
-    {
-        AST_UNARY_EXPRESSION,
-        1,
-        { AST_POSTFIX_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
-    },
     {
         AST_UNARY_EXPRESSION,
         2,
@@ -77,12 +83,12 @@ struct rule grammar[NUM_RULES] =
         2,
         { AST_MINUS, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID }
     },
-    /* postfix-expression: */
     {
-        AST_POSTFIX_EXPRESSION,
+        AST_UNARY_EXPRESSION,
         1,
-        { AST_PRIMARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        { AST_POSTFIX_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
+    /* postfix-expression: */
     {
         AST_POSTFIX_EXPRESSION,
         3,
@@ -97,6 +103,11 @@ struct rule grammar[NUM_RULES] =
         AST_POSTFIX_EXPRESSION,
         2,
         { AST_POSTFIX_EXPRESSION, AST_MINUS_MINUS, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        1,
+        { AST_PRIMARY_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     /* primary-expression: */
     {
@@ -169,34 +180,34 @@ shift(struct token *token)
 }
 
 struct astnode *
-reduce(struct astnode *node, struct listnode **stack)
+reduce(struct listnode **stack)
 {
     int i, j, skip;
     struct astnode *result, *inode;
     struct listnode *iterator;
 
-    result = node;
+    result = NULL;
 
     /*
      * Look through the grammar rules and check if astnode completes a rule.
      */
     for (i=0; i<NUM_RULES; i++)
     {
-        if (grammar[i].nodes[grammar[i].length_of_nodes-1] != node->type)
-        {
-            /* It doesn't complete a rule. */
-            continue;
-        }
-
         /*
          * Peek through the stack and check if rules match
          */
         skip = 0;
         iterator = *stack;
-        for (j=grammar[i].length_of_nodes-1; j>1; j--)
+        for (j=grammar[i].length_of_nodes-1; j>=0; j--)
         {
+            if (iterator == NULL)
+            {
+                skip = 1;
+                break;
+            }
+
             inode = iterator->data;
-            if (inode->type == grammar[i].nodes[j])
+            if (inode->type != grammar[i].nodes[j])
             {
                 skip = 1;
                 break;
@@ -214,9 +225,9 @@ reduce(struct astnode *node, struct listnode **stack)
         list_init(&result->children);
 
         /* Remove reduced rules from the stack. */
-        for (j=0; j<grammar[i].length_of_nodes-1; j++)
+        for (j=0; j<grammar[i].length_of_nodes; j++)
         {
-            list_append(&result->children, *stack);
+            list_prepend(&result->children, (*stack)->data);
             *stack = (*stack)->next;
         }
 
@@ -238,8 +249,9 @@ do_parsing(struct listnode *tokens)
     for(current = tokens; current != NULL; current = current->next)
     {
         ast_current = shift((struct token *)current->data);
-        ast_next = reduce(ast_current, &stack);
+        list_append(&stack, ast_current);
 
+        ast_next = reduce(&stack);
         list_append(&stack, ast_next);
     }
 
