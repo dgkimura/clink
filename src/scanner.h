@@ -33,7 +33,11 @@ enum token_t
     TOK_SINGLEQUOTE,
     TOK_DOUBLEQUOTE,
     TOK_INT,
-    TOK_CHAR
+    TOK_CHAR,
+    TOK_SHIFTLEFT,
+    TOK_SHIFTRIGHT,
+    TOK_LESSTHAN,
+    TOK_GREATERTHAN
 };
 
 struct token

@@ -313,6 +313,48 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             list_append(tokens, tok);
         }
+        else if (content[i] == '>')
+        {
+            i += 1;
+
+            if (i < content_len && content[i] == '>')
+            {
+                i += 1;
+
+                tok = (struct token *)malloc(sizeof(struct token));
+                tok->type = TOK_SHIFTRIGHT;
+
+                list_append(tokens, tok);
+            }
+            else
+            {
+                tok = (struct token *)malloc(sizeof(struct token));
+                tok->type = TOK_GREATERTHAN;
+
+                list_append(tokens, tok);
+            }
+        }
+        else if (content[i] == '<')
+        {
+            i += 1;
+
+            if (i < content_len && content[i] == '<')
+            {
+                i += 1;
+
+                tok = (struct token *)malloc(sizeof(struct token));
+                tok->type = TOK_SHIFTLEFT;
+
+                list_append(tokens, tok);
+            }
+            else
+            {
+                tok = (struct token *)malloc(sizeof(struct token));
+                tok->type = TOK_LESSTHAN;
+
+                list_append(tokens, tok);
+            }
+        }
         else if (isspace(content[i]))
         {
             i += 1;
