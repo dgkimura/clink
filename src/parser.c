@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 15
+#define NUM_RULES 18
 #define MAX_ASTNODES 5
 
 struct rule
@@ -19,6 +19,21 @@ struct rule grammar[NUM_RULES] =
         AST_MULTIPLICATIVE_EXPRESSION,
         1,
         { AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_MULTIPLICATIVE_EXPRESSION,
+        3,
+        { AST_MULTIPLICATIVE_EXPRESSION, AST_ASTERISK, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_MULTIPLICATIVE_EXPRESSION,
+        3,
+        { AST_MULTIPLICATIVE_EXPRESSION, AST_BACKSLASH, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_MULTIPLICATIVE_EXPRESSION,
+        3,
+        { AST_MULTIPLICATIVE_EXPRESSION, AST_MOD, AST_CAST_EXPRESSION, AST_INVALID, AST_INVALID }
     },
     /* cast-expression: */
     {
@@ -135,6 +150,18 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_ASTERISK;
+        node->constant = token;
+    }
+    else if (token->type == TOK_BACKSLASH)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_BACKSLASH;
+        node->constant = token;
+    }
+    else if (token->type == TOK_MOD)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_MOD;
         node->constant = token;
     }
 

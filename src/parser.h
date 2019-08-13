@@ -21,7 +21,9 @@ enum astnode_t
     AST_PLUS,
     AST_MINUS,
     AST_AMPERSAND,
-    AST_ASTERISK
+    AST_ASTERISK,
+    AST_BACKSLASH,
+    AST_MOD
 };
 
 struct astnode

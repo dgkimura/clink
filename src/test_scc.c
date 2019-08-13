@@ -291,6 +291,78 @@ START_TEST(test_parser_cast_expression_reduces_into_multiplicative_expression)
 }
 END_TEST
 
+static struct astnode *
+push_node_type_onto_stack(enum astnode_t type, struct listnode **stack)
+{
+    struct astnode *node;
+
+    node = malloc(sizeof(struct astnode));
+    node->type = type;
+
+    list_append(stack, node);
+    return node;
+}
+
+START_TEST(test_parser_multiplicative_expression_asterisk_cast_expression_reduces_into_multiplicative_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_ASTERISK, &stack);
+
+    node = malloc(sizeof(struct astnode));
+    node->type = AST_CAST_EXPRESSION;
+
+    /* perform next reduction on astnode */
+    node = reduce(node, &stack);
+
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_multiplicative_expression_backslash_cast_expression_reduces_into_multiplicative_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_BACKSLASH, &stack);
+
+    node = malloc(sizeof(struct astnode));
+    node->type = AST_CAST_EXPRESSION;
+
+    /* perform next reduction on astnode */
+    node = reduce(node, &stack);
+
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_multiplicative_expression_mod_cast_expression_reduces_into_multiplicative_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_BACKSLASH, &stack);
+
+    node = malloc(sizeof(struct astnode));
+    node->type = AST_CAST_EXPRESSION;
+
+    /* perform next reduction on astnode */
+    node = reduce(node, &stack);
+
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, node->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -317,6 +389,9 @@ main(void)
     tcase_add_test(testcase, test_parser_postfix_expression_and_plus_plus_reduces_into_postfix_expression);
     tcase_add_test(testcase, test_parser_unary_expression_reduces_into_cast_expression);
     tcase_add_test(testcase, test_parser_cast_expression_reduces_into_multiplicative_expression);
+    tcase_add_test(testcase, test_parser_multiplicative_expression_asterisk_cast_expression_reduces_into_multiplicative_expression);
+    tcase_add_test(testcase, test_parser_multiplicative_expression_backslash_cast_expression_reduces_into_multiplicative_expression);
+    tcase_add_test(testcase, test_parser_multiplicative_expression_mod_cast_expression_reduces_into_multiplicative_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
