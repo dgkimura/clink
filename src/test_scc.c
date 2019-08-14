@@ -409,6 +409,88 @@ START_TEST(test_parser_additive_expression_plus_multiplicative_expression_reduce
 }
 END_TEST
 
+START_TEST(test_parser_additive_expression_minus_multiplicative_expression_reduces_into_additive_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_ADDITIVE_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_MINUS, &stack);
+    push_node_type_onto_stack(AST_MULTIPLICATIVE_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ADDITIVE_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_ADDITIVE_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_MINUS, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_MULTIPLICATIVE_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_additive_expression_reduces_into_shift_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_ADDITIVE_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_shift_expression_shiftleft_additive_expression_reduces_into_shift_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_SHIFT_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SHIFTLEFT, &stack);
+    push_node_type_onto_stack(AST_ADDITIVE_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_SHIFTLEFT, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ADDITIVE_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_shift_expression_shiftright_additive_expression_reduces_into_shift_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_SHIFT_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SHIFTRIGHT, &stack);
+    push_node_type_onto_stack(AST_ADDITIVE_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_SHIFTRIGHT, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ADDITIVE_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -440,6 +522,10 @@ main(void)
     tcase_add_test(testcase, test_parser_multiplicative_expression_mod_cast_expression_reduces_into_multiplicative_expression);
     tcase_add_test(testcase, test_parser_multiplicative_expression_reduces_into_additive_expression);
     tcase_add_test(testcase, test_parser_additive_expression_plus_multiplicative_expression_reduces_into_additive_expression);
+    tcase_add_test(testcase, test_parser_additive_expression_minus_multiplicative_expression_reduces_into_additive_expression);
+    tcase_add_test(testcase, test_parser_additive_expression_reduces_into_shift_expression);
+    tcase_add_test(testcase, test_parser_shift_expression_shiftleft_additive_expression_reduces_into_shift_expression);
+    tcase_add_test(testcase, test_parser_shift_expression_shiftright_additive_expression_reduces_into_shift_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

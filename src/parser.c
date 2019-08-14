@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 20
+#define NUM_RULES 24
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,11 +14,32 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* shift-expression: */
+    {
+        AST_SHIFT_EXPRESSION,
+        3,
+        { AST_SHIFT_EXPRESSION, AST_SHIFTLEFT, AST_ADDITIVE_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_SHIFT_EXPRESSION,
+        3,
+        { AST_SHIFT_EXPRESSION, AST_SHIFTRIGHT, AST_ADDITIVE_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_SHIFT_EXPRESSION,
+        1,
+        { AST_ADDITIVE_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* additive-expression: */
     {
         AST_ADDITIVE_EXPRESSION,
         3,
         { AST_ADDITIVE_EXPRESSION, AST_PLUS, AST_MULTIPLICATIVE_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_ADDITIVE_EXPRESSION,
+        3,
+        { AST_ADDITIVE_EXPRESSION, AST_MINUS, AST_MULTIPLICATIVE_EXPRESSION, AST_INVALID, AST_INVALID }
     },
     {
         AST_ADDITIVE_EXPRESSION,
@@ -173,6 +194,18 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MOD;
+        node->constant = token;
+    }
+    else if (token->type == TOK_SHIFTLEFT)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_SHIFTLEFT;
+        node->constant = token;
+    }
+    else if (token->type == TOK_SHIFTRIGHT)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_SHIFTRIGHT;
         node->constant = token;
     }
 
