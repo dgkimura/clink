@@ -16,6 +16,7 @@ enum astnode_t
     AST_SHIFT_EXPRESSION,
     AST_RELATIONAL_EXPRESSION,
     AST_EQUALITY_EXPRESSION,
+    AST_AND_EXPRESSION,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,

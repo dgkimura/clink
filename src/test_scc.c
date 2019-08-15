@@ -659,6 +659,44 @@ START_TEST(test_parser_equality_expression_isnotequal_relational_expression_redu
 }
 END_TEST
 
+START_TEST(test_parser_equality_expression_reduces_into_and_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_EQUALITY_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_AND_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_and_expression_ampersand_equality_expression_reduces_into_and_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_AND_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_AMPERSAND, &stack);
+    push_node_type_onto_stack(AST_EQUALITY_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_AND_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_AND_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_AMPERSAND, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EQUALITY_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -702,6 +740,8 @@ main(void)
     tcase_add_test(testcase, test_parser_relational_expression_reduces_into_equality_expression);
     tcase_add_test(testcase, test_parser_equality_expression_isequal_relational_expression_reduces_into_equality_expression);
     tcase_add_test(testcase, test_parser_equality_expression_isnotequal_relational_expression_reduces_into_equality_expression);
+    tcase_add_test(testcase, test_parser_equality_expression_reduces_into_and_expression);
+    tcase_add_test(testcase, test_parser_and_expression_ampersand_equality_expression_reduces_into_and_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
