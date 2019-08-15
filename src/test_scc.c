@@ -133,7 +133,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_combination_tokens)
 {
-    char *content = "+++=---=->>><<";
+    char *content = "+++=---=->>><<<=>=";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -146,6 +146,8 @@ START_TEST(test_scanner_can_parse_combination_tokens)
     ck_assert_int_eq(TOK_ARROW, ((struct token *)tokens->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_SHIFTRIGHT, ((struct token *)tokens->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_SHIFTLEFT, ((struct token *)tokens->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_LESSTHANEQUAL, ((struct token *)tokens->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_GREATERTHANEQUAL, ((struct token *)tokens->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -491,6 +493,110 @@ START_TEST(test_parser_shift_expression_shiftright_additive_expression_reduces_i
 }
 END_TEST
 
+START_TEST(test_parser_shift_expression_reduces_into_relational_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_SHIFT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_relational_expression_lessthan_shift_expression_reduces_into_relational_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_RELATIONAL_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_LESSTHAN, &stack);
+    push_node_type_onto_stack(AST_SHIFT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LESSTHAN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_relational_expression_greaterthan_shift_expression_reduces_into_relational_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_RELATIONAL_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_GREATERTHAN, &stack);
+    push_node_type_onto_stack(AST_SHIFT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_GREATERTHAN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_relational_expression_lessthanequal_shift_expression_reduces_into_relational_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_RELATIONAL_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_LESSTHANEQUAL, &stack);
+    push_node_type_onto_stack(AST_SHIFT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LESSTHANEQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_relational_expression_greaterthanequal_shift_expression_reduces_into_relational_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_RELATIONAL_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_GREATERTHANEQUAL, &stack);
+    push_node_type_onto_stack(AST_SHIFT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_RELATIONAL_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_GREATERTHANEQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SHIFT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -526,6 +632,11 @@ main(void)
     tcase_add_test(testcase, test_parser_additive_expression_reduces_into_shift_expression);
     tcase_add_test(testcase, test_parser_shift_expression_shiftleft_additive_expression_reduces_into_shift_expression);
     tcase_add_test(testcase, test_parser_shift_expression_shiftright_additive_expression_reduces_into_shift_expression);
+    tcase_add_test(testcase, test_parser_shift_expression_reduces_into_relational_expression);
+    tcase_add_test(testcase, test_parser_relational_expression_lessthan_shift_expression_reduces_into_relational_expression);
+    tcase_add_test(testcase, test_parser_relational_expression_greaterthan_shift_expression_reduces_into_relational_expression);
+    tcase_add_test(testcase, test_parser_relational_expression_lessthanequal_shift_expression_reduces_into_relational_expression);
+    tcase_add_test(testcase, test_parser_relational_expression_greaterthanequal_shift_expression_reduces_into_relational_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

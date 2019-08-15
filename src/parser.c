@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 24
+#define NUM_RULES 29
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,6 +14,32 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* relational-expression: */
+    {
+        AST_RELATIONAL_EXPRESSION,
+        3,
+        { AST_RELATIONAL_EXPRESSION, AST_LESSTHAN, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_RELATIONAL_EXPRESSION,
+        3,
+        { AST_RELATIONAL_EXPRESSION, AST_GREATERTHAN, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_RELATIONAL_EXPRESSION,
+        3,
+        { AST_RELATIONAL_EXPRESSION, AST_LESSTHANEQUAL, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_RELATIONAL_EXPRESSION,
+        3,
+        { AST_RELATIONAL_EXPRESSION, AST_GREATERTHANEQUAL, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_RELATIONAL_EXPRESSION,
+        1,
+        { AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* shift-expression: */
     {
         AST_SHIFT_EXPRESSION,
@@ -206,6 +232,30 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SHIFTRIGHT;
+        node->constant = token;
+    }
+    else if (token->type == TOK_LESSTHAN)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_LESSTHAN;
+        node->constant = token;
+    }
+    else if (token->type == TOK_GREATERTHAN)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_GREATERTHAN;
+        node->constant = token;
+    }
+    else if (token->type == TOK_LESSTHANEQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_LESSTHANEQUAL;
+        node->constant = token;
+    }
+    else if (token->type == TOK_GREATERTHANEQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_GREATERTHANEQUAL;
         node->constant = token;
     }
 

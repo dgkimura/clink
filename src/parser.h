@@ -14,6 +14,7 @@ enum astnode_t
     AST_MULTIPLICATIVE_EXPRESSION,
     AST_ADDITIVE_EXPRESSION,
     AST_SHIFT_EXPRESSION,
+    AST_RELATIONAL_EXPRESSION,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,
@@ -27,7 +28,11 @@ enum astnode_t
     AST_BACKSLASH,
     AST_MOD,
     AST_SHIFTLEFT,
-    AST_SHIFTRIGHT
+    AST_SHIFTRIGHT,
+    AST_LESSTHAN,
+    AST_GREATERTHAN,
+    AST_LESSTHANEQUAL,
+    AST_GREATERTHANEQUAL
 };
 
 struct astnode
