@@ -184,6 +184,12 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_EQUAL;
 
+            if (content[i] == '=')
+            {
+                i += 1;
+                tok->type = TOK_EQ;
+            }
+
             list_append(tokens, tok);
         }
         else if (content[i] == '!')
@@ -192,6 +198,12 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_BANG;
+
+            if (content[i] == '=')
+            {
+                i += 1;
+                tok->type = TOK_NEQ;
+            }
 
             list_append(tokens, tok);
         }

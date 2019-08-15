@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 29
+#define NUM_RULES 32
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,26 +14,42 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* equality-expression: */
+    {
+        AST_EQUALITY_EXPRESSION,
+        3,
+        { AST_EQUALITY_EXPRESSION, AST_EQ, AST_RELATIONAL_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_EQUALITY_EXPRESSION,
+        3,
+        { AST_EQUALITY_EXPRESSION, AST_NEQ, AST_RELATIONAL_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_EQUALITY_EXPRESSION,
+        1,
+        { AST_RELATIONAL_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* relational-expression: */
     {
         AST_RELATIONAL_EXPRESSION,
         3,
-        { AST_RELATIONAL_EXPRESSION, AST_LESSTHAN, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+        { AST_RELATIONAL_EXPRESSION, AST_LT, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
     },
     {
         AST_RELATIONAL_EXPRESSION,
         3,
-        { AST_RELATIONAL_EXPRESSION, AST_GREATERTHAN, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+        { AST_RELATIONAL_EXPRESSION, AST_GT, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
     },
     {
         AST_RELATIONAL_EXPRESSION,
         3,
-        { AST_RELATIONAL_EXPRESSION, AST_LESSTHANEQUAL, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+        { AST_RELATIONAL_EXPRESSION, AST_LTEQ, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
     },
     {
         AST_RELATIONAL_EXPRESSION,
         3,
-        { AST_RELATIONAL_EXPRESSION, AST_GREATERTHANEQUAL, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
+        { AST_RELATIONAL_EXPRESSION, AST_GTEQ, AST_SHIFT_EXPRESSION, AST_INVALID, AST_INVALID }
     },
     {
         AST_RELATIONAL_EXPRESSION,
@@ -237,25 +253,37 @@ shift(struct token *token)
     else if (token->type == TOK_LESSTHAN)
     {
         node = malloc(sizeof(struct astnode));
-        node->type = AST_LESSTHAN;
+        node->type = AST_LT;
         node->constant = token;
     }
     else if (token->type == TOK_GREATERTHAN)
     {
         node = malloc(sizeof(struct astnode));
-        node->type = AST_GREATERTHAN;
+        node->type = AST_GT;
         node->constant = token;
     }
     else if (token->type == TOK_LESSTHANEQUAL)
     {
         node = malloc(sizeof(struct astnode));
-        node->type = AST_LESSTHANEQUAL;
+        node->type = AST_LTEQ;
         node->constant = token;
     }
     else if (token->type == TOK_GREATERTHANEQUAL)
     {
         node = malloc(sizeof(struct astnode));
-        node->type = AST_GREATERTHANEQUAL;
+        node->type = AST_GTEQ;
+        node->constant = token;
+    }
+    else if (token->type == TOK_EQ)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_EQ;
+        node->constant = token;
+    }
+    else if (token->type == TOK_NEQ)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_NEQ;
         node->constant = token;
     }
 

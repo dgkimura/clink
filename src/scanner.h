@@ -39,7 +39,9 @@ enum token_t
     TOK_LESSTHAN,
     TOK_GREATERTHAN,
     TOK_LESSTHANEQUAL,
-    TOK_GREATERTHANEQUAL
+    TOK_GREATERTHANEQUAL,
+    TOK_EQ,
+    TOK_NEQ
 };
 
 struct token

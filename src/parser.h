@@ -15,6 +15,7 @@ enum astnode_t
     AST_ADDITIVE_EXPRESSION,
     AST_SHIFT_EXPRESSION,
     AST_RELATIONAL_EXPRESSION,
+    AST_EQUALITY_EXPRESSION,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,
@@ -29,10 +30,12 @@ enum astnode_t
     AST_MOD,
     AST_SHIFTLEFT,
     AST_SHIFTRIGHT,
-    AST_LESSTHAN,
-    AST_GREATERTHAN,
-    AST_LESSTHANEQUAL,
-    AST_GREATERTHANEQUAL
+    AST_LT,
+    AST_GT,
+    AST_LTEQ,
+    AST_GTEQ,
+    AST_EQ,
+    AST_NEQ
 };
 
 struct astnode
