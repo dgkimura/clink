@@ -111,7 +111,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_special_characters)
 {
-    char *content = ";=+*&'\"/%<>^";
+    char *content = ";=+*&'\"/%<>^|";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -129,6 +129,7 @@ START_TEST(test_scanner_can_parse_special_characters)
     ck_assert_int_eq(TOK_LESSTHAN, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_GREATERTHAN, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_CARET, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_VERTICALBAR, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -736,6 +737,44 @@ START_TEST(test_parser_exclusive_or_expression_caret_and_expression_reduces_into
 }
 END_TEST
 
+START_TEST(test_parser_exclusive_or_expression_reduces_into_inclusive_or_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_EXCLUSIVE_OR_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_INCLUSIVE_OR_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_inclusive_or_expression_verticalbar_exclusive_or_expression_reduces_into_and_inclusive_or_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_INCLUSIVE_OR_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_VERTICALBAR, &stack);
+    push_node_type_onto_stack(AST_EXCLUSIVE_OR_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_INCLUSIVE_OR_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_INCLUSIVE_OR_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_VERTICALBAR, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXCLUSIVE_OR_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -783,6 +822,8 @@ main(void)
     tcase_add_test(testcase, test_parser_and_expression_ampersand_equality_expression_reduces_into_and_expression);
     tcase_add_test(testcase, test_parser_and_expression_reduces_into_exclusive_or_expression);
     tcase_add_test(testcase, test_parser_exclusive_or_expression_caret_and_expression_reduces_into_and_exclusive_or_expression);
+    tcase_add_test(testcase, test_parser_exclusive_or_expression_reduces_into_inclusive_or_expression);
+    tcase_add_test(testcase, test_parser_inclusive_or_expression_verticalbar_exclusive_or_expression_reduces_into_and_inclusive_or_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
