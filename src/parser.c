@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 34
+#define NUM_RULES 36
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,6 +14,17 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* exclusive-or-expression: */
+    {
+        AST_EXCLUSIVE_OR_EXPRESSION,
+        3,
+        { AST_EXCLUSIVE_OR_EXPRESSION, AST_CARET, AST_AND_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_EXCLUSIVE_OR_EXPRESSION,
+        1,
+        { AST_AND_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* and-expression: */
     {
         AST_AND_EXPRESSION,
@@ -241,6 +252,12 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_BACKSLASH;
+        node->constant = token;
+    }
+    else if (token->type == TOK_CARET)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_CARET;
         node->constant = token;
     }
     else if (token->type == TOK_MOD)

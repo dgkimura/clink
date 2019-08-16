@@ -30,6 +30,7 @@ enum token_t
     TOK_ARROW,
     TOK_ASTERISK,
     TOK_AMPERSAND,
+    TOK_CARET,
     TOK_SINGLEQUOTE,
     TOK_DOUBLEQUOTE,
     TOK_INT,

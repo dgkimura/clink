@@ -17,6 +17,7 @@ enum astnode_t
     AST_RELATIONAL_EXPRESSION,
     AST_EQUALITY_EXPRESSION,
     AST_AND_EXPRESSION,
+    AST_EXCLUSIVE_OR_EXPRESSION,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,
@@ -28,6 +29,7 @@ enum astnode_t
     AST_AMPERSAND,
     AST_ASTERISK,
     AST_BACKSLASH,
+    AST_CARET,
     AST_MOD,
     AST_SHIFTLEFT,
     AST_SHIFTRIGHT,
