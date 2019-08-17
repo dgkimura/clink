@@ -111,7 +111,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_special_characters)
 {
-    char *content = ";=+*&'\"/%<>^|";
+    char *content = ";=+*&'\"/%<>^|?:";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -130,6 +130,8 @@ START_TEST(test_scanner_can_parse_special_characters)
     ck_assert_int_eq(TOK_GREATERTHAN, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_CARET, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_VERTICALBAR, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_QUESTIONMARK, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_COLON, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -853,6 +855,124 @@ START_TEST(test_parser_logical_or_expression_verticalbarverticalbar_logical_and_
 }
 END_TEST
 
+START_TEST(test_parser_logical_or_expression_reduces_into_conditional_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LOGICAL_OR_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_CONDITIONAL_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_logical_or_expression_questionmark_expression_colon_conditional_expression_reduces_into_conditional_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LOGICAL_OR_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_QUESTIONMARK, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_COLON, &stack);
+    push_node_type_onto_stack(AST_CONDITIONAL_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_CONDITIONAL_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_LOGICAL_OR_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_QUESTIONMARK, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_COLON, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_CONDITIONAL_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_conditional_expression_reduces_into_assignment_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_CONDITIONAL_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_unary_expression_equal_assignment_expression_reduces_into_assignment_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_UNARY_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_EQUAL, &stack);
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_UNARY_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_EQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_assignment_expression_reduces_into_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_expression_comma_assignment_expression_reduces_into_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_COMMA, &stack);
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_COMMA, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -906,6 +1026,12 @@ main(void)
     tcase_add_test(testcase, test_parser_logical_and_expression_ampersandampersand_inclusive_or_expression_reduces_into_logical_and_expression);
     tcase_add_test(testcase, test_parser_logical_and_expression_reduces_into_logical_or_expression);
     tcase_add_test(testcase, test_parser_logical_or_expression_verticalbarverticalbar_logical_and_expression_reduces_into_logical_or_expression);
+    tcase_add_test(testcase, test_parser_logical_or_expression_reduces_into_conditional_expression);
+    tcase_add_test(testcase, test_parser_logical_or_expression_questionmark_expression_colon_conditional_expression_reduces_into_conditional_expression);
+    tcase_add_test(testcase, test_parser_conditional_expression_reduces_into_assignment_expression);
+    tcase_add_test(testcase, test_parser_unary_expression_equal_assignment_expression_reduces_into_assignment_expression);
+    tcase_add_test(testcase, test_parser_assignment_expression_reduces_into_expression);
+    tcase_add_test(testcase, test_parser_expression_comma_assignment_expression_reduces_into_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

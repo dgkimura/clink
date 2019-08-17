@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 42
+#define NUM_RULES 48
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,6 +14,54 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* conditional-expression: */
+    {
+        AST_CONDITIONAL_EXPRESSION,
+        5,
+        { AST_LOGICAL_OR_EXPRESSION, AST_QUESTIONMARK, AST_EXPRESSION, AST_COLON, AST_CONDITIONAL_EXPRESSION }
+    },
+    {
+        AST_CONDITIONAL_EXPRESSION,
+        1,
+        { AST_LOGICAL_OR_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* assignment-expression: */
+    /*
+     * FIXME: scan rules longest to shortest to ignore order of grammar rules.
+     *
+     * XXX: assignment-expression must be after conditional-expression so that
+     * a check whether AST_CONDITIONAL_EXPRESSION is part of a rule > size 1.
+     * Otherwise reduce will first match it to AST_ASSIGNMENT_EXPRESSION.
+     */
+    /* TODO: other assignemnt operators*/
+    {
+        AST_ASSIGNMENT_EXPRESSION,
+        3,
+        { AST_UNARY_EXPRESSION, AST_EQUAL, AST_ASSIGNMENT_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_ASSIGNMENT_EXPRESSION,
+        1,
+        { AST_CONDITIONAL_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* expression: */
+    /*
+     * FIXME: scan rules longest to shortest to ignore order of grammar rules.
+     *
+     * XXX: expression must be after assignment-expression so that a check
+     * whether AST_ASSIGNMENT_EXPRESSION is part of a rule > size 1.  Otherwise
+     * reduce will first match it to AST_EXPRESSION.
+     */
+    {
+        AST_EXPRESSION,
+        3,
+        { AST_EXPRESSION, AST_COMMA, AST_ASSIGNMENT_EXPRESSION, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_EXPRESSION,
+        1,
+        { AST_ASSIGNMENT_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* logical-or-expression: */
     {
         AST_LOGICAL_OR_EXPRESSION,
@@ -263,10 +311,22 @@ shift(struct token *token)
         node->type = AST_PLUS;
         node->constant = token;
     }
+    else if (token->type == TOK_PLUS_EQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_PLUS_EQUAL;
+        node->constant = token;
+    }
     else if (token->type == TOK_MINUS)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MINUS;
+        node->constant = token;
+    }
+    else if (token->type == TOK_MINUS_EQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_MINUS_EQUAL;
         node->constant = token;
     }
     else if (token->type == TOK_AMPERSAND)
@@ -287,10 +347,22 @@ shift(struct token *token)
         node->type = AST_ASTERISK;
         node->constant = token;
     }
+    else if (token->type == TOK_ASTERISK_EQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_ASTERISK_EQUAL;
+        node->constant = token;
+    }
     else if (token->type == TOK_BACKSLASH)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_BACKSLASH;
+        node->constant = token;
+    }
+    else if (token->type == TOK_BACKSLASH_EQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_BACKSLASH_EQUAL;
         node->constant = token;
     }
     else if (token->type == TOK_CARET)
@@ -299,10 +371,34 @@ shift(struct token *token)
         node->type = AST_CARET;
         node->constant = token;
     }
+    else if (token->type == TOK_COMMA)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_COMMA;
+        node->constant = token;
+    }
     else if (token->type == TOK_MOD)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MOD;
+        node->constant = token;
+    }
+    else if (token->type == TOK_MOD_EQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_MOD_EQUAL;
+        node->constant = token;
+    }
+    else if (token->type == TOK_QUESTIONMARK)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_QUESTIONMARK;
+        node->constant = token;
+    }
+    else if (token->type == TOK_COLON)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_COLON;
         node->constant = token;
     }
     else if (token->type == TOK_VERTICALBAR)
@@ -363,6 +459,12 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_NEQ;
+        node->constant = token;
+    }
+    else if (token->type == TOK_EQUAL)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_EQUAL;
         node->constant = token;
     }
 

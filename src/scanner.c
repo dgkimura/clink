@@ -259,6 +259,12 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_ASTERISK;
 
+            if (i < content_len && content[i] == '=')
+            {
+                i += 1;
+                tok->type = TOK_ASTERISK_EQUAL;
+            }
+
             list_append(tokens, tok);
         }
         else if (content[i] == '&')
@@ -298,7 +304,16 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
         {
             i += 1;
 
-            if (i < content_len && content[i] == '*')
+            if (i < content_len && content[i] == '=')
+            {
+                i += 1;
+
+                tok = (struct token *)malloc(sizeof(struct token));
+                tok->type = TOK_BACKSLASH_EQUAL;
+
+                list_append(tokens, tok);
+            }
+            else if (i < content_len && content[i] == '*')
             {
                 i += 1;
 
@@ -328,6 +343,12 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_MOD;
+
+            if (i < content_len && content[i] == '=')
+            {
+                i += 1;
+                tok->type = TOK_MOD_EQUAL;
+            }
 
             list_append(tokens, tok);
         }
@@ -397,6 +418,33 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_CARET;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == ',')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_COMMA;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == '?')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_QUESTIONMARK;
+
+            list_append(tokens, tok);
+        }
+        else if (content[i] == ':')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_COLON;
 
             list_append(tokens, tok);
         }
