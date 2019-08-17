@@ -14,25 +14,18 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
-    /* conditional-expression: */
+    /* expression: */
     {
-        AST_CONDITIONAL_EXPRESSION,
-        5,
-        { AST_LOGICAL_OR_EXPRESSION, AST_QUESTIONMARK, AST_EXPRESSION, AST_COLON, AST_CONDITIONAL_EXPRESSION }
+        AST_EXPRESSION,
+        3,
+        { AST_EXPRESSION, AST_COMMA, AST_ASSIGNMENT_EXPRESSION, AST_INVALID, AST_INVALID }
     },
     {
-        AST_CONDITIONAL_EXPRESSION,
+        AST_EXPRESSION,
         1,
-        { AST_LOGICAL_OR_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        { AST_ASSIGNMENT_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     /* assignment-expression: */
-    /*
-     * FIXME: scan rules longest to shortest to ignore order of grammar rules.
-     *
-     * XXX: assignment-expression must be after conditional-expression so that
-     * a check whether AST_CONDITIONAL_EXPRESSION is part of a rule > size 1.
-     * Otherwise reduce will first match it to AST_ASSIGNMENT_EXPRESSION.
-     */
     /* TODO: other assignemnt operators*/
     {
         AST_ASSIGNMENT_EXPRESSION,
@@ -44,23 +37,16 @@ struct rule grammar[NUM_RULES] =
         1,
         { AST_CONDITIONAL_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
-    /* expression: */
-    /*
-     * FIXME: scan rules longest to shortest to ignore order of grammar rules.
-     *
-     * XXX: expression must be after assignment-expression so that a check
-     * whether AST_ASSIGNMENT_EXPRESSION is part of a rule > size 1.  Otherwise
-     * reduce will first match it to AST_EXPRESSION.
-     */
+    /* conditional-expression: */
     {
-        AST_EXPRESSION,
-        3,
-        { AST_EXPRESSION, AST_COMMA, AST_ASSIGNMENT_EXPRESSION, AST_INVALID, AST_INVALID }
+        AST_CONDITIONAL_EXPRESSION,
+        5,
+        { AST_LOGICAL_OR_EXPRESSION, AST_QUESTIONMARK, AST_EXPRESSION, AST_COLON, AST_CONDITIONAL_EXPRESSION }
     },
     {
-        AST_EXPRESSION,
+        AST_CONDITIONAL_EXPRESSION,
         1,
-        { AST_ASSIGNMENT_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        { AST_LOGICAL_OR_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     /* logical-or-expression: */
     {
@@ -474,7 +460,7 @@ shift(struct token *token)
 struct astnode *
 reduce(struct listnode **stack)
 {
-    int i, j, skip;
+    int i, j, k, skip;
     struct astnode *result, *inode;
     struct listnode *iterator;
 
@@ -482,48 +468,62 @@ reduce(struct listnode **stack)
 
     /*
      * Look through the grammar rules and check if astnode completes a rule.
+     * Rule check is ordered from longest to shortest.
      */
-    for (i=0; i<NUM_RULES; i++)
+    for (i=MAX_ASTNODES; i>=1; i--)
     {
-        /*
-         * Peek through the stack and check if rules match
-         */
-        skip = 0;
-        iterator = *stack;
-        for (j=grammar[i].length_of_nodes-1; j>=0; j--)
+        for (j=0; j<NUM_RULES-1; j++)
         {
-            if (iterator == NULL)
+            if (grammar[j].length_of_nodes != i)
             {
-                skip = 1;
-                break;
+                continue;
             }
 
-            inode = iterator->data;
-            if (inode->type != grammar[i].nodes[j])
+            /*
+             * Peek through the stack and check if rules match
+             */
+            skip = 0;
+            iterator = *stack;
+            for (k=grammar[j].length_of_nodes-1; k>=0; k--)
             {
-                skip = 1;
-                break;
+                if (iterator == NULL)
+                {
+                    skip = 1;
+                    break;
+                }
+
+                inode = iterator->data;
+                if (inode->type != grammar[j].nodes[k])
+                {
+                    skip = 1;
+                    break;
+                }
+                iterator = iterator->next;
             }
-            iterator = iterator->next;
+            if (skip)
+            {
+                continue;
+            }
+
+            break;
         }
-        if (skip)
+
+        if (!skip)
         {
-            continue;
+            break;
         }
+    }
 
-        /* Create the new rule. */
-        result = malloc(sizeof(struct astnode));
-        result->type = grammar[i].type;
-        list_init(&result->children);
+    /* Create the new rule. */
+    result = malloc(sizeof(struct astnode));
+    result->type = grammar[j].type;
+    list_init(&result->children);
 
-        /* Remove reduced rules from the stack. */
-        for (j=0; j<grammar[i].length_of_nodes; j++)
-        {
-            list_prepend(&result->children, (*stack)->data);
-            *stack = (*stack)->next;
-        }
-
-        break;
+    /* Remove reduced rules from the stack. */
+    for (k=0; k<grammar[j].length_of_nodes; k++)
+    {
+        list_prepend(&result->children, (*stack)->data);
+        *stack = (*stack)->next;
     }
 
     return result;
