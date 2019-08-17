@@ -935,6 +935,116 @@ START_TEST(test_parser_unary_expression_equal_assignment_expression_reduces_into
 }
 END_TEST
 
+START_TEST(test_parser_unary_expression_asteriskequal_assignment_expression_reduces_into_assignment_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_UNARY_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_ASTERISK_EQUAL, &stack);
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_UNARY_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_ASTERISK_EQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_unary_expression_backslashequal_assignment_expression_reduces_into_assignment_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_UNARY_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_BACKSLASH_EQUAL, &stack);
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_UNARY_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_BACKSLASH_EQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_unary_expression_modequal_assignment_expression_reduces_into_assignment_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_UNARY_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_MOD_EQUAL, &stack);
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_UNARY_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_MOD_EQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_unary_expression_plusequal_assignment_expression_reduces_into_assignment_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_UNARY_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_PLUS_EQUAL, &stack);
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_UNARY_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_PLUS_EQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_unary_expression_minusequal_assignment_expression_reduces_into_assignment_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_UNARY_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_MINUS_EQUAL, &stack);
+    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_UNARY_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_MINUS_EQUAL, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_ASSIGNMENT_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 START_TEST(test_parser_assignment_expression_reduces_into_expression)
 {
     struct astnode *node;
@@ -1030,6 +1140,11 @@ main(void)
     tcase_add_test(testcase, test_parser_logical_or_expression_questionmark_expression_colon_conditional_expression_reduces_into_conditional_expression);
     tcase_add_test(testcase, test_parser_conditional_expression_reduces_into_assignment_expression);
     tcase_add_test(testcase, test_parser_unary_expression_equal_assignment_expression_reduces_into_assignment_expression);
+    tcase_add_test(testcase, test_parser_unary_expression_asteriskequal_assignment_expression_reduces_into_assignment_expression);
+    tcase_add_test(testcase, test_parser_unary_expression_backslashequal_assignment_expression_reduces_into_assignment_expression);
+    tcase_add_test(testcase, test_parser_unary_expression_modequal_assignment_expression_reduces_into_assignment_expression);
+    tcase_add_test(testcase, test_parser_unary_expression_plusequal_assignment_expression_reduces_into_assignment_expression);
+    tcase_add_test(testcase, test_parser_unary_expression_minusequal_assignment_expression_reduces_into_assignment_expression);
     tcase_add_test(testcase, test_parser_assignment_expression_reduces_into_expression);
     tcase_add_test(testcase, test_parser_expression_comma_assignment_expression_reduces_into_expression);
 
