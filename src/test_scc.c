@@ -135,7 +135,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_combination_tokens)
 {
-    char *content = "+++=---=->>><<<=>===!=&&";
+    char *content = "+++=---=->>><<<=>===!=&&||";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -153,6 +153,7 @@ START_TEST(test_scanner_can_parse_combination_tokens)
     ck_assert_int_eq(TOK_EQ, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_NEQ, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_AMPERSAND_AMPERSAND, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_VERTICALBAR_VERTICALBAR, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -814,6 +815,44 @@ START_TEST(test_parser_logical_and_expression_ampersandampersand_inclusive_or_ex
 }
 END_TEST
 
+START_TEST(test_parser_logical_and_expression_reduces_into_logical_or_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LOGICAL_AND_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_LOGICAL_OR_EXPRESSION, node->type);
+}
+END_TEST
+
+START_TEST(test_parser_logical_or_expression_verticalbarverticalbar_logical_and_expression_reduces_into_logical_or_expression)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LOGICAL_OR_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_VERTICALBAR_VERTICALBAR, &stack);
+    push_node_type_onto_stack(AST_LOGICAL_AND_EXPRESSION, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_LOGICAL_OR_EXPRESSION, node->type);
+
+    ck_assert_int_eq(AST_LOGICAL_OR_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_VERTICALBAR_VERTICALBAR, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_LOGICAL_AND_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -865,6 +904,8 @@ main(void)
     tcase_add_test(testcase, test_parser_inclusive_or_expression_verticalbar_exclusive_or_expression_reduces_into_inclusive_or_expression);
     tcase_add_test(testcase, test_parser_inclusive_or_expression_reduces_into_logical_and_expression);
     tcase_add_test(testcase, test_parser_logical_and_expression_ampersandampersand_inclusive_or_expression_reduces_into_logical_and_expression);
+    tcase_add_test(testcase, test_parser_logical_and_expression_reduces_into_logical_or_expression);
+    tcase_add_test(testcase, test_parser_logical_or_expression_verticalbarverticalbar_logical_and_expression_reduces_into_logical_or_expression);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

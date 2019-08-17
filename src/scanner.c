@@ -69,7 +69,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok_start = i;
 
             /* consume characters */
-            while (isalpha(content[i]) || isdigit(content[i]))
+            while (i < content_len && (isalpha(content[i]) || isdigit(content[i])))
             {
                 i += 1;
             }
@@ -98,7 +98,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok_start = i;
 
             /* consume digits */
-            while (isdigit(content[i]))
+            while (i < content_len && isdigit(content[i]))
             {
                 i += 1;
             }
@@ -184,7 +184,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_EQUAL;
 
-            if (content[i] == '=')
+            if (i < content_len && content[i] == '=')
             {
                 i += 1;
                 tok->type = TOK_EQ;
@@ -199,7 +199,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_BANG;
 
-            if (content[i] == '=')
+            if (i < content_len && content[i] == '=')
             {
                 i += 1;
                 tok->type = TOK_NEQ;
@@ -214,12 +214,12 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_PLUS;
 
-            if (content[i] == '+')
+            if (i < content_len && content[i] == '+')
             {
                 i += 1;
                 tok->type = TOK_PLUS_PLUS;
             }
-            else if (content[i] == '=')
+            else if (i < content_len && content[i] == '=')
             {
                 i += 1;
                 tok->type = TOK_PLUS_EQUAL;
@@ -234,17 +234,17 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_MINUS;
 
-            if (content[i] == '-')
+            if (i < content_len && content[i] == '-')
             {
                 i += 1;
                 tok->type = TOK_MINUS_MINUS;
             }
-            else if (content[i] == '=')
+            else if (i < content_len && content[i] == '=')
             {
                 i += 1;
                 tok->type = TOK_MINUS_EQUAL;
             }
-            else if (content[i] == '>')
+            else if (i < content_len && content[i] == '>')
             {
                 i += 1;
                 tok->type = TOK_ARROW;
@@ -406,6 +406,12 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_VERTICALBAR;
+
+            if (i < content_len && content[i] == '|')
+            {
+                i += 1;
+                tok->type = TOK_VERTICALBAR_VERTICALBAR;
+            }
 
             list_append(tokens, tok);
         }
