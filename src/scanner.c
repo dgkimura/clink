@@ -268,6 +268,12 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
             tok = (struct token *)malloc(sizeof(struct token));
             tok->type = TOK_AMPERSAND;
 
+            if (content[i] == '&')
+            {
+                i += 1;
+                tok->type = TOK_AMPERSAND_AMPERSAND;
+            }
+
             list_append(tokens, tok);
         }
         else if (content[i] == '\'')
