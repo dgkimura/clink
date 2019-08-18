@@ -57,7 +57,10 @@ enum token_t
     TOK_GOTO,
     TOK_CONTINUE,
     TOK_BREAK,
-    TOK_RETURN
+    TOK_RETURN,
+    TOK_FOR,
+    TOK_DO,
+    TOK_WHILE
 };
 
 struct token

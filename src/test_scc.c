@@ -1191,6 +1191,310 @@ START_TEST(test_parser_return_expression_semicomma_reduces_into_jump_statement)
 }
 END_TEST
 
+START_TEST(test_parser_while_lparen_expression_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_WHILE, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_WHILE, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_do_statement_while_lparen_expression_rparen_semicolon_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_DO, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+    push_node_type_onto_stack(AST_WHILE, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_DO, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_WHILE, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_semicolon_semicolon_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_expression_semicolon_semicolon_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_semicolon_expression_semicolon_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_semicolon_semicolon_expression_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_expression_semicolon_expression_semicolon_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_expression_semicolon_semicolon_expression_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_semicolon_expression_semicolon_expression_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_for_lparen_expression_semicolon_expression_semicolon_expression_rparen_statement_reduces_into_iteration_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_FOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_FOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -1260,6 +1564,16 @@ main(void)
     tcase_add_test(testcase, test_parser_break_semicomma_reduces_into_jump_statement);
     tcase_add_test(testcase, test_parser_return_semicomma_reduces_into_jump_statement);
     tcase_add_test(testcase, test_parser_return_expression_semicomma_reduces_into_jump_statement);
+    tcase_add_test(testcase, test_parser_while_lparen_expression_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_do_statement_while_lparen_expression_rparen_semicolon_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_semicolon_semicolon_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_expression_semicolon_semicolon_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_semicolon_expression_semicolon_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_semicolon_semicolon_expression_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_expression_semicolon_expression_semicolon_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_expression_semicolon_semicolon_expression_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_semicolon_expression_semicolon_expression_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_for_lparen_expression_semicolon_expression_semicolon_expression_rparen_statement_reduces_into_iteration_statement);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
