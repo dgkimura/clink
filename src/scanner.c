@@ -11,6 +11,10 @@ struct token reserved_map[] =
 {
     { TOK_INT, "int" },
     { TOK_CHAR, "char" },
+    { TOK_GOTO, "goto" },
+    { TOK_CONTINUE, "continue" },
+    { TOK_BREAK, "break" },
+    { TOK_RETURN, "return" },
     { TOK_INVALID, "" } /* TOK_INVALID must be last entry */
 };
 

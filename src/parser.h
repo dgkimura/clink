@@ -24,6 +24,7 @@ enum astnode_t
     AST_CONDITIONAL_EXPRESSION,
     AST_ASSIGNMENT_EXPRESSION,
     AST_EXPRESSION,
+    AST_JUMP_STATEMENT,
 
     /* tokens used in grammar rules */
     AST_IDENTIFIER,
@@ -46,6 +47,7 @@ enum astnode_t
     AST_MOD_EQUAL,
     AST_QUESTIONMARK,
     AST_COLON,
+    AST_SEMICOLON,
     AST_VERTICALBAR,
     AST_VERTICALBAR_VERTICALBAR,
     AST_SHIFTLEFT,
@@ -56,7 +58,15 @@ enum astnode_t
     AST_GTEQ,
     AST_EQ,
     AST_NEQ,
-    AST_EQUAL
+    AST_EQUAL,
+
+    /* reserved words */
+    AST_INT,
+    AST_CHAR,
+    AST_GOTO,
+    AST_CONTINUE,
+    AST_BREAK,
+    AST_RETURN
 };
 
 struct astnode

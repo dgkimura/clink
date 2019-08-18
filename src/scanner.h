@@ -42,8 +42,6 @@ enum token_t
     TOK_VERTICALBAR_VERTICALBAR,
     TOK_SINGLEQUOTE,
     TOK_DOUBLEQUOTE,
-    TOK_INT,
-    TOK_CHAR,
     TOK_SHIFTLEFT,
     TOK_SHIFTRIGHT,
     TOK_LESSTHAN,
@@ -51,7 +49,15 @@ enum token_t
     TOK_LESSTHANEQUAL,
     TOK_GREATERTHANEQUAL,
     TOK_EQ,
-    TOK_NEQ
+    TOK_NEQ,
+
+    /* reserved words */
+    TOK_INT,
+    TOK_CHAR,
+    TOK_GOTO,
+    TOK_CONTINUE,
+    TOK_BREAK,
+    TOK_RETURN
 };
 
 struct token

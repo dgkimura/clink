@@ -189,7 +189,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_reserved_words)
 {
-    char *content = "int char";
+    char *content = "int char goto  continue break  return";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -197,6 +197,10 @@ START_TEST(test_scanner_can_parse_reserved_words)
 
     ck_assert_int_eq(TOK_INT, ((struct token *)tokens->data)->type);
     ck_assert_int_eq(TOK_CHAR, ((struct token *)tokens->next->data)->type);
+    ck_assert_int_eq(TOK_GOTO, ((struct token *)tokens->next->next->data)->type);
+    ck_assert_int_eq(TOK_CONTINUE, ((struct token *)tokens->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_BREAK, ((struct token *)tokens->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_RETURN, ((struct token *)tokens->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -1083,6 +1087,110 @@ START_TEST(test_parser_expression_comma_assignment_expression_reduces_into_expre
 }
 END_TEST
 
+START_TEST(test_parser_goto_identifier_semicomma_reduces_into_jump_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_GOTO, &stack);
+    push_node_type_onto_stack(AST_IDENTIFIER, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_JUMP_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_GOTO, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_IDENTIFIER, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_continue_semicomma_reduces_into_jump_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_CONTINUE, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_JUMP_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_CONTINUE, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_break_semicomma_reduces_into_jump_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_BREAK, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_JUMP_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_BREAK, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_return_semicomma_reduces_into_jump_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_RETURN, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_JUMP_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_RETURN, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_return_expression_semicomma_reduces_into_jump_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_RETURN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_JUMP_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_RETURN, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -1147,6 +1255,11 @@ main(void)
     tcase_add_test(testcase, test_parser_unary_expression_minusequal_assignment_expression_reduces_into_assignment_expression);
     tcase_add_test(testcase, test_parser_assignment_expression_reduces_into_expression);
     tcase_add_test(testcase, test_parser_expression_comma_assignment_expression_reduces_into_expression);
+    tcase_add_test(testcase, test_parser_goto_identifier_semicomma_reduces_into_jump_statement);
+    tcase_add_test(testcase, test_parser_continue_semicomma_reduces_into_jump_statement);
+    tcase_add_test(testcase, test_parser_break_semicomma_reduces_into_jump_statement);
+    tcase_add_test(testcase, test_parser_return_semicomma_reduces_into_jump_statement);
+    tcase_add_test(testcase, test_parser_return_expression_semicomma_reduces_into_jump_statement);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

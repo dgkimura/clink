@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 53
+#define NUM_RULES 58
 #define MAX_ASTNODES 5
 
 struct rule
@@ -14,6 +14,32 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* jump-statement: */
+    {
+        AST_JUMP_STATEMENT,
+        3,
+        { AST_GOTO, AST_IDENTIFIER, AST_SEMICOLON, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_JUMP_STATEMENT,
+        2,
+        { AST_CONTINUE, AST_SEMICOLON, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_JUMP_STATEMENT,
+        2,
+        { AST_BREAK, AST_SEMICOLON, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_JUMP_STATEMENT,
+        2,
+        { AST_RETURN, AST_SEMICOLON, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_JUMP_STATEMENT,
+        3,
+        { AST_RETURN, AST_EXPRESSION, AST_SEMICOLON, AST_INVALID, AST_INVALID }
+    },
     /* expression: */
     {
         AST_EXPRESSION,
@@ -412,6 +438,12 @@ shift(struct token *token)
         node->type = AST_COLON;
         node->constant = token;
     }
+    else if (token->type == TOK_SEMICOLON)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_SEMICOLON;
+        node->constant = token;
+    }
     else if (token->type == TOK_VERTICALBAR)
     {
         node = malloc(sizeof(struct astnode));
@@ -476,6 +508,42 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_EQUAL;
+        node->constant = token;
+    }
+    else if (token->type == TOK_INT)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_INT;
+        node->constant = token;
+    }
+    else if (token->type == TOK_CHAR)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_CHAR;
+        node->constant = token;
+    }
+    else if (token->type == TOK_GOTO)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_GOTO;
+        node->constant = token;
+    }
+    else if (token->type == TOK_CONTINUE)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_CONTINUE;
+        node->constant = token;
+    }
+    else if (token->type == TOK_BREAK)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_BREAK;
+        node->constant = token;
+    }
+    else if (token->type == TOK_RETURN)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_RETURN;
         node->constant = token;
     }
 
