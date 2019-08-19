@@ -189,7 +189,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_reserved_words)
 {
-    char *content = "int char goto  continue break  return";
+    char *content = "int char goto  continue break  return if else switch";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -201,6 +201,9 @@ START_TEST(test_scanner_can_parse_reserved_words)
     ck_assert_int_eq(TOK_CONTINUE, ((struct token *)tokens->next->next->next->data)->type);
     ck_assert_int_eq(TOK_BREAK, ((struct token *)tokens->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_RETURN, ((struct token *)tokens->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_IF, ((struct token *)tokens->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_ELSE, ((struct token *)tokens->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_SWITCH, ((struct token *)tokens->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -1495,6 +1498,88 @@ START_TEST(test_parser_for_lparen_expression_semicolon_expression_semicolon_expr
 }
 END_TEST
 
+START_TEST(test_parser_if_lparen_expression_rparen_statement_reduces_into_selection_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_IF, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_SELECTION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_IF, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_switch_lparen_expression_rparen_statement_reduces_into_selection_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_IF, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_SELECTION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_IF, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_if_lparen_expression_rparen_statement_else_statement_reduces_into_selection_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_IF, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+    push_node_type_onto_stack(AST_ELSE, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_SELECTION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_IF, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_ELSE, ((struct astnode *)node->children->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->next->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -1574,6 +1659,9 @@ main(void)
     tcase_add_test(testcase, test_parser_for_lparen_expression_semicolon_semicolon_expression_rparen_statement_reduces_into_iteration_statement);
     tcase_add_test(testcase, test_parser_for_lparen_semicolon_expression_semicolon_expression_rparen_statement_reduces_into_iteration_statement);
     tcase_add_test(testcase, test_parser_for_lparen_expression_semicolon_expression_semicolon_expression_rparen_statement_reduces_into_iteration_statement);
+    tcase_add_test(testcase, test_parser_if_lparen_expression_rparen_statement_reduces_into_selection_statement);
+    tcase_add_test(testcase, test_parser_switch_lparen_expression_rparen_statement_reduces_into_selection_statement);
+    tcase_add_test(testcase, test_parser_if_lparen_expression_rparen_statement_else_statement_reduces_into_selection_statement);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

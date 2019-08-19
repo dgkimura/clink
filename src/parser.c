@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 68
+#define NUM_RULES 71
 #define MAX_ASTNODES 9
 
 struct rule
@@ -14,6 +14,22 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* selection-statement: */
+    {
+        AST_SELECTION_STATEMENT,
+        5,
+        { AST_IF, AST_LPAREN, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_SELECTION_STATEMENT,
+        7,
+        { AST_IF, AST_LPAREN, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT, AST_ELSE, AST_STATEMENT, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_SELECTION_STATEMENT,
+        5,
+        { AST_SWITCH, AST_LPAREN, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* iteration-statement: */
     {
         AST_ITERATION_STATEMENT,
@@ -625,6 +641,24 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_WHILE;
+        node->constant = token;
+    }
+    else if (token->type == TOK_IF)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_IF;
+        node->constant = token;
+    }
+    else if (token->type == TOK_ELSE)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_ELSE;
+        node->constant = token;
+    }
+    else if (token->type == TOK_SWITCH)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_SWITCH;
         node->constant = token;
     }
 

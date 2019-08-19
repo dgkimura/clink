@@ -60,7 +60,10 @@ enum token_t
     TOK_RETURN,
     TOK_FOR,
     TOK_DO,
-    TOK_WHILE
+    TOK_WHILE,
+    TOK_IF,
+    TOK_ELSE,
+    TOK_SWITCH
 };
 
 struct token

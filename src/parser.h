@@ -26,6 +26,7 @@ enum astnode_t
     AST_EXPRESSION,
     AST_JUMP_STATEMENT,
     AST_ITERATION_STATEMENT,
+    AST_SELECTION_STATEMENT,
     AST_STATEMENT,
 
     /* tokens used in grammar rules */
@@ -73,7 +74,10 @@ enum astnode_t
     AST_RETURN,
     AST_FOR,
     AST_DO,
-    AST_WHILE
+    AST_WHILE,
+    AST_IF,
+    AST_ELSE,
+    AST_SWITCH
 };
 
 struct astnode

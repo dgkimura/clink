@@ -18,6 +18,9 @@ struct token reserved_map[] =
     { TOK_FOR, "for" },
     { TOK_DO, "do" },
     { TOK_WHILE, "while" },
+    { TOK_IF, "if" },
+    { TOK_ELSE, "else" },
+    { TOK_SWITCH, "switch" },
     { TOK_INVALID, "" } /* TOK_INVALID must be last entry */
 };
 
