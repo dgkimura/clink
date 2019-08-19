@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 71
+#define NUM_RULES 77
 #define MAX_ASTNODES 9
 
 struct rule
@@ -14,6 +14,38 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* compound-statement: */
+    {
+        AST_COMPOUND_STATEMENT,
+        2,
+        { AST_LBRACE, AST_RBRACE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_COMPOUND_STATEMENT,
+        3,
+        { AST_LBRACE, AST_DECLARATION_LIST, AST_RBRACE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_COMPOUND_STATEMENT,
+        3,
+        { AST_LBRACE, AST_STATEMENT_LIST, AST_RBRACE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_COMPOUND_STATEMENT,
+        4,
+        { AST_LBRACE, AST_DECLARATION_LIST, AST_STATEMENT_LIST, AST_RBRACE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* statement-list: */
+    {
+        AST_STATEMENT_LIST,
+        2,
+        { AST_STATEMENT_LIST, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STATEMENT_LIST,
+        1,
+        { AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* selection-statement: */
     {
         AST_SELECTION_STATEMENT,
@@ -521,6 +553,18 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_RPAREN;
+        node->constant = token;
+    }
+    else if (token->type == TOK_LBRACE)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_LBRACE;
+        node->constant = token;
+    }
+    else if (token->type == TOK_RBRACE)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_RBRACE;
         node->constant = token;
     }
     else if (token->type == TOK_VERTICALBAR)
