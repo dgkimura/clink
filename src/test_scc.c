@@ -1706,6 +1706,44 @@ START_TEST(test_parser_lbrace_declaration_list_statement_list_rbrace_reduces_int
 }
 END_TEST
 
+START_TEST(test_parser_semicolon_reduces_into_expression_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_EXPRESSION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_expression_semicolon_reduces_into_expression_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_SEMICOLON, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_EXPRESSION_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_EXPRESSION, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_SEMICOLON, ((struct astnode *)node->children->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -1794,6 +1832,8 @@ main(void)
     tcase_add_test(testcase, test_parser_lbrace_declaration_list_rbrace_reduces_into_compound_statement);
     tcase_add_test(testcase, test_parser_lbrace_statement_list_rbrace_reduces_into_compound_statement);
     tcase_add_test(testcase, test_parser_lbrace_declaration_list_statement_list_rbrace_reduces_into_compound_statement);
+    tcase_add_test(testcase, test_parser_semicolon_reduces_into_expression_statement);
+    tcase_add_test(testcase, test_parser_expression_semicolon_reduces_into_expression_statement);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
