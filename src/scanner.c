@@ -21,6 +21,8 @@ struct token reserved_map[] =
     { TOK_IF, "if" },
     { TOK_ELSE, "else" },
     { TOK_SWITCH, "switch" },
+    { TOK_CASE, "case" },
+    { TOK_DEFAULT, "default" },
     { TOK_INVALID, "" } /* TOK_INVALID must be last entry */
 };
 

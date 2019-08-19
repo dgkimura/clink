@@ -30,7 +30,7 @@ enum astnode_t
     AST_STATEMENT_LIST,
     AST_COMPOUND_STATEMENT,
     AST_EXPRESSION_STATEMENT,
-
+    AST_LABELED_STATEMENT,
     AST_STATEMENT,
 
     AST_DECLARATION_LIST,
@@ -85,7 +85,9 @@ enum astnode_t
     AST_WHILE,
     AST_IF,
     AST_ELSE,
-    AST_SWITCH
+    AST_SWITCH,
+    AST_CASE,
+    AST_DEFAULT
 };
 
 struct astnode

@@ -189,7 +189,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_reserved_words)
 {
-    char *content = "int char goto  continue break  return if else switch";
+    char *content = "int char goto  continue break  return if else switch case default";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -204,6 +204,8 @@ START_TEST(test_scanner_can_parse_reserved_words)
     ck_assert_int_eq(TOK_IF, ((struct token *)tokens->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_ELSE, ((struct token *)tokens->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_SWITCH, ((struct token *)tokens->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_CASE, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_DEFAULT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -1744,6 +1746,74 @@ START_TEST(test_parser_expression_semicolon_reduces_into_expression_statement)
 }
 END_TEST
 
+START_TEST(test_parser_identifier_colon_statement_reduces_into_labeled_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_IDENTIFIER, &stack);
+    push_node_type_onto_stack(AST_COLON, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_LABELED_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_IDENTIFIER, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_COLON, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_case_constant_expression_colon_statement_reduces_into_labeled_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_CASE, &stack);
+    push_node_type_onto_stack(AST_CONDITIONAL_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_COLON, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_LABELED_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_CASE, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_CONDITIONAL_EXPRESSION, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_COLON, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_default_colon_statement_reduces_into_labeled_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_DEFAULT, &stack);
+    push_node_type_onto_stack(AST_COLON, &stack);
+    push_node_type_onto_stack(AST_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_LABELED_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_DEFAULT, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_COLON, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_STATEMENT, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -1834,6 +1904,9 @@ main(void)
     tcase_add_test(testcase, test_parser_lbrace_declaration_list_statement_list_rbrace_reduces_into_compound_statement);
     tcase_add_test(testcase, test_parser_semicolon_reduces_into_expression_statement);
     tcase_add_test(testcase, test_parser_expression_semicolon_reduces_into_expression_statement);
+    tcase_add_test(testcase, test_parser_identifier_colon_statement_reduces_into_labeled_statement);
+    tcase_add_test(testcase, test_parser_case_constant_expression_colon_statement_reduces_into_labeled_statement);
+    tcase_add_test(testcase, test_parser_default_colon_statement_reduces_into_labeled_statement);
 
     srunner_run_all(runner, CK_ENV);
     return 0;

@@ -63,7 +63,9 @@ enum token_t
     TOK_WHILE,
     TOK_IF,
     TOK_ELSE,
-    TOK_SWITCH
+    TOK_SWITCH,
+    TOK_CASE,
+    TOK_DEFAULT
 };
 
 struct token

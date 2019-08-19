@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 79
+#define NUM_RULES 83
 #define MAX_ASTNODES 9
 
 struct rule
@@ -14,6 +14,23 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* labeled-statement: */
+    {
+        AST_LABELED_STATEMENT,
+        3,
+        { AST_IDENTIFIER, AST_COLON, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_LABELED_STATEMENT,
+        4,
+        /* K&R grammar seems ambiguous here: constant-expression is a conditional-expression so why make distinction? */
+        { AST_CASE, AST_CONDITIONAL_EXPRESSION, AST_COLON, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_LABELED_STATEMENT,
+        3,
+        { AST_DEFAULT, AST_COLON, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* expression-statement: */
     {
         AST_EXPRESSION_STATEMENT,
@@ -714,6 +731,18 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SWITCH;
+        node->constant = token;
+    }
+    else if (token->type == TOK_CASE)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_CASE;
+        node->constant = token;
+    }
+    else if (token->type == TOK_DEFAULT)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_DEFAULT;
         node->constant = token;
     }
 
