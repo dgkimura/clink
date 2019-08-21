@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 89
+#define NUM_RULES 97
 #define MAX_ASTNODES 9
 
 struct rule
@@ -14,6 +14,54 @@ struct rule
 
 struct rule grammar[NUM_RULES] =
 {
+    /* direct-abstract-declarator: */
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        3,
+        { AST_LPAREN, AST_ABSTRACT_DECLARATOR, AST_RPAREN, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        2,
+        { AST_LBRACKET, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        3,
+        { AST_DIRECT_ABSTRACT_DECLARATOR, AST_LBRACKET, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        3,
+        /* K&R grammar seems ambiguous here: constant-expression is a conditional-expression so why make distinction? */
+        { AST_LBRACKET, AST_CONDITIONAL_EXPRESSION, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        4,
+        /* K&R grammar seems ambiguous here: constant-expression is a conditional-expression so why make distinction? */
+        { AST_DIRECT_ABSTRACT_DECLARATOR, AST_LBRACKET, AST_CONDITIONAL_EXPRESSION, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        2,
+        { AST_LPAREN, AST_RPAREN, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        3,
+        { AST_DIRECT_ABSTRACT_DECLARATOR, AST_LPAREN, AST_RPAREN, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        3,
+        { AST_LPAREN, AST_PARAMETER_TYPE_LIST, AST_RPAREN, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DIRECT_ABSTRACT_DECLARATOR,
+        4,
+        { AST_DIRECT_ABSTRACT_DECLARATOR, AST_LPAREN, AST_PARAMETER_TYPE_LIST, AST_RPAREN, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* statement: */
     {
         AST_STATEMENT,
@@ -612,6 +660,18 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_RPAREN;
+        node->constant = token;
+    }
+    else if (token->type == TOK_LBRACKET)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_LBRACKET;
+        node->constant = token;
+    }
+    else if (token->type == TOK_RBRACKET)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_RBRACKET;
         node->constant = token;
     }
     else if (token->type == TOK_LBRACE)

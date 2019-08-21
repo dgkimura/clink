@@ -1922,6 +1922,204 @@ START_TEST(test_parser_jump_statement_reduces_into_statement)
 }
 END_TEST
 
+START_TEST(test_parser_lparen_abstract_declaration_rparen_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_ABSTRACT_DECLARATOR, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_ABSTRACT_DECLARATOR, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_lbracket_rbracket_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LBRACKET, &stack);
+    push_node_type_onto_stack(AST_RBRACKET, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_LBRACKET, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_RBRACKET, ((struct astnode *)node->children->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_direct_abstract_declarator_lbracket_rbracket_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_DIRECT_ABSTRACT_DECLARATOR, &stack);
+    push_node_type_onto_stack(AST_LBRACKET, &stack);
+    push_node_type_onto_stack(AST_RBRACKET, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LBRACKET, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_RBRACKET, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_lbracket_conditional_expression_rbracket_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LBRACKET, &stack);
+    push_node_type_onto_stack(AST_CONDITIONAL_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RBRACKET, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_LBRACKET, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_CONDITIONAL_EXPRESSION, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_RBRACKET, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_direct_abstract_declarator_lbracket_conditional_expression_rbracket_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_DIRECT_ABSTRACT_DECLARATOR, &stack);
+    push_node_type_onto_stack(AST_LBRACKET, &stack);
+    push_node_type_onto_stack(AST_CONDITIONAL_EXPRESSION, &stack);
+    push_node_type_onto_stack(AST_RBRACKET, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LBRACKET, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_CONDITIONAL_EXPRESSION, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_RBRACKET, ((struct astnode *)node->children->next->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_lparen_rparen_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_direct_abstract_declarator_lparen_rparen_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_DIRECT_ABSTRACT_DECLARATOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_lparen_parameter_type_list_rparen_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_PARAMETER_TYPE_LIST, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_PARAMETER_TYPE_LIST, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_direct_abstract_declarator_lparen_parameter_type_list_rparen_reduces_into_direct_abstract_declaration)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_DIRECT_ABSTRACT_DECLARATOR, &stack);
+    push_node_type_onto_stack(AST_LPAREN, &stack);
+    push_node_type_onto_stack(AST_PARAMETER_TYPE_LIST, &stack);
+    push_node_type_onto_stack(AST_RPAREN, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, node->type);
+
+    ck_assert_int_eq(AST_DIRECT_ABSTRACT_DECLARATOR, ((struct astnode *)node->children->data)->type);
+    ck_assert_int_eq(AST_LPAREN, ((struct astnode *)node->children->next->data)->type);
+    ck_assert_int_eq(AST_PARAMETER_TYPE_LIST, ((struct astnode *)node->children->next->next->data)->type);
+    ck_assert_int_eq(AST_RPAREN, ((struct astnode *)node->children->next->next->next->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -2021,6 +2219,15 @@ main(void)
     tcase_add_test(testcase, test_parser_selection_statement_reduces_into_statement);
     tcase_add_test(testcase, test_parser_iteration_statement_reduces_into_statement);
     tcase_add_test(testcase, test_parser_jump_statement_reduces_into_statement);
+    tcase_add_test(testcase, test_parser_lparen_abstract_declaration_rparen_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_lbracket_rbracket_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_direct_abstract_declarator_lbracket_rbracket_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_lbracket_conditional_expression_rbracket_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_direct_abstract_declarator_lbracket_conditional_expression_rbracket_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_lparen_rparen_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_direct_abstract_declarator_lparen_rparen_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_lparen_parameter_type_list_rparen_reduces_into_direct_abstract_declaration);
+    tcase_add_test(testcase, test_parser_direct_abstract_declarator_lparen_parameter_type_list_rparen_reduces_into_direct_abstract_declaration);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
