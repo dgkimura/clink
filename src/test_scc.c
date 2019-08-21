@@ -1814,6 +1814,114 @@ START_TEST(test_parser_default_colon_statement_reduces_into_labeled_statement)
 }
 END_TEST
 
+START_TEST(test_parser_labeled_statement_reduces_into_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_LABELED_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_LABELED_STATEMENT, ((struct astnode *)node->children->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_expression_statement_reduces_into_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_EXPRESSION_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_EXPRESSION_STATEMENT, ((struct astnode *)node->children->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_compound_statement_reduces_into_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_COMPOUND_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_COMPOUND_STATEMENT, ((struct astnode *)node->children->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_selection_statement_reduces_into_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_SELECTION_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_SELECTION_STATEMENT, ((struct astnode *)node->children->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_iteration_statement_reduces_into_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_ITERATION_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_ITERATION_STATEMENT, ((struct astnode *)node->children->data)->type);
+}
+END_TEST
+
+START_TEST(test_parser_jump_statement_reduces_into_statement)
+{
+    struct astnode *node;
+    struct listnode *stack;
+
+    list_init(&stack);
+
+    push_node_type_onto_stack(AST_JUMP_STATEMENT, &stack);
+
+    /* perform next reduction on astnode */
+    node = reduce(&stack);
+
+    ck_assert_int_eq(AST_STATEMENT, node->type);
+
+    ck_assert_int_eq(AST_JUMP_STATEMENT, ((struct astnode *)node->children->data)->type);
+}
+END_TEST
+
 int
 main(void)
 {
@@ -1907,6 +2015,12 @@ main(void)
     tcase_add_test(testcase, test_parser_identifier_colon_statement_reduces_into_labeled_statement);
     tcase_add_test(testcase, test_parser_case_constant_expression_colon_statement_reduces_into_labeled_statement);
     tcase_add_test(testcase, test_parser_default_colon_statement_reduces_into_labeled_statement);
+    tcase_add_test(testcase, test_parser_labeled_statement_reduces_into_statement);
+    tcase_add_test(testcase, test_parser_expression_statement_reduces_into_statement);
+    tcase_add_test(testcase, test_parser_compound_statement_reduces_into_statement);
+    tcase_add_test(testcase, test_parser_selection_statement_reduces_into_statement);
+    tcase_add_test(testcase, test_parser_iteration_statement_reduces_into_statement);
+    tcase_add_test(testcase, test_parser_jump_statement_reduces_into_statement);
 
     srunner_run_all(runner, CK_ENV);
     return 0;
