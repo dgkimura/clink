@@ -2,6 +2,18 @@
 
 #include "parser.h"
 
+/*
+ * [S0]
+ * AST_TRANSLATION_UNT      ->  # AST_EXTERNAL_DECLARATION                                                                  |
+ *                              # AST_TRANSLATION_UNT AST_EXTERNAL_DECLARATION
+ * AST_EXTERNAL_DECLARATION ->  # AST_FUNCTION_DEFINITION                                                                   |
+ *                              # AST_DECLARATION
+ * AST_FUNCTION_DEFINITION  ->  # AST_DECLARATION_SPECIFIERS AST_DECLARATOR AST_DECLARATION_LIST AST_COMPOUND_STATEMENT     |
+ *                              # AST_DECLARATION_SPECIFIERS AST_DECLARATOR AST_COMPOUND_STATEMENT                          |
+ *                              # AST_DECLARATOR AST_DECLARATION_LIST AST_COMPOUND_STATEMENT                                |
+ *                              # AST_DECLARATOR AST_COMPOUND_STATEMENT
+ */
+
 #define NUM_RULES 97
 #define MAX_ASTNODES 9
 
