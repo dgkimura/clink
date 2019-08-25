@@ -2,68 +2,7 @@
 
 #include "parser.h"
 
-/*
- * Let # indicate current cursor in the rule.
- * Let @ indicate following symbols are lookahead symbols in the rule.
- * Let | split multiple lookahead symbols in the rule.
- * These symbols are usually '.', ',', and '|' respectively, but those conflict
- * with the grammar, so others are used.
- *
- * [S0]
- * S1                               ->  # AST_TRANSLATION_UNT @ $
- * AST_TRANSLATION_UNT              ->  # AST_EXTERNAL_DECLARATION @ $
- *                                      # AST_TRANSLATION_UNT AST_EXTERNAL_DECLARATION @ $
- * AST_EXTERNAL_DECLARATION         ->  # AST_FUNCTION_DEFINITION @ $
- *                                      # AST_DECLARATION @ $
- * AST_FUNCTION_DEFINITION          ->  # AST_DECLARATION_SPECIFIERS AST_DECLARATOR AST_DECLARATION_LIST AST_COMPOUND_STATEMENT @ $
- *                                      # AST_DECLARATION_SPECIFIERS AST_DECLARATOR AST_COMPOUND_STATEMENT @ $
- *                                      # AST_DECLARATOR AST_DECLARATION_LIST AST_COMPOUND_STATEMENT @ $
- *                                      # AST_DECLARATOR AST_COMPOUND_STATEMENT @ $
- * AST_DECLARATION_SPECIFIERS       ->  # AST_STORAGE_CLASS_SPECIFIER AST_DECLARATION_SPECIFIERS @ $
- *                                      # AST_STORAGE_CLASS_SPECIFIER @ $
- *                                      # AST_TYPE_SPECIFIER AST_DECLARATION_SPECIFIERS @ $
- *                                      # AST_TYPE_SPECIFIER @ $
- *                                      # AST_TYPE_QUALIFIER AST_DECLARATION_SPECIFIERS @ $
- *                                      # AST_TYPE_QUALIFIER @ $
- * AST_STORAGE_CLASS_SPECIFIER      ->  # auto @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # register @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # static @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # extern @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # typedef @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- * AST_TYPE_SPECIFIER               ->  # void @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # char @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # short @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # int @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # long @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # float @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # double @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # signed @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # unsigned @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # AST_STRUCT_OR_UNION_SPECIFIER @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # AST_ENUM_SPECIFIER @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum $
- *                                      # AST_TYPEDEF_NAME @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- * AST_TYPE_QUALIFIER               ->  # const @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # volatile @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- * AST_STRUCT_OR_UNION_SPECIFIER    ->  # AST_STRUCT_OR_UNION ideintifier { AST_STRUCT_DECLARATION_LIST } @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # AST_STRUCT_OR_UNION { AST_STRUCT_DECLARATION_LIST } @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- *                                      # AST_STRUCT_OR_UNION identifier @ $
- * AST_STRUCT_OR_UNION              ->  # struct @ identifier | {
- *                                      # union @ identifier | {
- * AST_ENUM_SPECIFIER               ->  # enum identifier { AST_ENUMERATOR_LIST } @ AST_DECLARATION_LIST | $
- *                                      # enum { AST_ENUMERATOR_LIST } @ AST_DECLARATION_LIST | $
- *                                      # enum identifier @ AST_DECLARATION_LIST | $
- * AST_TYPEDEF_NAME                 -> # identifier @ auto|register|static|extern|typedef|void|char|short|int|long|float|double|signed|unsigned|const|volatile|struct|enum | $
- */
-
 #define NUM_RULES 97
-#define MAX_ASTNODES 9
-
-struct rule
-{
-    enum astnode_t type;
-    int length_of_nodes;
-    enum astnode_t nodes[MAX_ASTNODES];
-};
 
 struct rule grammar[NUM_RULES] =
 {
@@ -584,6 +523,16 @@ struct rule grammar[NUM_RULES] =
         { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
 };
+
+void
+create_parse_table(struct rule *grammar, struct production augment)
+{
+    int i;
+
+    for (i=0; i<NUM_RULES; i++)
+    {
+    }
+}
 
 struct astnode *
 shift(struct token *token)

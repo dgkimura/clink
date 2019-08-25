@@ -134,6 +134,24 @@ struct astnode
     struct listnode *children;
 };
 
+#define MAX_ASTNODES 9
+
+struct rule
+{
+    enum astnode_t type;
+    int length_of_nodes;
+    enum astnode_t nodes[MAX_ASTNODES];
+};
+
+struct production
+{
+    struct rule rewrite_rule;
+    int cursor_position;
+};
+
+void
+create_parse_table(struct rule *grammar, struct production augment);
+
 struct astnode *
 shift(struct token * token);
 
