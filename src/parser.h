@@ -147,6 +147,7 @@ struct production
 {
     struct rule rewrite_rule;
     int cursor_position;
+    struct listnode *lookahead;
 };
 
 void
