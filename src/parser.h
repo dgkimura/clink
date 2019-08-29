@@ -8,6 +8,8 @@ enum astnode_t
     /*
      * following are terminal values in grammar
      */
+    AST_CHARACTER_CONSTANT,
+    AST_INTEGER_CONSTANT,
     AST_IDENTIFIER,
     AST_ARROW,
     AST_PLUS,
@@ -160,7 +162,7 @@ struct production
 };
 
 void
-head_terminal_values(struct rule *grammar, enum astnode_t node, struct listnode **terminals);
+head_terminal_values(enum astnode_t node, struct listnode **terminals);
 
 void
 create_parse_table(struct rule *grammar, struct production augment);

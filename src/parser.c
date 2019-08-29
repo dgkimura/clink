@@ -2,7 +2,7 @@
 
 #include "parser.h"
 
-#define NUM_RULES 97
+#define NUM_RULES 99
 
 struct rule grammar[NUM_RULES] =
 {
@@ -520,12 +520,17 @@ struct rule grammar[NUM_RULES] =
     {
         AST_CONSTANT,
         1,
-        { AST_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        { AST_INTEGER_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_CONSTANT,
+        1,
+        { AST_CHARACTER_CONSTANT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
 };
 
 void
-head_terminal_values(struct rule *grammar, enum astnode_t node, struct listnode **terminals)
+head_terminal_values(enum astnode_t node, struct listnode **terminals)
 {
     int i;
 
@@ -539,7 +544,7 @@ head_terminal_values(struct rule *grammar, enum astnode_t node, struct listnode 
             }
             else
             {
-                head_terminal_values(grammar, grammar[i].type, terminals);
+                head_terminal_values(grammar[i].nodes[0], terminals);
             }
         }
     }

@@ -17,23 +17,28 @@ push_node_type_onto_stack(enum astnode_t type, struct listnode **stack)
     list_prepend(stack, node);
 }
 
-START_TEST(x)
+START_TEST(test_head_terminal_values_on_constant)
 {
     struct listnode *terminals;
     list_init(&terminals);
-    int num_rules = 97;
-    struct rule grammar[num_rules];
-    memset(grammar, 0, num_rules);
 
-    int type = 5;
-    int terminal = 5;
+    head_terminal_values(AST_CONSTANT, &terminals);
 
-    grammar[0].type = type;
-    grammar[0].nodes[0] = terminal;
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
 
-    head_terminal_values(&grammar[0], type, &terminals);
+}
+END_TEST
 
-    ck_assert_int_eq(5, (int)terminals->data);
+START_TEST(test_head_terminal_values_on_primary_expression)
+{
+    struct listnode *terminals;
+    list_init(&terminals);
+
+    head_terminal_values(AST_PRIMARY_EXPRESSION, &terminals);
+
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
 
 }
 END_TEST
@@ -2149,7 +2154,8 @@ main(void)
     SRunner *runner = srunner_create(suite);
 
     suite_add_tcase(suite, testcase);
-    tcase_add_test(testcase, x);
+    tcase_add_test(testcase, test_head_terminal_values_on_constant);
+    tcase_add_test(testcase, test_head_terminal_values_on_primary_expression);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
