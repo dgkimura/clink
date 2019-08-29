@@ -154,10 +154,13 @@ struct rule
 
 struct production
 {
-    struct rule rewrite_rule;
+    struct rule *rewrite_rule;
     int cursor_position;
     struct listnode *lookahead;
 };
+
+void
+head_terminal_values(struct rule *grammar, enum astnode_t node, struct listnode **terminals);
 
 void
 create_parse_table(struct rule *grammar, struct production augment);

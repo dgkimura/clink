@@ -525,6 +525,27 @@ struct rule grammar[NUM_RULES] =
 };
 
 void
+head_terminal_values(struct rule *grammar, enum astnode_t node, struct listnode **terminals)
+{
+    int i;
+
+    for (i=0; i<NUM_RULES; i++)
+    {
+        if (grammar[i].type == node)
+        {
+            if (grammar[i].nodes[0] < AST_INVALID)
+            {
+                list_append(terminals, (void *)grammar[i].nodes[0]);
+            }
+            else
+            {
+                head_terminal_values(grammar, grammar[i].type, terminals);
+            }
+        }
+    }
+}
+
+void
 create_parse_table(struct rule *grammar, struct production augment)
 {
     int i;

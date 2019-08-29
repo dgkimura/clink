@@ -17,6 +17,27 @@ push_node_type_onto_stack(enum astnode_t type, struct listnode **stack)
     list_prepend(stack, node);
 }
 
+START_TEST(x)
+{
+    struct listnode *terminals;
+    list_init(&terminals);
+    int num_rules = 97;
+    struct rule grammar[num_rules];
+    memset(grammar, 0, num_rules);
+
+    int type = 5;
+    int terminal = 5;
+
+    grammar[0].type = type;
+    grammar[0].nodes[0] = terminal;
+
+    head_terminal_values(&grammar[0], type, &terminals);
+
+    ck_assert_int_eq(5, (int)terminals->data);
+
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -2128,6 +2149,7 @@ main(void)
     SRunner *runner = srunner_create(suite);
 
     suite_add_tcase(suite, testcase);
+    tcase_add_test(testcase, x);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
