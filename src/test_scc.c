@@ -43,6 +43,38 @@ START_TEST(test_head_terminal_values_on_primary_expression)
 }
 END_TEST
 
+START_TEST(test_head_terminal_values_on_postfix_expression)
+{
+    struct listnode *terminals;
+    list_init(&terminals);
+
+    head_terminal_values(AST_POSTFIX_EXPRESSION, &terminals);
+
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
+
+}
+END_TEST
+
+START_TEST(test_head_terminal_values_on_unary_expression)
+{
+    struct listnode *terminals;
+    list_init(&terminals);
+
+    head_terminal_values(AST_UNARY_EXPRESSION, &terminals);
+
+    ck_assert_int_eq(AST_PLUS_PLUS, (int)terminals->data);
+    ck_assert_int_eq(AST_MINUS_MINUS, (int)terminals->next->data);
+    ck_assert_int_eq(AST_AMPERSAND, (int)terminals->next->next->data);
+    ck_assert_int_eq(AST_ASTERISK, (int)terminals->next->next->next->data);
+    ck_assert_int_eq(AST_PLUS, (int)terminals->next->next->next->next->data);
+    ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -2156,6 +2188,8 @@ main(void)
     suite_add_tcase(suite, testcase);
     tcase_add_test(testcase, test_head_terminal_values_on_constant);
     tcase_add_test(testcase, test_head_terminal_values_on_primary_expression);
+    tcase_add_test(testcase, test_head_terminal_values_on_postfix_expression);
+    tcase_add_test(testcase, test_head_terminal_values_on_unary_expression);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);

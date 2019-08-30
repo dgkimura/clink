@@ -542,7 +542,7 @@ head_terminal_values(enum astnode_t node, struct listnode **terminals)
             {
                 list_append(terminals, (void *)grammar[i].nodes[0]);
             }
-            else
+            else if (grammar[i].nodes[0] != node)
             {
                 head_terminal_values(grammar[i].nodes[0], terminals);
             }
