@@ -550,13 +550,26 @@ head_terminal_values(enum astnode_t node, struct listnode **terminals)
     }
 }
 
+/*
+ * Generate the items for a given production node.
+ */
 void
-create_parse_table(struct rule *grammar, struct production augment)
+generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode **items)
 {
     int i;
+    struct item *item;
 
     for (i=0; i<NUM_RULES; i++)
     {
+        if (grammar[i].type == node)
+        {
+            item = malloc(sizeof(struct item));
+            item->rewrite_rule = &grammar[i];
+            item->cursor_position = 0;
+            item->lookahead = lookahead;
+
+            list_append(items, item);
+        }
     }
 }
 

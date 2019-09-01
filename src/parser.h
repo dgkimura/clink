@@ -154,7 +154,7 @@ struct rule
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
-struct production
+struct item
 {
     struct rule *rewrite_rule;
     int cursor_position;
@@ -165,7 +165,7 @@ void
 head_terminal_values(enum astnode_t node, struct listnode **terminals);
 
 void
-create_parse_table(struct rule *grammar, struct production augment);
+generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode **items);
 
 struct astnode *
 shift(struct token * token);
