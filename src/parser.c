@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "parser.h"
 
@@ -584,6 +585,58 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
             }
         }
     }
+}
+
+/*
+ * Given a state, construct the next state for the given node.
+ */
+struct state *
+construct_next_state(struct state *previous, enum astnode_t node)
+{
+    struct listnode *items;
+    struct item *previtem, *curritem;
+    struct state *next;
+    struct rule *rule;
+
+    next = malloc(sizeof(struct state));
+    memset(next->links, 0, NUM_TERMINALS * sizeof(struct state *));
+    list_init(&next->items);
+
+    for (items=previous->items; items!=NULL; items=items->next)
+    {
+        previtem = (struct item *)items->data;
+        rule = previtem->rewrite_rule;
+
+        /*
+         * Check if the previous state contains an item that consumes node as a
+         * next input.
+         */
+        if (previtem->cursor_position < rule->length_of_nodes &&
+            rule->nodes[previtem->cursor_position + 1] == node)
+        {
+            curritem = malloc(sizeof(struct item));
+            curritem->rewrite_rule = previtem->rewrite_rule;
+            curritem->lookahead = previtem->lookahead;
+            curritem->cursor_position = previtem->cursor_position + 1;
+
+            list_append(&next->items, curritem);
+
+            /*
+             * Check if there is another value beyond the matched consumed node
+             * and it is non-terminal, then generate the corresponding items.
+             */
+            if (curritem->cursor_position < rule->length_of_nodes &&
+                rule->nodes[curritem->cursor_position] > AST_INVALID)
+            {
+                generate_items(rule->nodes[curritem->cursor_position],
+                               NULL, &next->items);
+            }
+        }
+    }
+
+    previous->links[node] = next;
+
+    return next;
 }
 
 struct astnode *

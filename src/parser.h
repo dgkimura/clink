@@ -161,11 +161,22 @@ struct item
     struct listnode *lookahead;
 };
 
+#define NUM_TERMINALS (AST_INVALID + 1)
+
+struct state
+{
+    struct listnode *items;
+    struct state *links[NUM_TERMINALS];
+};
+
 void
 head_terminal_values(enum astnode_t node, struct listnode **terminals);
 
 void
 generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode **items);
+
+struct state *
+construct_next_state(struct state *state, enum astnode_t node);
 
 struct astnode *
 shift(struct token * token);
