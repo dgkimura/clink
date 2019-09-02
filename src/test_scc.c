@@ -185,6 +185,22 @@ START_TEST(test_generate_items_on_constant)
 }
 END_TEST
 
+START_TEST(test_generate_items_on_primary_expression)
+{
+    struct listnode *items;
+    list_init(&items);
+
+    generate_items(AST_PRIMARY_EXPRESSION, NULL, &items);
+
+    ck_assert_int_eq(AST_CONSTANT, ((struct item *)items->data)->rewrite_rule->nodes[0]);
+    ck_assert_int_eq(0, ((struct item *)items->data)->cursor_position);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, ((struct item *)items->next->data)->rewrite_rule->nodes[0]);
+    ck_assert_int_eq(0, ((struct item *)items->next->data)->cursor_position);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, ((struct item *)items->next->next->data)->rewrite_rule->nodes[0]);
+    ck_assert_int_eq(0, ((struct item *)items->next->next->data)->cursor_position);
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -2306,6 +2322,7 @@ main(void)
     tcase_add_test(testcase, test_head_terminal_values_on_shift_expression);
     tcase_add_test(testcase, test_head_terminal_values_on_relational_expression);
     tcase_add_test(testcase, test_generate_items_on_constant);
+    tcase_add_test(testcase, test_generate_items_on_primary_expression);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
