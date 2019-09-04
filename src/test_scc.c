@@ -1267,22 +1267,6 @@ START_TEST(test_parser_unary_expression_minusequal_assignment_expression_reduces
 }
 END_TEST
 
-START_TEST(test_parser_assignment_expression_reduces_into_expression)
-{
-    struct astnode *node;
-    struct listnode *stack;
-
-    list_init(&stack);
-
-    push_node_type_onto_stack(AST_ASSIGNMENT_EXPRESSION, &stack);
-
-    /* perform next reduction on astnode */
-    node = reduce(&stack);
-
-    ck_assert_int_eq(AST_EXPRESSION, node->type);
-}
-END_TEST
-
 START_TEST(test_parser_expression_comma_assignment_expression_reduces_into_expression)
 {
     struct astnode *node;
@@ -2407,7 +2391,6 @@ main(void)
     tcase_add_test(testcase, test_parser_unary_expression_modequal_assignment_expression_reduces_into_assignment_expression);
     tcase_add_test(testcase, test_parser_unary_expression_plusequal_assignment_expression_reduces_into_assignment_expression);
     tcase_add_test(testcase, test_parser_unary_expression_minusequal_assignment_expression_reduces_into_assignment_expression);
-    tcase_add_test(testcase, test_parser_assignment_expression_reduces_into_expression);
     tcase_add_test(testcase, test_parser_expression_comma_assignment_expression_reduces_into_expression);
     tcase_add_test(testcase, test_parser_goto_identifier_semicomma_reduces_into_jump_statement);
     tcase_add_test(testcase, test_parser_continue_semicomma_reduces_into_jump_statement);
