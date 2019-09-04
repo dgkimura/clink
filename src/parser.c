@@ -3,10 +3,32 @@
 
 #include "parser.h"
 
-#define NUM_RULES 114
+#define NUM_RULES 118
 
 struct rule grammar[NUM_RULES] =
 {
+    /* parameter-type-list: */
+    {
+        AST_PARAMETER_TYPE_LIST,
+        1,
+        { AST_PARAMETER_LIST, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_PARAMETER_TYPE_LIST,
+        3,
+        { AST_PARAMETER_LIST, AST_COMMA, AST_ELLIPSIS, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* parameter-list: */
+    {
+        AST_PARAMETER_LIST,
+        1,
+        { AST_PARAMETER_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_PARAMETER_LIST,
+        3,
+        { AST_PARAMETER_LIST, AST_COMMA, AST_PARAMETER_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* parameter-declaration: */
     {
         AST_PARAMETER_DECLARATION,
@@ -806,6 +828,12 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_COMMA;
+        node->constant = token;
+    }
+    else if (token->type == TOK_ELLIPSIS)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_ELLIPSIS;
         node->constant = token;
     }
     else if (token->type == TOK_MOD)

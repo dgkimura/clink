@@ -475,6 +475,21 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
 
             list_append(tokens, tok);
         }
+        else if (content[i] == '.')
+        {
+            i += 1;
+
+            tok = (struct token *)malloc(sizeof(struct token));
+            tok->type = TOK_DOT;
+
+            if (i < content_len + 2 && content[i] == '.' && content[i+1] == '.')
+            {
+                i += 2;
+                tok->type = TOK_ELLIPSIS;
+            }
+
+            list_append(tokens, tok);
+        }
         else if (isspace(content[i]))
         {
             i += 1;

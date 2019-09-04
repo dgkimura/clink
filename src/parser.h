@@ -26,6 +26,8 @@ enum astnode_t
     AST_BACKSLASH_EQUAL,
     AST_CARET,
     AST_COMMA,
+    AST_DOT,
+    AST_ELLIPSIS,
     AST_MOD,
     AST_MOD_EQUAL,
     AST_QUESTIONMARK,

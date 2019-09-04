@@ -324,7 +324,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_special_characters)
 {
-    char *content = ";=+*&'\"/%<>^|?:";
+    char *content = ";=+*&'\"/%<>^|?:.";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -345,12 +345,13 @@ START_TEST(test_scanner_can_parse_special_characters)
     ck_assert_int_eq(TOK_VERTICALBAR, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_QUESTIONMARK, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_COLON, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_DOT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
 START_TEST(test_scanner_can_parse_combination_tokens)
 {
-    char *content = "+++=---=->>><<<=>===!=&&||";
+    char *content = "+++=---=->>><<<=>===!=&&||...";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -369,6 +370,7 @@ START_TEST(test_scanner_can_parse_combination_tokens)
     ck_assert_int_eq(TOK_NEQ, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_AMPERSAND_AMPERSAND, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_VERTICALBAR_VERTICALBAR, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_ELLIPSIS, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
