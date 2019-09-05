@@ -67,7 +67,9 @@ enum token_t
     TOK_ELSE,
     TOK_SWITCH,
     TOK_CASE,
-    TOK_DEFAULT
+    TOK_DEFAULT,
+    TOK_ENUM,
+    TOK_STRUCT,
 };
 
 struct token

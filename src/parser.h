@@ -66,6 +66,8 @@ enum astnode_t
     AST_SWITCH,
     AST_CASE,
     AST_DEFAULT,
+    AST_ENUM,
+    AST_STRUCT,
 
     /*
      * invalid symbol that separates termainal and non-terminal values

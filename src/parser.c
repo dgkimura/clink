@@ -3,10 +3,75 @@
 
 #include "parser.h"
 
-#define NUM_RULES 130
+#define NUM_RULES 142
 
 struct rule grammar[NUM_RULES] =
 {
+    /* struct-declarator: */
+    {
+        AST_STRUCT_DECLARATOR,
+        1,
+        { AST_DECLARATOR, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STRUCT_DECLARATOR,
+        2,
+        { AST_COLON, AST_CONSTANT_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STRUCT_DECLARATOR,
+        3,
+        { AST_DECLARATOR, AST_COLON, AST_CONSTANT_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* enum-specifier: */
+    {
+        AST_ENUM_SPECIFIER,
+        2,
+        { AST_ENUM, AST_IDENTIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_ENUM_SPECIFIER,
+        4,
+        { AST_ENUM, AST_LBRACE, AST_ENUMERATOR_LIST, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_ENUM_SPECIFIER,
+        5,
+        { AST_ENUM, AST_IDENTIFIER, AST_LBRACE, AST_ENUMERATOR_LIST, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* enumerator-list: */
+    {
+        AST_ENUMERATOR_LIST,
+        1,
+        { AST_ENUMERATOR, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_ENUMERATOR_LIST,
+        3,
+        { AST_ENUMERATOR_LIST, AST_COMMA, AST_ENUMERATOR, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* enumerator: */
+    {
+        AST_ENUMERATOR,
+        1,
+        { AST_IDENTIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_ENUMERATOR,
+        3,
+        { AST_IDENTIFIER, AST_EQUAL, AST_CONSTANT_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* declarator: */
+    {
+        AST_DECLARATOR,
+        1,
+        { AST_DIRECT_DECLARATOR, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATOR,
+        2,
+        { AST_POINTER, AST_DIRECT_DECLARATOR, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* direct-declarator: */
     {
         AST_DIRECT_DECLARATOR,
@@ -1118,6 +1183,18 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_DEFAULT;
+        node->constant = token;
+    }
+    else if (token->type == TOK_ENUM)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_ENUM;
+        node->constant = token;
+    }
+    else if (token->type == TOK_STRUCT)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_STRUCT;
         node->constant = token;
     }
 

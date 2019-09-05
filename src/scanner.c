@@ -23,6 +23,8 @@ struct token reserved_map[] =
     { TOK_SWITCH, "switch" },
     { TOK_CASE, "case" },
     { TOK_DEFAULT, "default" },
+    { TOK_ENUM, "enum" },
+    { TOK_STRUCT, "struct" },
     { TOK_INVALID, "" } /* TOK_INVALID must be last entry */
 };
 
