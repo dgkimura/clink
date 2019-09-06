@@ -52,8 +52,15 @@ enum astnode_t
     AST_EQUAL,
 
     /* reserved words */
-    AST_INT,
+    AST_VOID,
     AST_CHAR,
+    AST_SHORT,
+    AST_INT,
+    AST_LONG,
+    AST_FLOAT,
+    AST_DOUBLE,
+    AST_SIGNED,
+    AST_UNSIGNED,
     AST_GOTO,
     AST_CONTINUE,
     AST_BREAK,
@@ -68,6 +75,14 @@ enum astnode_t
     AST_DEFAULT,
     AST_ENUM,
     AST_STRUCT,
+    AST_UNION,
+    AST_CONST,
+    AST_VOLATILE,
+    AST_AUTO,
+    AST_REGISTER,
+    AST_STATIC,
+    AST_EXTERN,
+    AST_TYPEDEF,
 
     /*
      * invalid symbol that separates termainal and non-terminal values
@@ -129,8 +144,10 @@ enum astnode_t
     AST_INIT_DECLARATOR,
     AST_INIT_DECLARATOR_LIST,
     AST_STRUCT_DECLARATION_LIST,
+    AST_STRUCT_OR_UNION,
     AST_STRUCT_OR_UNION_SPECIFIER,
     AST_TYPE_SPECIFIER,
+    AST_STORAGE_CLASS_SPECIFIER,
     AST_DECLARATION_SPECIFIERS,
     AST_DECLARATION_LIST,
     AST_DECLARATION,

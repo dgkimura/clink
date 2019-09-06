@@ -9,8 +9,15 @@ static enum token_t reserved_word_token(char *str, size_t len);
 
 struct token reserved_map[] =
 {
-    { TOK_INT, "int" },
+    { TOK_VOID, "void" },
     { TOK_CHAR, "char" },
+    { TOK_SHORT, "short" },
+    { TOK_INT, "int" },
+    { TOK_LONG, "long" },
+    { TOK_FLOAT, "float" },
+    { TOK_DOUBLE, "double" },
+    { TOK_SIGNED, "signed" },
+    { TOK_UNSIGNED, "unsigned" },
     { TOK_GOTO, "goto" },
     { TOK_CONTINUE, "continue" },
     { TOK_BREAK, "break" },
@@ -25,6 +32,14 @@ struct token reserved_map[] =
     { TOK_DEFAULT, "default" },
     { TOK_ENUM, "enum" },
     { TOK_STRUCT, "struct" },
+    { TOK_UNION, "union" },
+    { TOK_CONST, "const" },
+    { TOK_VOLATILE, "volatile" },
+    { TOK_AUTO, "auto" },
+    { TOK_REGISTER, "register" },
+    { TOK_STATIC, "static" },
+    { TOK_EXTERN, "extern" },
+    { TOK_TYPEDEF, "typedef" },
     { TOK_INVALID, "" } /* TOK_INVALID must be last entry */
 };
 

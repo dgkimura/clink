@@ -404,7 +404,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_reserved_words)
 {
-    char *content = "int char goto  continue break  return if else switch case default enum struct";
+    char *content = "int char goto  continue break  return if else switch case default enum struct union const volatile void short long float double signed unsigned";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -423,6 +423,16 @@ START_TEST(test_scanner_can_parse_reserved_words)
     ck_assert_int_eq(TOK_DEFAULT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_ENUM, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_STRUCT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_UNION, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_CONST, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_VOLATILE, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_VOID, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_SHORT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_LONG, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_FLOAT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_DOUBLE, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_SIGNED, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_UNSIGNED, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 

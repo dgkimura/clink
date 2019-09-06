@@ -3,10 +3,242 @@
 
 #include "parser.h"
 
-#define NUM_RULES 153
+#define NUM_RULES 197
 
 struct rule grammar[NUM_RULES] =
 {
+    /* translation-unit: */
+    {
+        AST_TRANSLATION_UNIT,
+        1,
+        { AST_EXTERNAL_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TRANSLATION_UNIT,
+        2,
+        { AST_TRANSLATION_UNIT, AST_EXTERNAL_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* external-declaration: */
+    {
+        AST_EXTERNAL_DECLARATION,
+        1,
+        { AST_FUNCTION_DEFINITION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_EXTERNAL_DECLARATION,
+        1,
+        { AST_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* function-definition: */
+    {
+        AST_FUNCTION_DEFINITION,
+        2,
+        { AST_DECLARATOR, AST_COMPOUND_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_FUNCTION_DEFINITION,
+        3,
+        { AST_DECLARATION_SPECIFIERS, AST_DECLARATOR, AST_COMPOUND_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_FUNCTION_DEFINITION,
+        3,
+        { AST_DECLARATOR, AST_DECLARATION_LIST, AST_COMPOUND_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_FUNCTION_DEFINITION,
+        4,
+        { AST_DECLARATION_SPECIFIERS, AST_DECLARATOR, AST_DECLARATION_LIST, AST_COMPOUND_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* declaration: */
+    {
+        AST_DECLARATION,
+        2,
+        { AST_DECLARATION_SPECIFIERS, AST_SEMICOLON, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATION,
+        3,
+        { AST_DECLARATION_SPECIFIERS, AST_INIT_DECLARATOR_LIST, AST_SEMICOLON, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* declaration-list: */
+    {
+        AST_DECLARATION_LIST,
+        1,
+        { AST_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATION_LIST,
+        2,
+        { AST_DECLARATION_LIST, AST_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* declaration-specifiers: */
+    {
+        AST_DECLARATION_SPECIFIERS,
+        1,
+        { AST_STORAGE_CLASS_SPECIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATION_SPECIFIERS,
+        2,
+        { AST_STORAGE_CLASS_SPECIFIER, AST_DECLARATION_SPECIFIERS, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATION_SPECIFIERS,
+        1,
+        { AST_TYPE_SPECIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATION_SPECIFIERS,
+        2,
+        { AST_TYPE_SPECIFIER, AST_DECLARATION_SPECIFIERS, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATION_SPECIFIERS,
+        1,
+        { AST_TYPE_QUALIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_DECLARATION_SPECIFIERS,
+        2,
+        { AST_TYPE_QUALIFIER, AST_DECLARATION_SPECIFIERS, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* storage-class-specifier: */
+    {
+        AST_STORAGE_CLASS_SPECIFIER,
+        1,
+        { AST_AUTO, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STORAGE_CLASS_SPECIFIER,
+        1,
+        { AST_REGISTER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STORAGE_CLASS_SPECIFIER,
+        1,
+        { AST_STATIC, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STORAGE_CLASS_SPECIFIER,
+        1,
+        { AST_EXTERN, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STORAGE_CLASS_SPECIFIER,
+        1,
+        { AST_TYPEDEF, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* type-specifier: */
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_VOID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_CHAR, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_SHORT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_INT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_LONG, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_FLOAT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_DOUBLE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_SIGNED, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_UNSIGNED, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_STRUCT_OR_UNION_SPECIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_ENUM_SPECIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_SPECIFIER,
+        1,
+        { AST_TYPE_NAME, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* type-qualifier: */
+    {
+        AST_TYPE_QUALIFIER,
+        1,
+        { AST_CONST, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_TYPE_QUALIFIER,
+        1,
+        { AST_VOLATILE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* struct-or-union-specifier: */
+    {
+        AST_STRUCT_OR_UNION_SPECIFIER,
+        4,
+        { AST_STRUCT_OR_UNION, AST_LBRACE, AST_STRUCT_DECLARATION_LIST, AST_RBRACE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STRUCT_OR_UNION_SPECIFIER,
+        5,
+        { AST_STRUCT_OR_UNION, AST_IDENTIFIER, AST_LBRACE, AST_STRUCT_DECLARATION_LIST, AST_RBRACE, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STRUCT_OR_UNION_SPECIFIER,
+        2,
+        { AST_STRUCT_OR_UNION, AST_IDENTIFIER, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* struct-or-union: */
+    {
+        AST_STRUCT_OR_UNION,
+        1,
+        { AST_STRUCT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STRUCT_OR_UNION,
+        1,
+        { AST_UNION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* struct-declaration-list: */
+    {
+        AST_STRUCT_DECLARATION_LIST,
+        1,
+        { AST_STRUCT_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    {
+        AST_STRUCT_DECLARATION_LIST,
+        2,
+        { AST_STRUCT_DECLARATION_LIST, AST_STRUCT_DECLARATION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
     /* init-declarator-list: */
     {
         AST_INIT_DECLARATOR_LIST,
@@ -1161,6 +1393,18 @@ shift(struct token *token)
         node->type = AST_EQUAL;
         node->constant = token;
     }
+    else if (token->type == TOK_VOID)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_VOID;
+        node->constant = token;
+    }
+    else if (token->type == TOK_SHORT)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_SHORT;
+        node->constant = token;
+    }
     else if (token->type == TOK_INT)
     {
         node = malloc(sizeof(struct astnode));
@@ -1171,6 +1415,66 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_CHAR;
+        node->constant = token;
+    }
+    else if (token->type == TOK_LONG)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_LONG;
+        node->constant = token;
+    }
+    else if (token->type == TOK_FLOAT)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_FLOAT;
+        node->constant = token;
+    }
+    else if (token->type == TOK_DOUBLE)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_DOUBLE;
+        node->constant = token;
+    }
+    else if (token->type == TOK_SIGNED)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_SIGNED;
+        node->constant = token;
+    }
+    else if (token->type == TOK_UNSIGNED)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_UNSIGNED;
+        node->constant = token;
+    }
+    else if (token->type == TOK_AUTO)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_AUTO;
+        node->constant = token;
+    }
+    else if (token->type == TOK_REGISTER)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_REGISTER;
+        node->constant = token;
+    }
+    else if (token->type == TOK_STATIC)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_STATIC;
+        node->constant = token;
+    }
+    else if (token->type == TOK_EXTERN)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_EXTERN;
+        node->constant = token;
+    }
+    else if (token->type == TOK_TYPEDEF)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_TYPEDEF;
         node->constant = token;
     }
     else if (token->type == TOK_GOTO)
@@ -1255,6 +1559,24 @@ shift(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_STRUCT;
+        node->constant = token;
+    }
+    else if (token->type == TOK_UNION)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_UNION;
+        node->constant = token;
+    }
+    else if (token->type == TOK_CONST)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_CONST;
+        node->constant = token;
+    }
+    else if (token->type == TOK_VOLATILE)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_VOLATILE;
         node->constant = token;
     }
 

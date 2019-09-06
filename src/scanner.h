@@ -54,8 +54,15 @@ enum token_t
     TOK_NEQ,
 
     /* reserved words */
-    TOK_INT,
+    TOK_VOID,
     TOK_CHAR,
+    TOK_SHORT,
+    TOK_INT,
+    TOK_LONG,
+    TOK_FLOAT,
+    TOK_DOUBLE,
+    TOK_SIGNED,
+    TOK_UNSIGNED,
     TOK_GOTO,
     TOK_CONTINUE,
     TOK_BREAK,
@@ -70,6 +77,14 @@ enum token_t
     TOK_DEFAULT,
     TOK_ENUM,
     TOK_STRUCT,
+    TOK_UNION,
+    TOK_CONST,
+    TOK_VOLATILE,
+    TOK_AUTO,
+    TOK_REGISTER,
+    TOK_STATIC,
+    TOK_EXTERN,
+    TOK_TYPEDEF,
 };
 
 struct token
