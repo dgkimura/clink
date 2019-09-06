@@ -201,6 +201,73 @@ START_TEST(test_generate_items_on_primary_expression)
 }
 END_TEST
 
+static void
+assert_rules_equal(struct rule r1, struct rule r2)
+{
+    int i;
+
+    ck_assert_int_eq(r1.type, r2.type);
+    ck_assert_int_eq(r1.length_of_nodes, r2.length_of_nodes);
+
+    for (i=0; i<r1.length_of_nodes; i++)
+    {
+        ck_assert_int_eq(r1.nodes[i], r2.nodes[i]);
+    }
+}
+
+START_TEST(test_generate_items_on_postfix_expression)
+{
+    struct listnode *items;
+    list_init(&items);
+
+    generate_items(AST_POSTFIX_EXPRESSION, NULL, &items);
+
+    assert_rules_equal(
+        (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
+        *((struct item *)items->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS } },
+        *((struct item *)items->next->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_MINUS_MINUS } },
+        *((struct item *)items->next->next->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_POSTFIX_EXPRESSION, 1, { AST_PRIMARY_EXPRESSION } },
+        *((struct item *)items->next->next->next->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_PRIMARY_EXPRESSION, 1, { AST_CONSTANT } },
+        *((struct item *)items->next->next->next->next->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_CONSTANT, 1, { AST_INTEGER_CONSTANT } },
+        *((struct item *)items->next->next->next->next->next->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_CONSTANT, 1, { AST_CHARACTER_CONSTANT } },
+        *((struct item *)items->next->next->next->next->next->next->data)->rewrite_rule);
+}
+END_TEST
+
+START_TEST(test_generate_items_on_unary_expression)
+{
+    struct listnode *items;
+    list_init(&items);
+
+    generate_items(AST_UNARY_EXPRESSION, NULL, &items);
+
+    assert_rules_equal(
+        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_PLUS_PLUS, AST_UNARY_EXPRESSION } },
+        *((struct item *)items->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_MINUS_MINUS, AST_UNARY_EXPRESSION } },
+        *((struct item *)items->next->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_AMPERSAND, AST_CAST_EXPRESSION } },
+        *((struct item *)items->next->next->data)->rewrite_rule);
+    assert_rules_equal(
+        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_ASTERISK, AST_CAST_EXPRESSION } },
+        *((struct item *)items->next->next->next->data)->rewrite_rule);
+}
+END_TEST
+
 START_TEST(test_construct_next_state_increments_cursor_position)
 {
     struct state *state;
@@ -2350,6 +2417,8 @@ main(void)
     tcase_add_test(testcase, test_head_terminal_values_on_relational_expression);
     tcase_add_test(testcase, test_generate_items_on_constant);
     tcase_add_test(testcase, test_generate_items_on_primary_expression);
+    tcase_add_test(testcase, test_generate_items_on_postfix_expression);
+    tcase_add_test(testcase, test_generate_items_on_unary_expression);
     tcase_add_test(testcase, test_construct_next_state_increments_cursor_position);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);

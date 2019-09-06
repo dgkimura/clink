@@ -34,7 +34,7 @@ list_append(
 {
     struct listnode *t = malloc(sizeof(struct listnode));
     t->data = data;
-    t->next = *head;
+    t->next = NULL;
 
     if (*head != NULL)
     {

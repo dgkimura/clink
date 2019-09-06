@@ -1079,6 +1079,28 @@ head_terminal_values(enum astnode_t node, struct listnode **terminals)
     }
 }
 
+static int
+items_contains(struct listnode **items, struct rule *r, int position)
+{
+    int contains = 0;
+    struct listnode *c;
+    struct item *i;
+
+    c = *items;
+    while (c != NULL)
+    {
+        i = (struct item *)c->data;
+        if (i->rewrite_rule == r && i->cursor_position == position)
+        {
+            contains = 1;
+            break;
+        }
+
+        c = c->next;
+    }
+    return contains;
+}
+
 /*
  * Generate the items for a given production node.
  */
@@ -1090,7 +1112,7 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
 
     for (i=0; i<NUM_RULES; i++)
     {
-        if (grammar[i].type == node)
+        if (grammar[i].type == node && !items_contains(items, &grammar[i], 0))
         {
             item = malloc(sizeof(struct item));
             item->rewrite_rule = &grammar[i];
