@@ -1138,55 +1138,64 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
 }
 
 /*
- * Given a state, construct the next state for the given node.
+ * Generate a state with items, recursively construct connecting states and
+ * transitions.
  */
-struct state *
-construct_next_state(struct state *previous, enum astnode_t node)
+void
+generate_transitions(struct state *s)
 {
     struct listnode *items;
-    struct item *previtem, *curritem;
-    struct state *next;
-    struct rule *rule;
+    struct item *i, *j;
+    struct state *t;
+    struct rule *r;
+    int index;
 
-    next = malloc(sizeof(struct state));
-    memset(next->links, 0, NUM_TERMINALS * sizeof(struct state *));
-    list_init(&next->items);
+    int terminal_state = 1;
 
-    for (items=previous->items; items!=NULL; items=items->next)
+    for (items=s->items; items!=NULL; items=items->next)
     {
-        previtem = (struct item *)items->data;
-        rule = previtem->rewrite_rule;
+        i = (struct item *)items->data;
+        r = i->rewrite_rule;
 
         /*
-         * Check if the previous state contains an item that consumes node as a
-         * next input.
+         * Check if the item contains another consumable value.
          */
-        if (previtem->cursor_position < rule->length_of_nodes &&
-            rule->nodes[previtem->cursor_position + 1] == node)
+        if (i->cursor_position < r->length_of_nodes)
         {
-            curritem = malloc(sizeof(struct item));
-            curritem->rewrite_rule = previtem->rewrite_rule;
-            curritem->lookahead = previtem->lookahead;
-            curritem->cursor_position = previtem->cursor_position + 1;
+            terminal_state = 0;
 
-            list_append(&next->items, curritem);
+            j = malloc(sizeof(struct item));
+            j->rewrite_rule = i->rewrite_rule;
+            j->lookahead = i->lookahead;
+            j->cursor_position = i->cursor_position + 1;
 
-            /*
-             * Check if there is another value beyond the matched consumed node
-             * and it is non-terminal, then generate the corresponding items.
-             */
-            if (curritem->cursor_position < rule->length_of_nodes &&
-                rule->nodes[curritem->cursor_position] > AST_INVALID)
+            index = INDEX(i->rewrite_rule->nodes[i->cursor_position]);
+            if (s->links[index] == NULL)
             {
-                generate_items(rule->nodes[curritem->cursor_position],
-                               NULL, &next->items);
+                t = malloc(sizeof(struct state));
+                memset(t->links, 0, NUM_TERMINALS * sizeof(struct state *));
+                list_init(&t->items);
+
+                s->links[index] = t;
             }
+
+            list_append(&t->items, j);
         }
     }
 
-    previous->links[node] = next;
-
-    return next;
+    /*
+     * If state transitions were added then recursively complete them.
+     */
+    if (!terminal_state)
+    {
+        for (index=0; index<NUM_SYMBOLS; index++)
+        {
+            if (s->links[index] != NULL)
+            {
+                generate_transitions(s->links[index]);
+            }
+        }
+    }
 }
 
 struct astnode *

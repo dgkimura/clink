@@ -185,12 +185,14 @@ struct item
     struct listnode *lookahead;
 };
 
-#define NUM_TERMINALS (AST_INVALID + 1)
+#define NUM_TERMINALS (AST_INVALID - AST_CHARACTER_CONSTANT+ 1)
+#define NUM_SYMBOLS (AST_TRANSLATION_UNIT - AST_CHARACTER_CONSTANT)
+#define INDEX(s) ((s) - AST_CHARACTER_CONSTANT)
 
 struct state
 {
     struct listnode *items;
-    struct state *links[NUM_TERMINALS];
+    struct state *links[NUM_SYMBOLS];
 };
 
 void
@@ -199,8 +201,8 @@ head_terminal_values(enum astnode_t node, struct listnode **terminals);
 void
 generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode **items);
 
-struct state *
-construct_next_state(struct state *state, enum astnode_t node);
+void
+generate_transitions(struct state *state);
 
 struct astnode *
 shift(struct token * token);

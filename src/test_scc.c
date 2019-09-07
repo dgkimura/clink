@@ -268,7 +268,7 @@ START_TEST(test_generate_items_on_unary_expression)
 }
 END_TEST
 
-START_TEST(test_construct_next_state_increments_cursor_position)
+START_TEST(test_generate_transitions_increments_cursor_position)
 {
     struct state *state;
     struct item *item;
@@ -277,23 +277,16 @@ START_TEST(test_construct_next_state_increments_cursor_position)
     state = malloc(sizeof(struct state));;
     memset(state, 0, sizeof(struct state));
 
-    rule = malloc(sizeof(struct rule));;
-    memset(rule, 0, sizeof(struct rule));
-    rule->length_of_nodes = 1;
-    rule->type = AST_CONSTANT;
-    rule->nodes[0] = AST_CHARACTER_CONSTANT;
-
     item = malloc(sizeof(struct item));;
-    item->rewrite_rule = rule;
+    item->rewrite_rule = &(struct rule) { AST_CONSTANT, 1, { AST_INTEGER_CONSTANT} };
     item->cursor_position = 0;
-    item->lookahead = NULL;
 
     list_append(&state->items, item);
 
-    construct_next_state(state, AST_CHARACTER_CONSTANT);
+    generate_transitions(state);
 
     /* next state should increment the cursor position */
-    ck_assert_int_eq(1, ((struct item *)(state->links[AST_CHARACTER_CONSTANT]->items->data))->cursor_position);
+    ck_assert_int_eq(1, ((struct item *)(state->links[INDEX(AST_INTEGER_CONSTANT)]->items->data))->cursor_position);
 }
 END_TEST
 
@@ -2419,7 +2412,7 @@ main(void)
     tcase_add_test(testcase, test_generate_items_on_primary_expression);
     tcase_add_test(testcase, test_generate_items_on_postfix_expression);
     tcase_add_test(testcase, test_generate_items_on_unary_expression);
-    tcase_add_test(testcase, test_construct_next_state_increments_cursor_position);
+    tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
