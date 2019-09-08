@@ -204,6 +204,9 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
 void
 generate_transitions(struct state *state);
 
+struct state *
+generate_states(void);
+
 struct astnode *
 shift(struct token * token);
 

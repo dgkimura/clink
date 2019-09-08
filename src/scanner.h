@@ -1,6 +1,7 @@
 #ifndef __SCANNER_H__
 #define __SCANNER_H__
 
+#include <stddef.h>
 #include <ctype.h>
 
 #include "list.h"

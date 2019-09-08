@@ -272,7 +272,6 @@ START_TEST(test_generate_transitions_increments_cursor_position)
 {
     struct state *state;
     struct item *item;
-    struct rule *rule;
 
     state = malloc(sizeof(struct state));;
     memset(state, 0, sizeof(struct state));
@@ -287,6 +286,12 @@ START_TEST(test_generate_transitions_increments_cursor_position)
 
     /* next state should increment the cursor position */
     ck_assert_int_eq(1, ((struct item *)(state->links[INDEX(AST_INTEGER_CONSTANT)]->items->data))->cursor_position);
+}
+END_TEST
+
+START_TEST(test_parser_generate_states)
+{
+    generate_states();
 }
 END_TEST
 
@@ -2413,6 +2418,7 @@ main(void)
     tcase_add_test(testcase, test_generate_items_on_postfix_expression);
     tcase_add_test(testcase, test_generate_items_on_unary_expression);
     tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
+    tcase_add_test(testcase, test_parser_generate_states);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);

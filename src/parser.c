@@ -1173,13 +1173,13 @@ generate_transitions(struct state *s)
             if (s->links[index] == NULL)
             {
                 t = malloc(sizeof(struct state));
-                memset(t->links, 0, NUM_TERMINALS * sizeof(struct state *));
+                memset(t->links, 0, NUM_SYMBOLS * sizeof(struct state *));
                 list_init(&t->items);
 
                 s->links[index] = t;
             }
 
-            list_append(&t->items, j);
+            list_append(&s->links[index]->items, j);
         }
     }
 
@@ -1196,6 +1196,24 @@ generate_transitions(struct state *s)
             }
         }
     }
+}
+
+/*
+ * Generates all state for grammar and returns the root state.
+ */
+struct state *
+generate_states(void)
+{
+    struct state *s;
+
+    s = malloc(sizeof(struct state));
+    memset(s, 0, sizeof(struct state));
+    list_init(&s->items);
+
+    generate_items(AST_TRANSLATION_UNIT, NULL, &s->items);
+    generate_transitions(s);
+
+    return s;
 }
 
 struct astnode *
