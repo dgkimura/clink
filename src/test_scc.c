@@ -291,7 +291,11 @@ END_TEST
 
 START_TEST(test_parser_generate_states)
 {
-    generate_states();
+    struct state *state;
+
+    state = generate_states();
+
+    ck_assert_int_eq(0, state->identifier);
 }
 END_TEST
 

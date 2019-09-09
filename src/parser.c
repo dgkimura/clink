@@ -3,6 +3,8 @@
 
 #include "parser.h"
 
+static int current_identifier = 0;
+
 #define NUM_RULES 197
 
 struct rule grammar[NUM_RULES] =
@@ -1175,6 +1177,7 @@ generate_transitions(struct state *s)
                 t = malloc(sizeof(struct state));
                 memset(t->links, 0, NUM_SYMBOLS * sizeof(struct state *));
                 list_init(&t->items);
+                t->identifier = current_identifier++;
 
                 s->links[index] = t;
             }
@@ -1209,6 +1212,8 @@ generate_states(void)
     s = malloc(sizeof(struct state));
     memset(s, 0, sizeof(struct state));
     list_init(&s->items);
+
+    s->identifier = current_identifier++;
 
     generate_items(AST_TRANSLATION_UNIT, NULL, &s->items);
     generate_transitions(s);

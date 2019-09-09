@@ -191,6 +191,7 @@ struct item
 
 struct state
 {
+    int identifier;
     struct listnode *items;
     struct state *links[NUM_SYMBOLS];
 };
