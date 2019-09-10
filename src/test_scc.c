@@ -299,6 +299,106 @@ START_TEST(test_parser_generate_states)
 }
 END_TEST
 
+START_TEST(test_parser_iterate_over_generate_states)
+{
+    struct state *state;
+    struct state_iterator iterator;
+
+    state = generate_states();
+
+    memset(&iterator, 0, sizeof(struct state_iterator));
+    list_init(&iterator.states);
+    iterator_init(&iterator, state);
+
+    ck_assert_int_eq(0, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(5, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(8, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(39, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(41, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(40, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(6, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(42, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(43, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(17, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(18, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(19, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(20, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(21, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(22, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(23, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(24, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(25, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(31, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(44, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(46, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(47, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(48, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(45, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(49, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(50, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(28, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(29, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(35, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(36, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(11, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(12, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(13, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(14, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(15, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(32, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(34, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(51, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(52, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(7, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(53, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(4, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(55, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(56, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(58, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(59, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(57, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(60, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(54, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(61, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(62, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(63, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(3, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(64, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(65, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(66, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(30, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(33, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(27, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(68, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(69, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(70, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(71, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(67, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(72, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(73, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(26, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(16, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(74, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(75, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(10, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(76, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(9, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(78, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(77, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(80, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(81, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(82, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(79, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(83, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(37, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(2, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(1, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(38, iterator_next(&iterator)->identifier);
+    ck_assert_int_eq(84, iterator_next(&iterator)->identifier);
+    ck_assert_ptr_null(iterator_next(&iterator));
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -2423,6 +2523,7 @@ main(void)
     tcase_add_test(testcase, test_generate_items_on_unary_expression);
     tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
     tcase_add_test(testcase, test_parser_generate_states);
+    tcase_add_test(testcase, test_parser_iterate_over_generate_states);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);

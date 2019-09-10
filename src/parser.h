@@ -186,7 +186,7 @@ struct item
 };
 
 #define NUM_TERMINALS (AST_INVALID - AST_CHARACTER_CONSTANT+ 1)
-#define NUM_SYMBOLS (AST_TRANSLATION_UNIT - AST_CHARACTER_CONSTANT)
+#define NUM_SYMBOLS (AST_TRANSLATION_UNIT - AST_CHARACTER_CONSTANT + 1)
 #define INDEX(s) ((s) - AST_CHARACTER_CONSTANT)
 
 struct state
@@ -194,6 +194,14 @@ struct state
     int identifier;
     struct listnode *items;
     struct state *links[NUM_SYMBOLS];
+};
+
+#define MAX_STATES 256
+
+struct state_iterator
+{
+    struct listnode *states;
+    int visited[MAX_STATES];
 };
 
 void
@@ -207,6 +215,12 @@ generate_transitions(struct state *state);
 
 struct state *
 generate_states(void);
+
+void
+iterator_init(struct state_iterator *iterator, struct state *s);
+
+struct state *
+iterator_next(struct state_iterator *i);
 
 struct astnode *
 shift(struct token * token);

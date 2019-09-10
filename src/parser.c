@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -1179,6 +1180,8 @@ generate_transitions(struct state *s)
                 list_init(&t->items);
                 t->identifier = current_identifier++;
 
+                assert(t->identifier <= MAX_STATES);
+
                 s->links[index] = t;
             }
 
@@ -1219,6 +1222,50 @@ generate_states(void)
     generate_transitions(s);
 
     return s;
+}
+
+/*
+ * Initializes an interator to be used by iterator_next().
+ */
+void
+iterator_init(struct state_iterator *iterator, struct state *state)
+{
+    int i;
+
+    list_append(&iterator->states, state);
+    iterator->visited[state->identifier] = 1;
+
+    for (i=0; i<NUM_SYMBOLS; i++)
+    {
+        if (state->links[i] != NULL && !iterator->visited[state->links[i]->identifier])
+        {
+            iterator_init(iterator, state->links[i]);
+        }
+    }
+}
+
+/*
+ * Iterates over all state. Returns NULL if non-left.
+ */
+struct state *
+iterator_next(struct state_iterator *iterator)
+{
+    int i;
+    struct state *next;
+    struct listnode *node;
+
+    if (iterator->states != NULL)
+    {
+        next = (struct state *)iterator->states->data;
+
+        node = iterator->states;
+        iterator->states = iterator->states->next;
+        free(node);
+
+        return next;
+    }
+
+    return NULL;
 }
 
 struct astnode *
