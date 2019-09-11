@@ -178,10 +178,25 @@ struct rule
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
+/*
+ * item is a rule with a cursor position to indicate how many symbols have been
+ * consumed.
+ */
 struct item
 {
+    /*
+     * rule that is being used.
+     */
     struct rule *rewrite_rule;
+
+    /*
+     * position into the rule.
+     */
     int cursor_position;
+
+    /*
+     * list of lookahead symbols.
+     */
     struct listnode *lookahead;
 };
 
@@ -189,18 +204,43 @@ struct item
 #define NUM_SYMBOLS (AST_TRANSLATION_UNIT - AST_CHARACTER_CONSTANT + 1)
 #define INDEX(s) ((s) - AST_CHARACTER_CONSTANT)
 
+/*
+ * state contains information of a set of items.
+ */
 struct state
 {
+    /*
+     * unique identifier of the state.
+     */
     int identifier;
+
+    /*
+     * list of items in the state.
+     */
     struct listnode *items;
+
+    /*
+     * links maps symbol transitions to other states.
+     */
     struct state *links[NUM_SYMBOLS];
 };
 
 #define MAX_STATES 256
 
+/*
+ * state_iterator is used to iterate over a graph of state structures.
+ */
 struct state_iterator
 {
+    /*
+     * list of all the states all states to iterate over.
+     */
     struct listnode *states;
+
+    /*
+     * array used to when building up the states list to identify states
+     * which states have already been * added to the list.
+     */
     int visited[MAX_STATES];
 };
 
@@ -216,8 +256,8 @@ generate_transitions(struct state *state);
 struct state *
 generate_states(void);
 
-void
-iterator_init(struct state_iterator *iterator, struct state *s);
+struct state_iterator *
+iterator_init(struct state *s);
 
 struct state *
 iterator_next(struct state_iterator *i);

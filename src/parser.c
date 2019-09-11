@@ -1224,11 +1224,8 @@ generate_states(void)
     return s;
 }
 
-/*
- * Initializes an interator to be used by iterator_next().
- */
-void
-iterator_init(struct state_iterator *iterator, struct state *state)
+static void
+internal_iterator_init(struct state_iterator *iterator, struct state *state)
 {
     int i;
 
@@ -1239,9 +1236,27 @@ iterator_init(struct state_iterator *iterator, struct state *state)
     {
         if (state->links[i] != NULL && !iterator->visited[state->links[i]->identifier])
         {
-            iterator_init(iterator, state->links[i]);
+            internal_iterator_init(iterator, state->links[i]);
         }
     }
+}
+
+/*
+ * Initializes an interator to be used by iterator_next().
+ */
+struct state_iterator *
+iterator_init(struct state *state)
+{
+    struct state_iterator *iterator;
+
+    iterator = malloc(sizeof(struct state_iterator));
+
+    memset(iterator, 0, sizeof(struct state_iterator));
+    list_init(&iterator->states);
+
+    internal_iterator_init(iterator, state);
+
+    return iterator;
 }
 
 /*
