@@ -397,6 +397,20 @@ START_TEST(test_parser_iterate_over_generate_states)
 }
 END_TEST
 
+START_TEST(test_parser_generates_parsetable)
+{
+    struct parsetable_item *parsetable, *item;
+
+    parsetable = generate_parsetable();
+
+    item = parsetable + (NUM_SYMBOLS - 1);
+
+    ck_assert_int_eq(0, item->shift);
+    ck_assert_int_eq(0, item->reduce);
+    ck_assert_int_eq(38, item->state);
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -2522,6 +2536,7 @@ main(void)
     tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
     tcase_add_test(testcase, test_parser_generate_states);
     tcase_add_test(testcase, test_parser_iterate_over_generate_states);
+    tcase_add_test(testcase, test_parser_generates_parsetable);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);

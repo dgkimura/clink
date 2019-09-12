@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-static int current_identifier = 0;
+static int state_identifier = 0;
 
 #define NUM_RULES 197
 
@@ -1176,9 +1176,9 @@ generate_transitions(struct state *s)
             if (s->links[index] == NULL)
             {
                 t = malloc(sizeof(struct state));
-                memset(t->links, 0, NUM_SYMBOLS * sizeof(struct state *));
+                memset(t, 0, sizeof(struct state));
                 list_init(&t->items);
-                t->identifier = current_identifier++;
+                t->identifier = state_identifier++;
 
                 assert(t->identifier <= MAX_STATES);
 
@@ -1216,7 +1216,7 @@ generate_states(void)
     memset(s, 0, sizeof(struct state));
     list_init(&s->items);
 
-    s->identifier = current_identifier++;
+    s->identifier = state_identifier++;
 
     generate_items(AST_TRANSLATION_UNIT, NULL, &s->items);
     generate_transitions(s);
@@ -1267,20 +1267,59 @@ iterator_next(struct state_iterator *iterator)
 {
     int i;
     struct state *next;
-    struct listnode *node;
 
     if (iterator->states != NULL)
     {
         next = (struct state *)iterator->states->data;
 
-        node = iterator->states;
         iterator->states = iterator->states->next;
-        free(node);
 
         return next;
     }
 
     return NULL;
+}
+
+struct parsetable_item *
+generate_parsetable(void)
+{
+    int i;
+    struct parsetable_item *table, *row, *cell;
+    struct state *state;
+    struct state_iterator *iterator;
+    struct listnode *items;
+
+    iterator = iterator_init(generate_states());
+
+    table = malloc(sizeof(struct parsetable_item) * (NUM_SYMBOLS) * (state_identifier + 1));
+    memset(table, 0, sizeof(struct parsetable_item) * NUM_SYMBOLS * (state_identifier + 1));
+
+    while ((state = iterator_next(iterator)) != NULL && (items = state->items))
+    {
+        row = &table[state->identifier * NUM_SYMBOLS];
+        for (i=0; i<NUM_SYMBOLS; i++)
+        {
+            cell = row + i;
+
+            if (state->links[i] != NULL && i > AST_INVALID)
+            {
+                /*
+                 * non-terminal value
+                 */
+                cell->state = state->links[i]->identifier;
+            }
+            else if (state->links[i] != NULL && i < AST_INVALID)
+            {
+                /*
+                 * terminal value
+                 */
+                cell->shift = 1;
+                cell->state = state->links[i]->identifier;
+            }
+        }
+    }
+
+    return table;
 }
 
 struct astnode *

@@ -244,6 +244,34 @@ struct state_iterator
     int visited[MAX_STATES];
 };
 
+/*
+ * item inside a parse table row.
+ */
+struct parsetable_item
+{
+    /*
+     * rule to reduce, if this is a reduce operation.
+     */
+    struct rule *rule;
+
+    /*
+     * shift indicates whether this is a shift operation. It cannot be both a
+     * shift and reduce operation.
+     */
+    unsigned int shift:1;
+
+    /*
+     * reduce indicates whether this is a shift operation. It cannot be both a
+     * shift and reduce operation.
+     */
+    unsigned int reduce:1;
+
+    /*
+     * state indicates the next state to shift to.
+     */
+    unsigned int state:30;
+};
+
 void
 head_terminal_values(enum astnode_t node, struct listnode **terminals);
 
@@ -261,6 +289,9 @@ iterator_init(struct state *s);
 
 struct state *
 iterator_next(struct state_iterator *i);
+
+struct parsetable_item *
+generate_parsetable(void);
 
 struct astnode *
 shift(struct token * token);
