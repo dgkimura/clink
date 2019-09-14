@@ -1061,22 +1061,68 @@ struct rule grammar[NUM_RULES] =
     },
 };
 
+static int
+checked_nodes_contains(struct listnode **items, enum astnode_t node)
+{
+    int contains = 0;
+    struct listnode *c;
+
+    c = *items;
+    while (c != NULL)
+    {
+        if ((enum astnode_t)c->data == node)
+        {
+            contains = 1;
+            break;
+        }
+
+        c = c->next;
+    }
+    return contains;
+}
+
 void
-head_terminal_values(enum astnode_t node, struct listnode **terminals)
+head_terminal_values(enum astnode_t node, struct listnode **checked_nodes,
+                     struct listnode **terminals)
 {
     int i;
+
+    if (checked_nodes_contains(checked_nodes, node))
+    {
+        /*
+         * If another iteration is already checking node, then there is nothing
+         * more to do here.
+         */
+        return;
+    }
+
+    /*
+     * Update checked_nodes to avoid trying to repeated work and infinite
+     * recursion.
+     */
+    list_append(checked_nodes, (void *)node);
 
     for (i=0; i<NUM_RULES; i++)
     {
         if (grammar[i].type == node)
         {
-            if (grammar[i].nodes[0] < AST_INVALID)
+            if (grammar[i].nodes[0] < AST_INVALID &&
+                !checked_nodes_contains(terminals, grammar[i].nodes[0]))
             {
+                /*
+                 * If the symbol is a terminal value and we have not already
+                 * added it to terminals then add it
+                 */
                 list_append(terminals, (void *)grammar[i].nodes[0]);
             }
             else if (grammar[i].nodes[0] != node)
             {
-                head_terminal_values(grammar[i].nodes[0], terminals);
+                /*
+                 * If the symbol is a non-terminal value then recurse and find
+                 * the head terminal
+                 */
+                head_terminal_values(grammar[i].nodes[0], checked_nodes,
+                                     terminals);
             }
         }
     }

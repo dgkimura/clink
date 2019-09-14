@@ -273,7 +273,8 @@ struct parsetable_item
 };
 
 void
-head_terminal_values(enum astnode_t node, struct listnode **terminals);
+head_terminal_values(enum astnode_t node, struct listnode **checked_nodes,
+                     struct listnode **terminals);
 
 void
 generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode **items);

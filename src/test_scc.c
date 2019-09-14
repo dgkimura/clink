@@ -19,10 +19,12 @@ push_node_type_onto_stack(enum astnode_t type, struct listnode **stack)
 
 START_TEST(test_head_terminal_values_on_constant)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_CONSTANT, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_CONSTANT, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
@@ -32,10 +34,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_primary_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_PRIMARY_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_PRIMARY_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
@@ -45,10 +49,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_postfix_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_POSTFIX_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_POSTFIX_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
@@ -58,10 +64,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_unary_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_UNARY_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_UNARY_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_PLUS_PLUS, (int)terminals->data);
     ck_assert_int_eq(AST_MINUS_MINUS, (int)terminals->next->data);
@@ -77,10 +85,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_cast_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_CAST_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_CAST_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_PLUS_PLUS, (int)terminals->data);
     ck_assert_int_eq(AST_MINUS_MINUS, (int)terminals->next->data);
@@ -96,10 +106,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_multiplicative_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_MULTIPLICATIVE_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_MULTIPLICATIVE_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_PLUS_PLUS, (int)terminals->data);
     ck_assert_int_eq(AST_MINUS_MINUS, (int)terminals->next->data);
@@ -115,10 +127,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_additive_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_ADDITIVE_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_ADDITIVE_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_PLUS_PLUS, (int)terminals->data);
     ck_assert_int_eq(AST_MINUS_MINUS, (int)terminals->next->data);
@@ -134,10 +148,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_shift_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_SHIFT_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_SHIFT_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_PLUS_PLUS, (int)terminals->data);
     ck_assert_int_eq(AST_MINUS_MINUS, (int)terminals->next->data);
@@ -153,10 +169,12 @@ END_TEST
 
 START_TEST(test_head_terminal_values_on_relational_expression)
 {
-    struct listnode *terminals;
-    list_init(&terminals);
+    struct listnode *terminals, *checked_nodes;
 
-    head_terminal_values(AST_RELATIONAL_EXPRESSION, &terminals);
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_RELATIONAL_EXPRESSION, &checked_nodes, &terminals);
 
     ck_assert_int_eq(AST_PLUS_PLUS, (int)terminals->data);
     ck_assert_int_eq(AST_MINUS_MINUS, (int)terminals->next->data);
@@ -166,6 +184,34 @@ START_TEST(test_head_terminal_values_on_relational_expression)
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+
+}
+END_TEST
+
+START_TEST(test_head_terminal_values_on_specifier_qualifier_list)
+{
+    struct listnode *terminals, *checked_nodes;
+
+    list_init(&terminals);
+    list_init(&checked_nodes);
+
+    head_terminal_values(AST_SPECIFIER_QUALIFIER_LIST, &checked_nodes, &terminals);
+
+    ck_assert_int_eq(AST_VOID, (int)terminals->data);
+    ck_assert_int_eq(AST_CHAR, (int)terminals->next->data);
+    ck_assert_int_eq(AST_SHORT, (int)terminals->next->next->data);
+    ck_assert_int_eq(AST_INT, (int)terminals->next->next->next->data);
+    ck_assert_int_eq(AST_LONG, (int)terminals->next->next->next->next->data);
+    ck_assert_int_eq(AST_FLOAT, (int)terminals->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_DOUBLE, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_SIGNED, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_UNSIGNED, (int)terminals->next->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_STRUCT, (int)terminals->next->next->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_UNION, (int)terminals->next->next->next->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_ENUM, (int)terminals->next->next->next->next->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CONST, (int)terminals->next->next->next->next->next->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_VOLATILE, (int)terminals->next->next->next->next->next->next->next->next->next->next->next->next->next->data);
+    ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next->next->next->next->next->next->next);
 
 }
 END_TEST
@@ -2529,6 +2575,7 @@ main(void)
     tcase_add_test(testcase, test_head_terminal_values_on_additive_expression);
     tcase_add_test(testcase, test_head_terminal_values_on_shift_expression);
     tcase_add_test(testcase, test_head_terminal_values_on_relational_expression);
+    tcase_add_test(testcase, test_head_terminal_values_on_specifier_qualifier_list);
     tcase_add_test(testcase, test_generate_items_on_constant);
     tcase_add_test(testcase, test_generate_items_on_primary_expression);
     tcase_add_test(testcase, test_generate_items_on_postfix_expression);
