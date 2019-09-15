@@ -228,23 +228,6 @@ struct state
 #define MAX_STATES 256
 
 /*
- * state_iterator is used to iterate over a graph of state structures.
- */
-struct state_iterator
-{
-    /*
-     * list of all the states all states to iterate over.
-     */
-    struct listnode *states;
-
-    /*
-     * array used to when building up the states list to identify states
-     * which states have already been * added to the list.
-     */
-    int visited[MAX_STATES];
-};
-
-/*
  * item inside a parse table row.
  */
 struct parsetable_item
@@ -284,12 +267,6 @@ generate_transitions(struct state *state);
 
 struct state *
 generate_states(void);
-
-struct state_iterator *
-iterator_init(struct state *s);
-
-struct state *
-iterator_next(struct state_iterator *i);
 
 struct parsetable_item *
 generate_parsetable(void);

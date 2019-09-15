@@ -4,7 +4,15 @@
 
 #include "parser.h"
 
+/*
+ * state_identifier indicates the total number of states in the grammar.
+ */
 static int state_identifier = 0;
+
+/*
+ * states is the list of states in the grammar.
+ */
+static struct state states[MAX_STATES];
 
 #define NUM_RULES 197
 
@@ -1221,9 +1229,7 @@ generate_transitions(struct state *s)
             index = INDEX(i->rewrite_rule->nodes[i->cursor_position]);
             if (s->links[index] == NULL)
             {
-                t = malloc(sizeof(struct state));
-                memset(t, 0, sizeof(struct state));
-                list_init(&t->items);
+                t = &states[state_identifier];
                 t->identifier = state_identifier++;
 
                 assert(t->identifier <= MAX_STATES);
@@ -1258,10 +1264,9 @@ generate_states(void)
 {
     struct state *s;
 
-    s = malloc(sizeof(struct state));
-    memset(s, 0, sizeof(struct state));
-    list_init(&s->items);
+    memset(states, 0, sizeof(struct state) * MAX_STATES);
 
+    s = &states[0];
     s->identifier = state_identifier++;
 
     generate_items(AST_TRANSLATION_UNIT, NULL, &s->items);
@@ -1270,97 +1275,41 @@ generate_states(void)
     return s;
 }
 
-static void
-internal_iterator_init(struct state_iterator *iterator, struct state *state)
-{
-    int i;
-
-    list_append(&iterator->states, state);
-    iterator->visited[state->identifier] = 1;
-
-    for (i=0; i<NUM_SYMBOLS; i++)
-    {
-        if (state->links[i] != NULL && !iterator->visited[state->links[i]->identifier])
-        {
-            internal_iterator_init(iterator, state->links[i]);
-        }
-    }
-}
-
-/*
- * Initializes an interator to be used by iterator_next().
- */
-struct state_iterator *
-iterator_init(struct state *state)
-{
-    struct state_iterator *iterator;
-
-    iterator = malloc(sizeof(struct state_iterator));
-
-    memset(iterator, 0, sizeof(struct state_iterator));
-    list_init(&iterator->states);
-
-    internal_iterator_init(iterator, state);
-
-    return iterator;
-}
-
-/*
- * Iterates over all state. Returns NULL if non-left.
- */
-struct state *
-iterator_next(struct state_iterator *iterator)
-{
-    int i;
-    struct state *next;
-
-    if (iterator->states != NULL)
-    {
-        next = (struct state *)iterator->states->data;
-
-        iterator->states = iterator->states->next;
-
-        return next;
-    }
-
-    return NULL;
-}
-
 struct parsetable_item *
 generate_parsetable(void)
 {
-    int i;
+    int i, j;
     struct parsetable_item *table, *row, *cell;
     struct state *state;
-    struct state_iterator *iterator;
-    struct listnode *items;
 
-    iterator = iterator_init(generate_states());
+    generate_states();
 
     table = malloc(sizeof(struct parsetable_item) * (NUM_SYMBOLS) * (state_identifier + 1));
     memset(table, 0, sizeof(struct parsetable_item) * NUM_SYMBOLS * (state_identifier + 1));
 
-    while ((state = iterator_next(iterator)) != NULL && (items = state->items))
+    for (i=0; i<state_identifier; i++)
     {
+        state = &states[i];
         row = &table[state->identifier * NUM_SYMBOLS];
-        for (i=0; i<NUM_SYMBOLS; i++)
-        {
-            cell = row + i;
 
-            if (state->links[i] != NULL && i > AST_INVALID)
+        for (j=0; j<NUM_SYMBOLS; j++)
+        {
+            cell = row + j;
+
+            if (state->links[j] != NULL && j > AST_INVALID)
             {
                 /*
                  * non-terminal value
                  */
-                cell->state = state->links[i]->identifier;
+                cell->state = state->links[j]->identifier;
             }
-            else if (state->links[i] != NULL && i < AST_INVALID)
+            else if (state->links[j] != NULL && j < AST_INVALID)
             {
                 /*
                  * terminal value
                  */
                 cell->shift = 1;
-                cell->state = state->links[i]->identifier;
+                cell->state = state->links[j]->identifier;
             }
         }
     }
