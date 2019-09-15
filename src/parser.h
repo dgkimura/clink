@@ -268,6 +268,9 @@ generate_transitions(struct state *state);
 struct state *
 generate_states(void);
 
+int
+index_of_state(struct state *state);
+
 struct parsetable_item *
 generate_parsetable(void);
 

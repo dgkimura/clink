@@ -1136,6 +1136,7 @@ head_terminal_values(enum astnode_t node, struct listnode **checked_nodes,
     }
 }
 
+// TODO: do you need to check lookahead too?
 static int
 items_contains(struct listnode **items, struct rule *r, int position)
 {
@@ -1273,6 +1274,78 @@ generate_states(void)
     generate_transitions(s);
 
     return s;
+}
+
+/*
+ * Returns whether the given state contains the given item.
+ */
+static int
+state_contains_item(struct state *state, struct item *item)
+{
+    int contains = 0;
+    struct listnode *l;
+    struct item *i;
+
+    for (l=state->items; l!=NULL; l=l->next)
+    {
+        i = (struct item *)l->data;
+
+        if (item->rewrite_rule == i->rewrite_rule &&
+            item->cursor_position == i->cursor_position &&
+            list_equal(item->lookahead, i->lookahead))
+        {
+            contains = 1;
+            break;
+        }
+    }
+    return contains;
+}
+
+/*
+ * Returns the index of a state in global states that has identical items or -1
+ * if does not exist.
+ */
+int
+index_of_state(struct state *state)
+{
+    int index, i, match;
+    struct listnode *l;
+
+    for (i=0; i<state_identifier; i++)
+    {
+        match = 1;
+
+        /*
+         * Check that indexed state contains everything in state.
+         */
+        for (l=state->items; l!=NULL; l=l->next)
+        {
+            if (!state_contains_item(&states[i], (struct item *)l->data))
+            {
+                match = 0;
+                break;
+            }
+        }
+
+        /*
+         * Inverse check that state contains everything in indexed state.
+         */
+        for (l=states[i].items; l!=NULL; l=l->next)
+        {
+            if (!state_contains_item(state, (struct item *)l->data))
+            {
+                match = 0;
+                break;
+            }
+        }
+
+        if (match)
+        {
+            index = i;
+        }
+    }
+
+    return index;
 }
 
 struct parsetable_item *

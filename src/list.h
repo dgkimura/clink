@@ -22,6 +22,8 @@ void list_prepend(struct listnode **head, void *data);
 
 void list_append(struct listnode **head, void *data);
 
+int list_equal(struct listnode *a, struct listnode *b);
+
 struct listnode *list_findkey(struct listnode *head, char *key);
 
 #endif

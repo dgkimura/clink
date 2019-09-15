@@ -48,6 +48,55 @@ list_append(
     }
 }
 
+int
+list_equal(struct listnode *a, struct listnode *b)
+{
+    struct listnode *_a, *_b;
+    int match = 0;
+
+    for (_a=a; _a!=NULL; _a=_a->next)
+    {
+        for (_b=b; _b!=NULL; _b=_b->next)
+        {
+            if (_a->data == _b->data)
+            {
+                match = 1;
+                break;
+            }
+        }
+
+        if (!match)
+        {
+            /*
+             * a contained data that b does not contain.
+             */
+            return 0;
+        }
+    }
+
+    for (_b=b; _b!=NULL; _b=_b->next)
+    {
+        for (_a=a; _a!=NULL; _a=_a->next)
+        {
+            if (_a->data == _b->data)
+            {
+                match = 1;
+                break;
+            }
+        }
+
+        if (!match)
+        {
+            /*
+             * b contained data that a does not contain.
+             */
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 struct listnode *
 list_findkey(struct listnode *head, char *key)
 {
