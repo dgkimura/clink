@@ -283,4 +283,7 @@ reduce(struct listnode **stack);
 struct astnode *
 do_parsing(struct listnode *tokens);
 
+void
+print_state(struct state *state);
+
 #endif
