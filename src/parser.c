@@ -1239,6 +1239,16 @@ generate_transitions(struct state *s)
                 s->links[index] = t;
             }
 
+            if (items_contains(&s->links[index]->items, j->rewrite_rule,
+                                j->cursor_position))
+            {
+                /*
+                 * If state already contains item then continue.
+                 */
+                free(j);
+                continue;
+            }
+
             list_append(&s->links[index]->items, j);
         }
     }
