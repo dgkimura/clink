@@ -1290,7 +1290,7 @@ generate_states(void)
 /*
  * Returns whether the given state contains the given item.
  */
-static int
+int
 state_contains_item(struct state *state, struct item *item)
 {
     int contains = 0;

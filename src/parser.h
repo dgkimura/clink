@@ -269,6 +269,9 @@ struct state *
 generate_states(void);
 
 int
+state_contains_item(struct state *state, struct item *item);
+
+int
 index_of_state(struct state *state);
 
 struct parsetable_item *
