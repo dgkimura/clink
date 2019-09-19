@@ -15,6 +15,8 @@ static int state_identifier = 0;
  */
 static struct state states[MAX_STATES];
 
+static struct state temp_states[MAX_STATES];
+
 #define NUM_RULES 197
 
 struct rule grammar[NUM_RULES] =
@@ -1205,9 +1207,8 @@ generate_transitions(struct state *s)
 {
     struct listnode *items;
     struct item *i, *j;
-    struct state *t;
     struct rule *r;
-    int index;
+    int index, new_index;
 
     int terminal_state = 1;
 
@@ -1225,18 +1226,17 @@ generate_transitions(struct state *s)
 
             j = malloc(sizeof(struct item));
             j->rewrite_rule = i->rewrite_rule;
-            j->lookahead = i->lookahead;
+
+            //FIXME: properly handle lookahead
+            // j->lookahead = i->lookahead;
+            j->lookahead = NULL;
             j->cursor_position = i->cursor_position + 1;
 
             index = INDEX(i->rewrite_rule->nodes[i->cursor_position]);
             if (s->links[index] == NULL)
             {
-                t = &states[state_identifier];
-                t->identifier = state_identifier++;
-
-                assert(t->identifier <= MAX_STATES);
-
-                s->links[index] = t;
+                s->links[index] = &temp_states[index];
+                memset(s->links[index], 0, sizeof(struct state));
             }
 
             if (items_contains(&s->links[index]->items, j->rewrite_rule,
@@ -1250,20 +1250,60 @@ generate_transitions(struct state *s)
             }
 
             list_append(&s->links[index]->items, j);
+
+            if (j->cursor_position < j->rewrite_rule->length_of_nodes &&
+                j->rewrite_rule->nodes[j->cursor_position] > AST_INVALID)
+            {
+                /*
+                 * Append new states due to subsequent non-terminal.
+                 */
+                struct listnode *lookahead;
+                list_init(&lookahead);
+
+                if (j->cursor_position + 1 < j->rewrite_rule->length_of_nodes)
+                {
+                    /*
+                     * If there is a follow symbol.
+                     */
+                    struct listnode *checked_nodes;
+                    list_init(&checked_nodes);
+
+                    /*
+                     * Find terminal value of the follow symbol.
+                     */
+                    head_terminal_values(
+                        j->rewrite_rule->nodes[j->cursor_position + 1],
+                        &checked_nodes,
+                        &lookahead);
+                }
+
+                /*
+                 * Find all items derived from current symbol and add them
+                 * to state with lookhead found above.
+                 */
+                generate_items(
+                    j->rewrite_rule->nodes[j->cursor_position],
+                    lookahead, &s->links[index]->items);
+            }
         }
     }
 
-    /*
-     * If state transitions were added then recursively complete them.
-     */
-    if (!terminal_state)
+    for (index=0; index<NUM_SYMBOLS; index++)
     {
-        for (index=0; index<NUM_SYMBOLS; index++)
+        if (s->links[index] != NULL && index_of_state(s->links[index]) == -1)
         {
-            if (s->links[index] != NULL)
-            {
-                generate_transitions(s->links[index]);
-            }
+            /*
+             * If the state does not exist in global states then update the
+             * links and recursively generate next transitions. We waited until
+             * now to set the link because we finally know all items have been
+             * added and can avoid duplicate states.
+             */
+            new_index = state_identifier;
+
+            s->links[index]->identifier = state_identifier++;
+            states[new_index] = *s->links[index];
+
+            generate_transitions(&states[new_index]);
         }
     }
 }
@@ -1312,6 +1352,41 @@ state_contains_item(struct state *state, struct item *item)
     return contains;
 }
 
+int
+compare_states(struct state *a, struct state *b)
+{
+    int index, i, compare;
+    struct listnode *l;
+
+    compare = 0;
+
+    /*
+     * Check that indexed state contains everything in state.
+     */
+    for (l=a->items; l!=NULL; l=l->next)
+    {
+        if (!state_contains_item(b, (struct item *)l->data))
+        {
+            compare = -1;
+            break;
+        }
+    }
+
+    /*
+     * Inverse check that state contains everything in indexed state.
+     */
+    for (l=b->items; l!=NULL; l=l->next)
+    {
+        if (!state_contains_item(a, (struct item *)l->data))
+        {
+            compare = 1;
+            break;
+        }
+    }
+
+    return compare;
+}
+
 /*
  * Returns the index of a state in global states that has identical items or -1
  * if does not exist.
@@ -1322,37 +1397,13 @@ index_of_state(struct state *state)
     int index, i, match;
     struct listnode *l;
 
+    index = -1;
     for (i=0; i<state_identifier; i++)
     {
-        match = 1;
-
-        /*
-         * Check that indexed state contains everything in state.
-         */
-        for (l=state->items; l!=NULL; l=l->next)
-        {
-            if (!state_contains_item(&states[i], (struct item *)l->data))
-            {
-                match = 0;
-                break;
-            }
-        }
-
-        /*
-         * Inverse check that state contains everything in indexed state.
-         */
-        for (l=states[i].items; l!=NULL; l=l->next)
-        {
-            if (!state_contains_item(state, (struct item *)l->data))
-            {
-                match = 0;
-                break;
-            }
-        }
-
-        if (match)
+        if (compare_states(state, &states[i]) == 0)
         {
             index = i;
+            break;
         }
     }
 

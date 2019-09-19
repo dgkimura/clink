@@ -358,6 +358,9 @@ START_TEST(test_parser_generate_states)
     state = generate_states();
 
     ck_assert_int_eq(0, state->identifier);
+    ck_assert_int_eq(0, index_of_state(state));
+    ck_assert_int_eq(96, index_of_state(state->links[2]));
+    ck_assert_int_eq(103, index_of_state(state->links[12]));
 }
 END_TEST
 
@@ -371,7 +374,7 @@ START_TEST(test_parser_generates_parsetable)
 
     ck_assert_int_eq(0, item->shift);
     ck_assert_int_eq(0, item->reduce);
-    ck_assert_int_eq(38, item->state);
+    ck_assert_int_eq(91, item->state);
 }
 END_TEST
 

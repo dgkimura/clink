@@ -272,6 +272,9 @@ int
 state_contains_item(struct state *state, struct item *item);
 
 int
+compare_states(struct state *a, struct state *b);
+
+int
 index_of_state(struct state *state);
 
 struct parsetable_item *
