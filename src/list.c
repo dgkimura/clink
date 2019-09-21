@@ -54,6 +54,11 @@ list_equal(struct listnode *a, struct listnode *b)
     struct listnode *_a, *_b;
     int match = 0;
 
+    if (a == b)
+    {
+        return 1;
+    }
+
     for (_a=a; _a!=NULL; _a=_a->next)
     {
         for (_b=b; _b!=NULL; _b=_b->next)

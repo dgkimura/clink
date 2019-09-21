@@ -1139,9 +1139,8 @@ head_terminal_values(enum astnode_t node, struct listnode **checked_nodes,
     }
 }
 
-// TODO: do you need to check lookahead too?
 static int
-items_contains(struct listnode **items, struct rule *r, int position)
+items_contains(struct listnode **items, struct rule *r, int position, struct listnode *lookahead)
 {
     int contains = 0;
     struct listnode *c;
@@ -1151,7 +1150,8 @@ items_contains(struct listnode **items, struct rule *r, int position)
     while (c != NULL)
     {
         i = (struct item *)c->data;
-        if (i->rewrite_rule == r && i->cursor_position == position)
+        if (i->rewrite_rule == r && i->cursor_position == position &&
+            list_equal(i->lookahead, lookahead))
         {
             contains = 1;
             break;
@@ -1173,7 +1173,7 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
 
     for (i=0; i<NUM_RULES; i++)
     {
-        if (grammar[i].type == node && !items_contains(items, &grammar[i], 0))
+        if (grammar[i].type == node && !items_contains(items, &grammar[i], 0, lookahead))
         {
             item = malloc(sizeof(struct item));
             item->rewrite_rule = &grammar[i];
@@ -1189,7 +1189,14 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
             {
                 if (grammar[i].length_of_nodes > 1)
                 {
+                    struct listnode *checked_nodes;
+                    list_init(&checked_nodes);
+
                     list_init(&lookahead);
+                    head_terminal_values(
+                        grammar[i].nodes[1],
+                        &checked_nodes,
+                        &lookahead);
                     list_append(&lookahead, &grammar[i].nodes[1]);
                 }
                 generate_items(grammar[i].nodes[0], lookahead, items);
@@ -1240,7 +1247,7 @@ generate_transitions(struct state *s)
             }
 
             if (items_contains(&s->links[index]->items, j->rewrite_rule,
-                                j->cursor_position))
+                                j->cursor_position, j->lookahead))
             {
                 /*
                  * If state already contains item then continue.
