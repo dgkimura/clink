@@ -11,11 +11,12 @@ TEST_OBJS = $(TEST_SRCS:.c=.o)
 
 SRCS = $(filter-out main.c, $(filter-out $(TEST_SRCS), $(wildcard *.c)))
 OBJS = $(SRCS:.c=.o)
+CFLAGS = -g
 
 all: scc test_scc
 
 scc: main.o $(OBJS)
-	$(CC) -o $@ $^
+	$(CC) -g -o $@ $^
 
 test_scc: $(TEST_OBJS) $(OBJS)
 	$(CC) -g $^ -o $@ $(TEST_LIBS)
