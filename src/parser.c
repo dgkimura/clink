@@ -1234,9 +1234,7 @@ generate_transitions(struct state *s)
             j = malloc(sizeof(struct item));
             j->rewrite_rule = i->rewrite_rule;
 
-            //FIXME: properly handle lookahead
-            // j->lookahead = i->lookahead;
-            j->lookahead = NULL;
+            j->lookahead = i->lookahead;
             j->cursor_position = i->cursor_position + 1;
 
             index = INDEX(i->rewrite_rule->nodes[i->cursor_position]);

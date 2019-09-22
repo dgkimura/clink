@@ -225,7 +225,7 @@ struct state
     struct state *links[NUM_SYMBOLS];
 };
 
-#define MAX_STATES 256
+#define MAX_STATES 1024
 
 /*
  * item inside a parse table row.
