@@ -1197,7 +1197,7 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
                         grammar[i].nodes[1],
                         &checked_nodes,
                         &lookahead);
-                    list_append(&lookahead, &grammar[i].nodes[1]);
+                    list_append(&lookahead, grammar[i].nodes[1]);
                 }
                 generate_items(grammar[i].nodes[0], lookahead, items);
             }
