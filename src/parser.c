@@ -1170,6 +1170,7 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
 {
     int i;
     struct item *item;
+    struct listnode *checked_nodes, *next_lookahead = lookahead;
 
     for (i=0; i<NUM_RULES; i++)
     {
@@ -1189,17 +1190,16 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
             {
                 if (grammar[i].length_of_nodes > 1)
                 {
-                    struct listnode *checked_nodes;
                     list_init(&checked_nodes);
+                    list_init(&next_lookahead);
 
-                    list_init(&lookahead);
                     head_terminal_values(
                         grammar[i].nodes[1],
                         &checked_nodes,
-                        &lookahead);
-                    list_append(&lookahead, grammar[i].nodes[1]);
+                        &next_lookahead);
+                    list_append(&next_lookahead, (void *)grammar[i].nodes[1]);
                 }
-                generate_items(grammar[i].nodes[0], lookahead, items);
+                generate_items(grammar[i].nodes[0], next_lookahead, items);
             }
         }
     }

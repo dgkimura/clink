@@ -268,73 +268,15 @@ START_TEST(test_generate_items_on_postfix_expression)
 
     generate_items(AST_POSTFIX_EXPRESSION, NULL, &items);
 
-    // FIXME: additional items due to lookahead
     assert_rules_equal(
         (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
         *((struct item *)items->data)->rewrite_rule);
+    ck_assert_ptr_null(((struct item *)items->data)->lookahead);
+
     assert_rules_equal(
         (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
         *((struct item *)items->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS } },
-        *((struct item *)items->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
-        *((struct item *)items->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_MINUS_MINUS } },
-        *((struct item *)items->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
-        *((struct item *)items->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 1, { AST_PRIMARY_EXPRESSION } },
-        *((struct item *)items->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_PRIMARY_EXPRESSION, 1, { AST_CONSTANT } },
-        *((struct item *)items->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_CONSTANT, 1, { AST_INTEGER_CONSTANT } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_CONSTANT, 1, { AST_CHARACTER_CONSTANT } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 1, { AST_PRIMARY_EXPRESSION } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_PRIMARY_EXPRESSION, 1, { AST_CONSTANT } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_CONSTANT, 1, { AST_INTEGER_CONSTANT } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_CONSTANT, 1, { AST_CHARACTER_CONSTANT } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_MINUS_MINUS } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 2, { AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_POSTFIX_EXPRESSION, 1, { AST_PRIMARY_EXPRESSION } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_PRIMARY_EXPRESSION, 1, { AST_CONSTANT } },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_CONSTANT, 1, { AST_INTEGER_CONSTANT} },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
-    assert_rules_equal(
-        (struct rule){ AST_CONSTANT, 1, { AST_CHARACTER_CONSTANT} },
-        *((struct item *)items->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->rewrite_rule);
+    ck_assert_int_eq(AST_ARROW, (int)((struct item *)items->next->data)->lookahead->data);
 }
 END_TEST
 
@@ -405,8 +347,8 @@ START_TEST(test_parser_generate_states)
 
     ck_assert_int_eq(0, state->identifier);
     ck_assert_int_eq(0, index_of_state(state));
-    ck_assert_int_eq(211, index_of_state(state->links[2]));
-    ck_assert_int_eq(384, index_of_state(state->links[12]));
+    ck_assert_int_eq(13, index_of_state(state->links[2]));
+    ck_assert_int_eq(2, index_of_state(state->links[12]));
 }
 END_TEST
 
@@ -420,7 +362,7 @@ START_TEST(test_parser_generates_parsetable)
 
     ck_assert_int_eq(0, item->shift);
     ck_assert_int_eq(0, item->reduce);
-    ck_assert_int_eq(194, item->state);
+    ck_assert_int_eq(179, item->state);
 }
 END_TEST
 
