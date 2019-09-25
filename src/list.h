@@ -16,6 +16,9 @@ struct listnode
     void *data;
 };
 
+#define foreach(item, list) \
+    for (struct listnode *item=list; item!=NULL; item=item->next)
+
 void list_init(struct listnode **head);
 
 void list_prepend(struct listnode **head, void *data);

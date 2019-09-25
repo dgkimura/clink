@@ -1421,6 +1421,9 @@ generate_parsetable(void)
     int i, j;
     struct parsetable_item *table, *row, *cell;
     struct state *state;
+    struct listnode *node, *inner_node;
+    struct item *item;
+    int lookahead;
 
     generate_states();
 
@@ -1450,6 +1453,22 @@ generate_parsetable(void)
                  */
                 cell->shift = 1;
                 cell->state = state->links[j]->identifier;
+            }
+        }
+
+        /*
+         * Iterate over all items and for each completed rules add to parse
+         * table based on lookahead.
+         */
+        foreach(node, state->items)
+        {
+            item = ((struct item *)node->data);
+            if (item->cursor_position == item->rewrite_rule->length_of_nodes)
+            {
+                foreach(inner_node, item->lookahead)
+                {
+                    lookahead = ((int)inner_node->data);
+                }
             }
         }
     }
