@@ -1107,6 +1107,15 @@ head_terminal_values(enum astnode_t node, struct listnode **checked_nodes,
         return;
     }
 
+    if (node < AST_INVALID)
+    {
+        /*
+         * If node is a terminal symbol then add it and return.
+         */
+        list_append(terminals, (void *)node);
+        return;
+    }
+
     /*
      * Update checked_nodes to avoid trying to repeated work and infinite
      * recursion.
@@ -1197,7 +1206,6 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
                         grammar[i].nodes[1],
                         &checked_nodes,
                         &next_lookahead);
-                    list_append(&next_lookahead, (void *)grammar[i].nodes[1]);
                 }
                 generate_items(grammar[i].nodes[0], next_lookahead, items);
             }
