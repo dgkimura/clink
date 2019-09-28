@@ -1476,6 +1476,10 @@ generate_parsetable(void)
                 foreach(inner_node, item->lookahead)
                 {
                     lookahead = ((int)inner_node->data);
+                    cell = row + lookahead;
+
+                    cell->reduce = 1;
+                    cell->rule = item->rewrite_rule;
                 }
             }
         }
