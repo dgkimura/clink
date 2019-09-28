@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "parser.h"
+#include "utilities.h"
 
 /*
  * state_identifier indicates the total number of states in the grammar.
@@ -1072,6 +1073,12 @@ struct rule grammar[NUM_RULES] =
     },
 };
 
+struct rule *
+get_grammar(void)
+{
+    return grammar;
+}
+
 static int
 checked_nodes_contains(struct listnode **items, enum astnode_t node)
 {
@@ -1995,19 +2002,4 @@ do_parsing(struct listnode *tokens)
     }
 
     return result;
-}
-
-void
-print_state(struct state *s)
-{
-    struct listnode *items;
-    struct item *item;
-    int i;
-
-    printf("state %d\n", s->identifier);
-    for (items=s->items; items!=NULL; items=items->next)
-    {
-        item = (struct item *)items->data;
-        printf("  (%d,%d)\n", (int)(item->rewrite_rule-grammar), item->cursor_position);
-    }
 }

@@ -255,6 +255,9 @@ struct parsetable_item
     unsigned int state:30;
 };
 
+struct rule *
+get_grammar(void);
+
 void
 head_terminal_values(enum astnode_t node, struct listnode **checked_nodes,
                      struct listnode **terminals);
@@ -288,8 +291,5 @@ reduce(struct listnode **stack);
 
 struct astnode *
 do_parsing(struct listnode *tokens);
-
-void
-print_state(struct state *state);
 
 #endif
