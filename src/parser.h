@@ -286,10 +286,4 @@ generate_parsetable(void);
 struct astnode *
 shift(struct token * token);
 
-struct astnode *
-reduce(struct listnode **stack);
-
-struct astnode *
-do_parsing(struct listnode *tokens);
-
 #endif
