@@ -1488,6 +1488,19 @@ generate_parsetable(void)
                     cell->reduce = 1;
                     cell->rule = item->rewrite_rule;
                 }
+
+                if (item->lookahead == NULL)
+                {
+                    /*
+                     * NULL lookahead means end of input (e.g. $). Since
+                     * nothing should match AST_INVALID, let's use that for
+                     * NULL lookahead items.
+                     */
+                    cell = row + AST_INVALID;
+
+                    cell->reduce = 1;
+                    cell->rule = item->rewrite_rule;
+                }
             }
         }
     }
