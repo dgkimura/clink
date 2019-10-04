@@ -1232,7 +1232,6 @@ generate_transitions(struct state *s)
     struct rule *r;
     int index, new_index;
 
-    int terminal_state = 1;
 
     for (items=s->items; items!=NULL; items=items->next)
     {
@@ -1244,8 +1243,6 @@ generate_transitions(struct state *s)
          */
         if (i->cursor_position < r->length_of_nodes)
         {
-            terminal_state = 0;
-
             j = malloc(sizeof(struct item));
             j->rewrite_rule = i->rewrite_rule;
 
@@ -1493,8 +1490,8 @@ generate_parsetable(void)
                 {
                     /*
                      * NULL lookahead means end of input (e.g. $). Since
-                     * nothing should match AST_INVALID, let's use that for
-                     * NULL lookahead items.
+                     * nothing should match AST_INVALID, let's use that column
+                     * for NULL lookahead items.
                      */
                     cell = row + AST_INVALID;
 
