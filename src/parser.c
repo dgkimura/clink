@@ -1920,3 +1920,41 @@ shift(struct token *token)
 
     return node;
 }
+
+struct astnode *
+parse(struct listnode *tokens, struct parsetable_item *parsetable)
+{
+    struct astnode *node;
+    struct listnode *stack;
+    struct listnode *token;
+    struct parsetable_item *row, *cell;
+
+    list_init(&stack);
+
+    /*
+     * Stack starts at state 0.
+     */
+    list_append(&stack, 0);
+
+    for (token=tokens; token!=NULL; token=token->next)
+    {
+        row = parsetable + (int)stack->data * NUM_SYMBOLS;
+
+        node = shift((struct token *)token->data);
+        cell = row + INDEX(node->type);
+        if (cell->shift)
+        {
+            /*
+             * Push onto stack
+             */
+        }
+        else if (cell->reduce)
+        {
+            /*
+             * Pop off stack
+             */
+        }
+    }
+
+    return node;
+}

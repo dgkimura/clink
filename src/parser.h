@@ -286,4 +286,7 @@ generate_parsetable(void);
 struct astnode *
 shift(struct token * token);
 
+struct astnode *
+parse(struct listnode *tokens, struct parsetable_item *parsetable);
+
 #endif
