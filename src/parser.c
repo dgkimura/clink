@@ -1479,7 +1479,7 @@ generate_parsetable(void)
             {
                 foreach(inner_node, item->lookahead)
                 {
-                    lookahead = ((int)inner_node->data);
+                    lookahead = (int)inner_node->data;
                     cell = row + lookahead;
 
                     cell->reduce = 1;
@@ -1506,7 +1506,7 @@ generate_parsetable(void)
 }
 
 struct astnode *
-shift(struct token *token)
+token_to_astnode(struct token *token)
 {
     struct astnode *node;
     if (token->type == TOK_INTEGER)
@@ -1928,25 +1928,28 @@ parse(struct listnode *tokens, struct parsetable_item *parsetable)
     struct listnode *stack;
     struct listnode *token;
     struct parsetable_item *row, *cell;
+    static int zero = 0;
 
     list_init(&stack);
 
     /*
      * Stack starts at state 0.
      */
-    list_append(&stack, 0);
+    list_prepend(&stack, &zero);
 
     for (token=tokens; token!=NULL; token=token->next)
     {
         row = parsetable + (int)stack->data * NUM_SYMBOLS;
 
-        node = shift((struct token *)token->data);
+        node = token_to_astnode((struct token *)token->data);
         cell = row + INDEX(node->type);
         if (cell->shift)
         {
             /*
              * Push onto stack
              */
+            list_prepend(&stack, node);
+            list_prepend(&stack, &cell->state);
         }
         else if (cell->reduce)
         {

@@ -241,18 +241,18 @@ struct parsetable_item
      * shift indicates whether this is a shift operation. It cannot be both a
      * shift and reduce operation.
      */
-    unsigned int shift:1;
+    int shift;
 
     /*
      * reduce indicates whether this is a shift operation. It cannot be both a
      * shift and reduce operation.
      */
-    unsigned int reduce:1;
+    int reduce;
 
     /*
      * state indicates the next state to shift to.
      */
-    unsigned int state:30;
+    int state;
 };
 
 struct rule *
@@ -284,7 +284,7 @@ struct parsetable_item *
 generate_parsetable(void);
 
 struct astnode *
-shift(struct token * token);
+token_to_astnode(struct token * token);
 
 struct astnode *
 parse(struct listnode *tokens, struct parsetable_item *parsetable);
