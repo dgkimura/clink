@@ -1924,11 +1924,12 @@ token_to_astnode(struct token *token)
 struct astnode *
 parse(struct listnode *tokens, struct parsetable_item *parsetable)
 {
-    struct astnode *node;
+    struct astnode *node, *root;
     struct listnode *stack;
     struct listnode *token;
     struct parsetable_item *row, *cell;
     static int zero = 0;
+    int i;
 
     list_init(&stack);
 
@@ -1946,7 +1947,7 @@ parse(struct listnode *tokens, struct parsetable_item *parsetable)
         if (cell->shift)
         {
             /*
-             * Push onto stack
+             * Shift involves pushing node and state onto stack.
              */
             list_prepend(&stack, node);
             list_prepend(&stack, &cell->state);
@@ -1954,10 +1955,27 @@ parse(struct listnode *tokens, struct parsetable_item *parsetable)
         else if (cell->reduce)
         {
             /*
-             * Pop off stack
+             * Reduce involves removing the astnodes that compose the rule from
+             * the stack. Then create the reduced astnode and push it onto the
+             * stack.
              */
+            for (i=0; i<cell->rule->length_of_nodes; i++)
+            {
+                root = malloc(sizeof(struct astnode));
+                memset(root, 0, sizeof(struct astnode));
+
+                root->type = cell->rule->type;
+                list_append(&root->children, stack->data);
+
+                /*
+                 * Remove astnode and cell state from the stack.
+                 */
+                stack = stack->next->next;
+            }
+
+            list_prepend(&stack, root);
         }
     }
 
-    return node;
+    return root;
 }
