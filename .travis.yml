@@ -1,0 +1,13 @@
+sudo: required
+dist: trusty
+language: c
+
+compiler:
+  - gcc
+  - clang
+
+install:
+  - sudo apt-get install check subunit
+
+script:
+  - pushd src && make && ./test_scc
