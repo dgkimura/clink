@@ -354,17 +354,24 @@ START_TEST(test_parser_generate_states)
 }
 END_TEST
 
+static struct token *
+create_token(enum token_t token)
+{
+    struct token *tok = malloc(sizeof(struct token));
+    tok->type = token;
+    return tok;
+}
+
 START_TEST(test_parser_generates_parsetable)
 {
-    struct parsetable_item *parsetable, *item;
+    struct listnode *tokens;
+    list_init(&tokens);
 
-    parsetable = generate_parsetable();
+    list_append(&tokens, create_token(TOK_INT));
 
-    item = parsetable + (NUM_SYMBOLS - 1);
+    init_parsetable();
 
-    ck_assert_int_eq(0, item->shift);
-    ck_assert_int_eq(0, item->reduce);
-    ck_assert_int_eq(196, item->state);
+    parse(tokens);
 }
 END_TEST
 

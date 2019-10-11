@@ -280,13 +280,13 @@ compare_states(struct state *a, struct state *b);
 int
 index_of_state(struct state *state);
 
-struct parsetable_item *
-generate_parsetable(void);
+void
+init_parsetable(void);
 
 struct astnode *
 token_to_astnode(struct token * token);
 
 struct astnode *
-parse(struct listnode *tokens, struct parsetable_item *parsetable);
+parse(struct listnode *tokens);
 
 #endif

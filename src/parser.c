@@ -6,6 +6,8 @@
 #include "parser.h"
 #include "utilities.h"
 
+static struct parsetable_item *parsetable = NULL;
+
 /*
  * state_identifier indicates the total number of states in the grammar.
  */
@@ -1427,25 +1429,30 @@ index_of_state(struct state *state)
     return index;
 }
 
-struct parsetable_item *
-generate_parsetable(void)
+void
+init_parsetable(void)
 {
     int i, j;
-    struct parsetable_item *table, *row, *cell;
+    struct parsetable_item *row, *cell;
     struct state *state;
     struct listnode *node, *inner_node;
     struct item *item;
     int lookahead;
 
+    if (parsetable != NULL)
+    {
+        return;
+    }
+
     generate_states();
 
-    table = malloc(sizeof(struct parsetable_item) * (NUM_SYMBOLS) * (state_identifier + 1));
-    memset(table, 0, sizeof(struct parsetable_item) * NUM_SYMBOLS * (state_identifier + 1));
+    parsetable = malloc(sizeof(struct parsetable_item) * (NUM_SYMBOLS) * (state_identifier + 1));
+    memset(parsetable, 0, sizeof(struct parsetable_item) * NUM_SYMBOLS * (state_identifier + 1));
 
     for (i=0; i<state_identifier; i++)
     {
         state = &states[i];
-        row = &table[state->identifier * NUM_SYMBOLS];
+        row = &parsetable[state->identifier * NUM_SYMBOLS];
 
         for (j=0; j<NUM_SYMBOLS; j++)
         {
@@ -1501,8 +1508,6 @@ generate_parsetable(void)
             }
         }
     }
-
-    return table;
 }
 
 struct astnode *
@@ -1922,7 +1927,7 @@ token_to_astnode(struct token *token)
 }
 
 struct astnode *
-parse(struct listnode *tokens, struct parsetable_item *parsetable)
+parse(struct listnode *tokens)
 {
     struct astnode *node, *root;
     struct listnode *stack;
@@ -1940,7 +1945,7 @@ parse(struct listnode *tokens, struct parsetable_item *parsetable)
 
     for (token=tokens; token!=NULL; )
     {
-        row = parsetable + (int)stack->data * NUM_SYMBOLS;
+        row = parsetable + *(int *)stack->data * NUM_SYMBOLS;
 
         node = token_to_astnode((struct token *)token->data);
         cell = row + INDEX(node->type);
