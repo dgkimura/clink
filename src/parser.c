@@ -1938,7 +1938,7 @@ parse(struct listnode *tokens, struct parsetable_item *parsetable)
      */
     list_prepend(&stack, &zero);
 
-    for (token=tokens; token!=NULL; token=token->next)
+    for (token=tokens; token!=NULL; )
     {
         row = parsetable + (int)stack->data * NUM_SYMBOLS;
 
@@ -1951,6 +1951,11 @@ parse(struct listnode *tokens, struct parsetable_item *parsetable)
              */
             list_prepend(&stack, node);
             list_prepend(&stack, &cell->state);
+
+            /*
+             * Consume a token
+             */
+            token=token->next;
         }
         else if (cell->reduce)
         {
@@ -1973,7 +1978,19 @@ parse(struct listnode *tokens, struct parsetable_item *parsetable)
                 stack = stack->next->next;
             }
 
+            /*
+             * Push the reduced node and the next state number.
+             */
+            row = parsetable + (int)stack->data * NUM_SYMBOLS;
+            cell = row + INDEX(root->type);
+
             list_prepend(&stack, root);
+            list_prepend(&stack, &cell->state);
+
+            /*
+             * Next iteration will use the cell->state, but should reuse the
+             * current input token. (Do not increment token->next)
+             */
         }
     }
 
