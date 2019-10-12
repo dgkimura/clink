@@ -12,6 +12,7 @@ static struct parsetable_item *parsetable = NULL;
  * state_identifier indicates the total number of states in the grammar.
  */
 static int state_identifier = 0;
+static int tmp_state_identifier = 0;
 
 /*
  * states is the list of states in the grammar.
@@ -1254,8 +1255,8 @@ generate_transitions(struct state *s)
             index = INDEX(i->rewrite_rule->nodes[i->cursor_position]);
             if (s->links[index] == NULL)
             {
-                s->links[index] = &temp_states[index];
-                memset(s->links[index], 0, sizeof(struct state));
+                s->links[index] = &temp_states[tmp_state_identifier++];
+                memset(&temp_states[index], 0, sizeof(struct state));
             }
 
             if (items_contains(&s->links[index]->items, j->rewrite_rule,
@@ -1317,9 +1318,9 @@ generate_transitions(struct state *s)
              * now to set the link because we finally know all items have been
              * added and can avoid duplicate states.
              */
-            new_index = state_identifier;
+            new_index = state_identifier++;
 
-            s->links[index]->identifier = state_identifier++;
+            s->links[index]->identifier = new_index;
             states[new_index] = *s->links[index];
 
             generate_transitions(&states[new_index]);
@@ -1378,6 +1379,11 @@ compare_states(struct state *a, struct state *b)
     struct listnode *l;
 
     compare = 0;
+
+    if ((a == NULL && b != NULL) || (a != NULL && b == NULL))
+    {
+        return -1;
+    }
 
     /*
      * Check that indexed state contains everything in state.
