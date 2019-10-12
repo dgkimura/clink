@@ -1529,7 +1529,7 @@ token_to_astnode(struct token *token)
     else if (token->type == TOK_IDENTIFIER)
     {
         node = malloc(sizeof(struct astnode));
-        node->type = AST_PRIMARY_EXPRESSION;
+        node->type = AST_IDENTIFIER;
         node->constant = token;
     }
     else if (token->type == TOK_PLUS)
@@ -1992,7 +1992,7 @@ parse(struct listnode *tokens)
             /*
              * Push the reduced node and the next state number.
              */
-            row = parsetable + (int)stack->data * NUM_SYMBOLS;
+            row = parsetable + *(int *)stack->data * NUM_SYMBOLS;
             cell = row + INDEX(root->type);
 
             list_prepend(&stack, root);
