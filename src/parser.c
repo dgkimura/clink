@@ -1256,7 +1256,7 @@ generate_transitions(struct state *s)
             if (s->links[index] == NULL)
             {
                 s->links[index] = &temp_states[tmp_state_identifier++];
-                memset(&temp_states[index], 0, sizeof(struct state));
+                memset(s->links[index], 0, sizeof(struct state));
             }
 
             if (items_contains(&s->links[index]->items, j->rewrite_rule,
