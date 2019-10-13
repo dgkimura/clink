@@ -1310,7 +1310,9 @@ generate_transitions(struct state *s)
 
     for (index=0; index<NUM_SYMBOLS; index++)
     {
-        if (s->links[index] != NULL && index_of_state(s->links[index]) == -1)
+        new_index = index_of_state(s->links[index]);
+
+        if (s->links[index] != NULL && new_index == -1)
         {
             /*
              * If the state does not exist in global states then update the
@@ -1319,11 +1321,21 @@ generate_transitions(struct state *s)
              * added and can avoid duplicate states.
              */
             new_index = state_identifier++;
+            assert(state_identifier < MAX_STATES);
 
             s->links[index]->identifier = new_index;
             states[new_index] = *s->links[index];
 
             generate_transitions(&states[new_index]);
+        }
+        else if (s->links[index] != NULL)
+        {
+            /*
+             * It may be the case that state was recursively generated. In
+             * which case we do not want to recurse again, but we still need to
+             * set the identifier.
+             */
+            s->links[index]->identifier = new_index;
         }
     }
 }
