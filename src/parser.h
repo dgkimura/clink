@@ -83,6 +83,7 @@ enum astnode_t
     AST_STATIC,
     AST_EXTERN,
     AST_TYPEDEF,
+    AST_TYPEDEF_NAME,
 
     /*
      * invalid symbol that separates termainal and non-terminal values
