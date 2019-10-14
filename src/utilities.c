@@ -6,7 +6,7 @@
 void
 print_state(struct state *s)
 {
-    struct listnode *items;
+    struct listnode *items, *lookaheads;
     struct item *item;
     int i;
 
@@ -14,14 +14,20 @@ print_state(struct state *s)
     for (items=s->items; items!=NULL; items=items->next)
     {
         item = (struct item *)items->data;
-        printf("  (%d,%d)\n", (int)(item->rewrite_rule-get_grammar()), item->cursor_position);
+        printf("  (%d,%d)", (int)(item->rewrite_rule-get_grammar()), item->cursor_position);
+
+        for (lookaheads=item->lookahead; lookaheads!=NULL; lookaheads=lookaheads->next)
+        {
+            printf(" %d", (int)(lookaheads->data));
+        }
+        printf("\n");
     }
 }
 
 void
 print_parsetable(struct parsetable_item *table)
 {
-    int i, j, num_states = 100; // FIXME: expose total states (state_identifier)..
+    int i, j, num_states = 750; // FIXME: expose total states (state_identifier)..
     struct parsetable_item *cell;
 
     printf("parse table:\n");
