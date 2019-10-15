@@ -349,8 +349,8 @@ START_TEST(test_parser_generate_states)
 
     ck_assert_int_eq(0, state->identifier);
     ck_assert_int_eq(0, index_of_state(state));
-    ck_assert_int_eq(16, index_of_state(state->links[2]));
-    ck_assert_int_eq(372, index_of_state(state->links[12]));
+    ck_assert_int_eq(1, index_of_state(state->links[2]));
+    ck_assert_int_eq(2, index_of_state(state->links[12]));
 }
 END_TEST
 
@@ -364,14 +364,18 @@ create_token(enum token_t token)
 
 START_TEST(test_parser_generates_parsetable)
 {
+    struct astnode *ast;
     struct listnode *tokens;
     list_init(&tokens);
 
     list_append(&tokens, create_token(TOK_INT));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
 
     init_parsetable();
 
-    parse(tokens);
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_INIT_DECLARATOR_LIST, ast->type);
 }
 END_TEST
 
