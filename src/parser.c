@@ -1985,6 +1985,11 @@ parse(struct listnode *tokens)
         }
         else if (cell->reduce)
         {
+            root = malloc(sizeof(struct astnode));
+            memset(root, 0, sizeof(struct astnode));
+
+            root->type = cell->rule->type;
+
             /*
              * Reduce involves removing the astnodes that compose the rule from
              * the stack. Then create the reduced astnode and push it onto the
@@ -1992,10 +1997,6 @@ parse(struct listnode *tokens)
              */
             for (i=0; i<cell->rule->length_of_nodes; i++)
             {
-                root = malloc(sizeof(struct astnode));
-                memset(root, 0, sizeof(struct astnode));
-
-                root->type = cell->rule->type;
                 list_append(&root->children, stack->data);
 
                 /*
