@@ -21,7 +21,7 @@ static struct state states[MAX_STATES];
 
 static struct state temp_states[MAX_STATES];
 
-#define NUM_RULES 197
+#define NUM_RULES 198
 
 struct rule grammar[NUM_RULES] =
 {
@@ -572,14 +572,12 @@ struct rule grammar[NUM_RULES] =
     {
         AST_DIRECT_ABSTRACT_DECLARATOR,
         3,
-        /* K&R grammar seems ambiguous here: constant-expression is a conditional-expression so why make distinction? */
-        { AST_LBRACKET, AST_CONDITIONAL_EXPRESSION, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        { AST_LBRACKET, AST_CONSTANT_EXPRESSION, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     {
         AST_DIRECT_ABSTRACT_DECLARATOR,
         4,
-        /* K&R grammar seems ambiguous here: constant-expression is a conditional-expression so why make distinction? */
-        { AST_DIRECT_ABSTRACT_DECLARATOR, AST_LBRACKET, AST_CONDITIONAL_EXPRESSION, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        { AST_DIRECT_ABSTRACT_DECLARATOR, AST_LBRACKET, AST_CONSTANT_EXPRESSION, AST_RBRACKET, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     {
         AST_DIRECT_ABSTRACT_DECLARATOR,
@@ -641,8 +639,7 @@ struct rule grammar[NUM_RULES] =
     {
         AST_LABELED_STATEMENT,
         4,
-        /* K&R grammar seems ambiguous here: constant-expression is a conditional-expression so why make distinction? */
-        { AST_CASE, AST_CONDITIONAL_EXPRESSION, AST_COLON, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+        { AST_CASE, AST_CONSTANT_EXPRESSION, AST_COLON, AST_STATEMENT, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
     {
         AST_LABELED_STATEMENT,
@@ -830,6 +827,12 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_ASSIGNMENT_EXPRESSION,
+        1,
+        { AST_CONDITIONAL_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
+    },
+    /* constant-expression: */
+    {
+        AST_CONSTANT_EXPRESSION,
         1,
         { AST_CONDITIONAL_EXPRESSION, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID, AST_INVALID }
     },
