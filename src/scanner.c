@@ -40,16 +40,16 @@ struct token reserved_map[] =
     { TOK_STATIC, "static" },
     { TOK_EXTERN, "extern" },
     { TOK_TYPEDEF, "typedef" },
-    { TOK_INVALID, "" } /* TOK_INVALID must be last entry */
+    { TOK_EOF, "" } /* TOK_EOF must be last entry */
 };
 
 static enum token_t
 reserved_word_token(char *str, size_t len)
 {
-    enum token_t t = TOK_INVALID;
+    enum token_t t = TOK_EOF;
     int i;
 
-    for (i = 0; reserved_map[i].type != TOK_INVALID; i++)
+    for (i = 0; reserved_map[i].type != TOK_EOF; i++)
     {
         if (len != strlen(reserved_map[i].value))
         {
@@ -112,7 +112,7 @@ do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
              * a label.
              */
             tok->type = reserved_word_token(&content[tok_start], tok_size);
-            if (tok->type == TOK_INVALID)
+            if (tok->type == TOK_EOF)
             {
                 tok->type = TOK_IDENTIFIER;
                 tok->value = (char *)malloc(sizeof(char) * tok_size);

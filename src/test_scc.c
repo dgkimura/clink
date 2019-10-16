@@ -362,7 +362,7 @@ create_token(enum token_t token)
     return tok;
 }
 
-START_TEST(test_parser_generates_parsetable)
+START_TEST(test_parser_can_parse_int_identifier_semicolon)
 {
     struct astnode *ast;
     struct listnode *tokens;
@@ -371,11 +371,12 @@ START_TEST(test_parser_generates_parsetable)
     list_append(&tokens, create_token(TOK_INT));
     list_append(&tokens, create_token(TOK_IDENTIFIER));
     list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_EOF));
 
     init_parsetable();
 
     ast = parse(tokens);
-    ck_assert_int_eq(AST_INIT_DECLARATOR_LIST, ast->type);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
 }
 END_TEST
 
@@ -611,7 +612,7 @@ main(void)
     tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
     tcase_add_test(testcase, test_parser_state_contains_item);
     tcase_add_test(testcase, test_parser_generate_states);
-    tcase_add_test(testcase, test_parser_generates_parsetable);
+    tcase_add_test(testcase, test_parser_can_parse_int_identifier_semicolon);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);

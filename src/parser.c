@@ -1943,6 +1943,12 @@ token_to_astnode(struct token *token)
         node->type = AST_VOLATILE;
         node->constant = token;
     }
+    else if (token->type == TOK_EOF)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_INVALID;
+        node->constant = token;
+    }
 
     return node;
 }
@@ -2018,6 +2024,15 @@ parse(struct listnode *tokens)
              * Next iteration will use the cell->state, but should reuse the
              * current input token. (Do not increment token->next)
              */
+        }
+        else
+        {
+            /*
+             * We expect to be neither shift nor reduce iff this is the last
+             * token.
+             */
+            assert(token->next == NULL);
+            break;
         }
     }
 
