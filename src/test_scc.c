@@ -419,6 +419,47 @@ START_TEST(test_parser_can_parse_empty_function)
 }
 END_TEST
 
+START_TEST(test_parser_can_parse_struct)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    /*
+     * parse empty struct
+     */
+    list_append(&tokens, create_token(TOK_STRUCT));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_EOF));
+
+    init_parsetable();
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    list_init(&tokens);
+
+    /*
+     * parse simple struct
+     */
+    list_append(&tokens, create_token(TOK_STRUCT));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_LBRACE));
+    list_append(&tokens, create_token(TOK_INT));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_RBRACE));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_EOF));
+
+    init_parsetable();
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -654,6 +695,7 @@ main(void)
     tcase_add_test(testcase, test_parser_can_parse_simple_declaration);
     tcase_add_test(testcase, test_parser_can_parse_multiple_simple_declarations);
     tcase_add_test(testcase, test_parser_can_parse_empty_function);
+    tcase_add_test(testcase, test_parser_can_parse_struct);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
