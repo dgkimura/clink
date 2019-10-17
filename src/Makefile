@@ -1,6 +1,6 @@
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux)
-	TEST_LIBS =-lcheck_pic -lpthread -lrt -lm
+	TEST_LIBS =-lcheck_pic -lsubunit -lpthread -lrt -lm
 endif
 ifeq ($(UNAME_S), Darwin)
 	TEST_LIBS =-lcheck
