@@ -98,13 +98,13 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_DECLARATION_SPECIFIERS,
-        1,
-        { AST_TYPE_SPECIFIER }
+        2,
+        { AST_STORAGE_CLASS_SPECIFIER, AST_DECLARATION_SPECIFIERS }
     },
     {
         AST_DECLARATION_SPECIFIERS,
-        2,
-        { AST_STORAGE_CLASS_SPECIFIER, AST_DECLARATION_SPECIFIERS }
+        1,
+        { AST_TYPE_SPECIFIER }
     },
     {
         AST_DECLARATION_SPECIFIERS,
@@ -1192,7 +1192,7 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
 {
     int i;
     struct item *item;
-    struct listnode *checked_nodes, *next_lookahead = lookahead;
+    struct listnode *checked_nodes, *next_lookahead;
 
     for (i=0; i<NUM_RULES; i++)
     {
@@ -1219,8 +1219,12 @@ generate_items(enum astnode_t node, struct listnode *lookahead, struct listnode 
                         grammar[i].nodes[1],
                         &checked_nodes,
                         &next_lookahead);
+                    generate_items(grammar[i].nodes[0], next_lookahead, items);
                 }
-                generate_items(grammar[i].nodes[0], next_lookahead, items);
+                else
+                {
+                    generate_items(grammar[i].nodes[0], lookahead, items);
+                }
             }
         }
     }
