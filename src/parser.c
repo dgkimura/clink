@@ -1290,27 +1290,35 @@ generate_transitions(struct state *s)
                 if (j->cursor_position + 1 < j->rewrite_rule->length_of_nodes)
                 {
                     /*
-                     * If there is a follow symbol.
+                     * If a follow symbol exists then find terminal values of
+                     * the follow symbol. Then generate items derived from the
+                     * current symbol and add them to state with the new
+                     * lookahead.
                      */
                     struct listnode *checked_nodes;
                     list_init(&checked_nodes);
 
-                    /*
-                     * Find terminal value of the follow symbol.
-                     */
                     head_terminal_values(
                         j->rewrite_rule->nodes[j->cursor_position + 1],
                         &checked_nodes,
                         &lookahead);
+
+                    generate_items(
+                        j->rewrite_rule->nodes[j->cursor_position],
+                        lookahead, &s->links[index]->items);
+                }
+                else
+                {
+                    /*
+                     * If there is no follow symbol then simply generate the
+                     * items derived fromthe current symbol and pass along the
+                     * current lookahead from the previous state.
+                     */
+                    generate_items(
+                        j->rewrite_rule->nodes[j->cursor_position],
+                        j->lookahead, &s->links[index]->items);
                 }
 
-                /*
-                 * Find all items derived from current symbol and add them
-                 * to state with lookhead found above.
-                 */
-                generate_items(
-                    j->rewrite_rule->nodes[j->cursor_position],
-                    lookahead, &s->links[index]->items);
             }
         }
     }

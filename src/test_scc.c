@@ -365,6 +365,19 @@ START_TEST(test_parser_can_parse_simple_declaration)
 
     init_parsetable();
 
+    list_init(&tokens);
+
+    /*
+     * parse global variable declaration with multiple specifiers
+     */
+    list_append(&tokens, create_token(TOK_STATIC));
+    list_append(&tokens, create_token(TOK_INT));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_EOF));
+
+    init_parsetable();
+
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
 }
