@@ -28,7 +28,6 @@ START_TEST(test_head_terminal_values_on_constant)
 
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
-    ck_assert_ptr_null(terminals->next->next);
 }
 END_TEST
 
@@ -43,7 +42,6 @@ START_TEST(test_head_terminal_values_on_primary_expression)
 
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
-    ck_assert_ptr_null(terminals->next->next);
 }
 END_TEST
 
@@ -58,7 +56,6 @@ START_TEST(test_head_terminal_values_on_postfix_expression)
 
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
-    ck_assert_ptr_null(terminals->next->next);
 }
 END_TEST
 
@@ -79,7 +76,6 @@ START_TEST(test_head_terminal_values_on_unary_expression)
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
-    ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next);
 }
 END_TEST
 
@@ -100,7 +96,6 @@ START_TEST(test_head_terminal_values_on_cast_expression)
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
-    ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next);
 }
 END_TEST
 
@@ -121,7 +116,6 @@ START_TEST(test_head_terminal_values_on_multiplicative_expression)
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
-    ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next);
 }
 END_TEST
 
@@ -142,7 +136,6 @@ START_TEST(test_head_terminal_values_on_additive_expression)
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
-    ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next);
 }
 END_TEST
 
@@ -163,7 +156,6 @@ START_TEST(test_head_terminal_values_on_shift_expression)
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
-    ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next);
 }
 END_TEST
 
@@ -184,7 +176,6 @@ START_TEST(test_head_terminal_values_on_relational_expression)
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
     ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
-    ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next);
 }
 END_TEST
 
@@ -213,7 +204,6 @@ START_TEST(test_head_terminal_values_on_specifier_qualifier_list)
     // FIXME: update this test...
     //ck_assert_int_eq(AST_CONST, (int)terminals->next->next->next->next->next->next->next->next->next->next->next->next->data);
     //ck_assert_int_eq(AST_VOLATILE, (int)terminals->next->next->next->next->next->next->next->next->next->next->next->next->next->data);
-    //ck_assert_ptr_null(terminals->next->next->next->next->next->next->next->next->next->next->next->next->next->next);
 }
 END_TEST
 
@@ -228,7 +218,6 @@ START_TEST(test_generate_items_on_constant)
     ck_assert_int_eq(0, ((struct item *)items->data)->cursor_position);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, ((struct item *)items->next->data)->rewrite_rule->nodes[0]);
     ck_assert_int_eq(0, ((struct item *)items->next->data)->cursor_position);
-    ck_assert_ptr_null(items->next->next);
 }
 END_TEST
 
@@ -245,7 +234,6 @@ START_TEST(test_generate_items_on_primary_expression)
     ck_assert_int_eq(0, ((struct item *)items->next->data)->cursor_position);
     ck_assert_int_eq(AST_CHARACTER_CONSTANT, ((struct item *)items->next->next->data)->rewrite_rule->nodes[0]);
     ck_assert_int_eq(0, ((struct item *)items->next->next->data)->cursor_position);
-    ck_assert_ptr_null(items->next->next->next);
 }
 END_TEST
 
@@ -273,7 +261,6 @@ START_TEST(test_generate_items_on_postfix_expression)
     assert_rules_equal(
         (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
         *((struct item *)items->data)->rewrite_rule);
-    ck_assert_ptr_null(((struct item *)items->data)->lookahead);
 
     assert_rules_equal(
         (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
@@ -362,15 +349,67 @@ create_token(enum token_t token)
     return tok;
 }
 
-START_TEST(test_parser_can_parse_int_identifier_semicolon)
+START_TEST(test_parser_can_parse_simple_declaration)
 {
     struct astnode *ast;
     struct listnode *tokens;
     list_init(&tokens);
 
+    /*
+     * parse global variable declaration
+     */
     list_append(&tokens, create_token(TOK_INT));
     list_append(&tokens, create_token(TOK_IDENTIFIER));
     list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_EOF));
+
+    init_parsetable();
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
+START_TEST(test_parser_can_parse_multiple_simple_declarations)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    init_parsetable();
+
+    /*
+     * parse global variable declaration
+     */
+    list_append(&tokens, create_token(TOK_INT));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+
+    list_append(&tokens, create_token(TOK_LONG));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_EOF));
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
+START_TEST(test_parser_can_parse_empty_function)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    /*
+     * parse empty function
+     */
+    list_append(&tokens, create_token(TOK_CHAR));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_LPAREN));
+    list_append(&tokens, create_token(TOK_RPAREN));
+    list_append(&tokens, create_token(TOK_LBRACE));
+    list_append(&tokens, create_token(TOK_RBRACE));
     list_append(&tokens, create_token(TOK_EOF));
 
     init_parsetable();
@@ -612,7 +651,9 @@ main(void)
     tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
     tcase_add_test(testcase, test_parser_state_contains_item);
     tcase_add_test(testcase, test_parser_generate_states);
-    tcase_add_test(testcase, test_parser_can_parse_int_identifier_semicolon);
+    tcase_add_test(testcase, test_parser_can_parse_simple_declaration);
+    tcase_add_test(testcase, test_parser_can_parse_multiple_simple_declarations);
+    tcase_add_test(testcase, test_parser_can_parse_empty_function);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
