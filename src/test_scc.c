@@ -365,6 +365,9 @@ START_TEST(test_parser_can_parse_simple_declaration)
 
     init_parsetable();
 
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
     list_init(&tokens);
 
     /*
@@ -375,8 +378,6 @@ START_TEST(test_parser_can_parse_simple_declaration)
     list_append(&tokens, create_token(TOK_IDENTIFIER));
     list_append(&tokens, create_token(TOK_SEMICOLON));
     list_append(&tokens, create_token(TOK_EOF));
-
-    init_parsetable();
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -408,7 +409,7 @@ START_TEST(test_parser_can_parse_multiple_simple_declarations)
 }
 END_TEST
 
-START_TEST(test_parser_can_parse_empty_function)
+START_TEST(test_parser_can_parse_function)
 {
     struct astnode *ast;
     struct listnode *tokens;
@@ -426,6 +427,25 @@ START_TEST(test_parser_can_parse_empty_function)
     list_append(&tokens, create_token(TOK_EOF));
 
     init_parsetable();
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    list_init(&tokens);
+
+    /*
+     * parse function with variable declarations
+     */
+    list_append(&tokens, create_token(TOK_CHAR));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_LPAREN));
+    list_append(&tokens, create_token(TOK_RPAREN));
+    list_append(&tokens, create_token(TOK_LBRACE));
+    list_append(&tokens, create_token(TOK_INT));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_RBRACE));
+    list_append(&tokens, create_token(TOK_EOF));
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -462,11 +482,12 @@ START_TEST(test_parser_can_parse_struct)
     list_append(&tokens, create_token(TOK_INT));
     list_append(&tokens, create_token(TOK_IDENTIFIER));
     list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_CHAR));
+    list_append(&tokens, create_token(TOK_IDENTIFIER));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
     list_append(&tokens, create_token(TOK_RBRACE));
     list_append(&tokens, create_token(TOK_SEMICOLON));
     list_append(&tokens, create_token(TOK_EOF));
-
-    init_parsetable();
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -707,7 +728,7 @@ main(void)
     tcase_add_test(testcase, test_parser_generate_states);
     tcase_add_test(testcase, test_parser_can_parse_simple_declaration);
     tcase_add_test(testcase, test_parser_can_parse_multiple_simple_declarations);
-    tcase_add_test(testcase, test_parser_can_parse_empty_function);
+    tcase_add_test(testcase, test_parser_can_parse_function);
     tcase_add_test(testcase, test_parser_can_parse_struct);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
