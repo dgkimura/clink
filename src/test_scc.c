@@ -434,7 +434,7 @@ START_TEST(test_parser_can_parse_function)
     list_init(&tokens);
 
     /*
-     * parse function with variable declarations
+     * parse function with variable declarations and for loop
      */
     list_append(&tokens, create_token(TOK_CHAR));
     list_append(&tokens, create_token(TOK_IDENTIFIER));
@@ -444,6 +444,13 @@ START_TEST(test_parser_can_parse_function)
     list_append(&tokens, create_token(TOK_INT));
     list_append(&tokens, create_token(TOK_IDENTIFIER));
     list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_FOR));
+    list_append(&tokens, create_token(TOK_LPAREN));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_SEMICOLON));
+    list_append(&tokens, create_token(TOK_RPAREN));
+    list_append(&tokens, create_token(TOK_LBRACE));
+    list_append(&tokens, create_token(TOK_RBRACE));
     list_append(&tokens, create_token(TOK_RBRACE));
     list_append(&tokens, create_token(TOK_EOF));
 
