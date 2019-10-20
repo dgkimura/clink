@@ -40,8 +40,9 @@ START_TEST(test_head_terminal_values_on_primary_expression)
 
     head_terminal_values(AST_PRIMARY_EXPRESSION, &checked_nodes, &terminals);
 
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->data);
 }
 END_TEST
 
@@ -54,8 +55,9 @@ START_TEST(test_head_terminal_values_on_postfix_expression)
 
     head_terminal_values(AST_POSTFIX_EXPRESSION, &checked_nodes, &terminals);
 
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->data);
 }
 END_TEST
 
@@ -74,8 +76,9 @@ START_TEST(test_head_terminal_values_on_unary_expression)
     ck_assert_int_eq(AST_ASTERISK, (int)terminals->next->next->next->data);
     ck_assert_int_eq(AST_PLUS, (int)terminals->next->next->next->next->data);
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->next->data);
 }
 END_TEST
 
@@ -94,8 +97,9 @@ START_TEST(test_head_terminal_values_on_cast_expression)
     ck_assert_int_eq(AST_ASTERISK, (int)terminals->next->next->next->data);
     ck_assert_int_eq(AST_PLUS, (int)terminals->next->next->next->next->data);
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->next->data);
 }
 END_TEST
 
@@ -114,8 +118,9 @@ START_TEST(test_head_terminal_values_on_multiplicative_expression)
     ck_assert_int_eq(AST_ASTERISK, (int)terminals->next->next->next->data);
     ck_assert_int_eq(AST_PLUS, (int)terminals->next->next->next->next->data);
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->next->data);
 }
 END_TEST
 
@@ -134,8 +139,9 @@ START_TEST(test_head_terminal_values_on_additive_expression)
     ck_assert_int_eq(AST_ASTERISK, (int)terminals->next->next->next->data);
     ck_assert_int_eq(AST_PLUS, (int)terminals->next->next->next->next->data);
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->next->data);
 }
 END_TEST
 
@@ -154,8 +160,9 @@ START_TEST(test_head_terminal_values_on_shift_expression)
     ck_assert_int_eq(AST_ASTERISK, (int)terminals->next->next->next->data);
     ck_assert_int_eq(AST_PLUS, (int)terminals->next->next->next->next->data);
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->next->data);
 }
 END_TEST
 
@@ -174,8 +181,9 @@ START_TEST(test_head_terminal_values_on_relational_expression)
     ck_assert_int_eq(AST_ASTERISK, (int)terminals->next->next->next->data);
     ck_assert_int_eq(AST_PLUS, (int)terminals->next->next->next->next->data);
     ck_assert_int_eq(AST_MINUS, (int)terminals->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->data);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_IDENTIFIER, (int)terminals->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->data);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, (int)terminals->next->next->next->next->next->next->next->next->data);
 }
 END_TEST
 
@@ -228,12 +236,14 @@ START_TEST(test_generate_items_on_primary_expression)
 
     generate_items(AST_PRIMARY_EXPRESSION, NULL, &items);
 
-    ck_assert_int_eq(AST_CONSTANT, ((struct item *)items->data)->rewrite_rule->nodes[0]);
+    ck_assert_int_eq(AST_IDENTIFIER, ((struct item *)items->data)->rewrite_rule->nodes[0]);
     ck_assert_int_eq(0, ((struct item *)items->data)->cursor_position);
-    ck_assert_int_eq(AST_INTEGER_CONSTANT, ((struct item *)items->next->data)->rewrite_rule->nodes[0]);
+    ck_assert_int_eq(AST_CONSTANT, ((struct item *)items->next->data)->rewrite_rule->nodes[0]);
     ck_assert_int_eq(0, ((struct item *)items->next->data)->cursor_position);
-    ck_assert_int_eq(AST_CHARACTER_CONSTANT, ((struct item *)items->next->next->data)->rewrite_rule->nodes[0]);
+    ck_assert_int_eq(AST_INTEGER_CONSTANT, ((struct item *)items->next->next->data)->rewrite_rule->nodes[0]);
     ck_assert_int_eq(0, ((struct item *)items->next->next->data)->cursor_position);
+    ck_assert_int_eq(AST_CHARACTER_CONSTANT, ((struct item *)items->next->next->next->data)->rewrite_rule->nodes[0]);
+    ck_assert_int_eq(0, ((struct item *)items->next->next->next->data)->cursor_position);
 }
 END_TEST
 

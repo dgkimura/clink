@@ -21,7 +21,7 @@ static struct state states[MAX_STATES];
 
 static struct state temp_states[MAX_STATES];
 
-#define NUM_RULES 198
+#define NUM_RULES 199
 
 struct rule grammar[NUM_RULES] =
 {
@@ -1064,6 +1064,11 @@ struct rule grammar[NUM_RULES] =
     {
         AST_PRIMARY_EXPRESSION,
         1,
+        { AST_IDENTIFIER }
+    },
+    {
+        AST_PRIMARY_EXPRESSION,
+        1,
         { AST_CONSTANT }
     },
     /* constant: */
@@ -1550,7 +1555,7 @@ token_to_astnode(struct token *token)
     if (token->type == TOK_INTEGER)
     {
         node = malloc(sizeof(struct astnode));
-        node->type = AST_CONSTANT;
+        node->type = AST_INTEGER_CONSTANT;
         node->constant = token;
     }
     else if (token->type == TOK_IDENTIFIER)
