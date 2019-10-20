@@ -341,29 +341,20 @@ START_TEST(test_parser_generate_states)
 }
 END_TEST
 
-static struct token *
-create_token(enum token_t token)
-{
-    struct token *tok = malloc(sizeof(struct token));
-    tok->type = token;
-    return tok;
-}
-
 START_TEST(test_parser_can_parse_simple_declaration)
 {
     struct astnode *ast;
     struct listnode *tokens;
+    char *content;
     list_init(&tokens);
+
+    init_parsetable();
 
     /*
      * parse global variable declaration
      */
-    list_append(&tokens, create_token(TOK_INT));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_EOF));
-
-    init_parsetable();
+    content = "int identifier;";
+    do_tokenizing(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -373,11 +364,8 @@ START_TEST(test_parser_can_parse_simple_declaration)
     /*
      * parse global variable declaration with multiple specifiers
      */
-    list_append(&tokens, create_token(TOK_STATIC));
-    list_append(&tokens, create_token(TOK_INT));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_EOF));
+    content = "static int identifier;";
+    do_tokenizing(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -388,6 +376,7 @@ START_TEST(test_parser_can_parse_multiple_simple_declarations)
 {
     struct astnode *ast;
     struct listnode *tokens;
+    char *content;
     list_init(&tokens);
 
     init_parsetable();
@@ -395,14 +384,9 @@ START_TEST(test_parser_can_parse_multiple_simple_declarations)
     /*
      * parse global variable declaration
      */
-    list_append(&tokens, create_token(TOK_INT));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-
-    list_append(&tokens, create_token(TOK_LONG));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_EOF));
+    content = "int identifier;"
+              "long identifier;";
+    do_tokenizing(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -413,18 +397,16 @@ START_TEST(test_parser_can_parse_function)
 {
     struct astnode *ast;
     struct listnode *tokens;
+    char *content;
     list_init(&tokens);
 
     /*
      * parse empty function
      */
-    list_append(&tokens, create_token(TOK_CHAR));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_LPAREN));
-    list_append(&tokens, create_token(TOK_RPAREN));
-    list_append(&tokens, create_token(TOK_LBRACE));
-    list_append(&tokens, create_token(TOK_RBRACE));
-    list_append(&tokens, create_token(TOK_EOF));
+    content = "char function()"
+              "{"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
 
     init_parsetable();
 
@@ -436,23 +418,15 @@ START_TEST(test_parser_can_parse_function)
     /*
      * parse function with variable declarations and for loop
      */
-    list_append(&tokens, create_token(TOK_CHAR));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_LPAREN));
-    list_append(&tokens, create_token(TOK_RPAREN));
-    list_append(&tokens, create_token(TOK_LBRACE));
-    list_append(&tokens, create_token(TOK_INT));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_FOR));
-    list_append(&tokens, create_token(TOK_LPAREN));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_RPAREN));
-    list_append(&tokens, create_token(TOK_LBRACE));
-    list_append(&tokens, create_token(TOK_RBRACE));
-    list_append(&tokens, create_token(TOK_RBRACE));
-    list_append(&tokens, create_token(TOK_EOF));
+    content = "char function()"
+              "{"
+              "    int identifier;"
+              "    long identifier;"
+              "    for (;;)"
+              "    {"
+              "    }"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -463,15 +437,14 @@ START_TEST(test_parser_can_parse_struct)
 {
     struct astnode *ast;
     struct listnode *tokens;
+    char *content;
     list_init(&tokens);
 
     /*
      * parse empty struct
      */
-    list_append(&tokens, create_token(TOK_STRUCT));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_EOF));
+    content = "struct identifier;";
+    do_tokenizing(content, strlen(content), &tokens);
 
     init_parsetable();
 
@@ -483,18 +456,12 @@ START_TEST(test_parser_can_parse_struct)
     /*
      * parse simple struct
      */
-    list_append(&tokens, create_token(TOK_STRUCT));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_LBRACE));
-    list_append(&tokens, create_token(TOK_INT));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_CHAR));
-    list_append(&tokens, create_token(TOK_IDENTIFIER));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_RBRACE));
-    list_append(&tokens, create_token(TOK_SEMICOLON));
-    list_append(&tokens, create_token(TOK_EOF));
+    content = "struct identifier"
+              "{"
+              "    int identifier;"
+              "    char identifier;"
+              "};";
+    do_tokenizing(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
