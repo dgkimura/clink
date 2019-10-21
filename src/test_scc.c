@@ -478,6 +478,56 @@ START_TEST(test_parser_can_parse_struct)
 }
 END_TEST
 
+START_TEST(test_parser_can_parse_arithmatic_statements)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    char *content;
+    list_init(&tokens);
+
+    init_parsetable();
+
+    /*
+     * parse expressions
+     */
+    content = "char function()"
+              "{"
+              "    int a;"
+              "    a = b + c * d;"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
+START_TEST(test_parser_can_parse_conditional_statements)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    char *content;
+    list_init(&tokens);
+
+    init_parsetable();
+
+    /*
+     * parse expressions
+     */
+    content = "char function()"
+              "{"
+              "    if (a == b)"
+              "    {"
+              "        a = c;"
+              "    }"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -714,6 +764,8 @@ main(void)
     tcase_add_test(testcase, test_parser_can_parse_multiple_simple_declarations);
     tcase_add_test(testcase, test_parser_can_parse_function);
     tcase_add_test(testcase, test_parser_can_parse_struct);
+    tcase_add_test(testcase, test_parser_can_parse_arithmatic_statements);
+    tcase_add_test(testcase, test_parser_can_parse_conditional_statements);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
