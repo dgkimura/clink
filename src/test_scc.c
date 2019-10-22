@@ -423,16 +423,45 @@ START_TEST(test_parser_can_parse_function)
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
 
-    list_init(&tokens);
-
     /*
      * parse function with variable declarations and for loop
      */
+    list_init(&tokens);
     content = "char function()"
               "{"
               "    int identifier;"
               "    long identifier;"
               "    for (;;)"
+              "    {"
+              "    }"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    /*
+     * parse function for loop with parameters
+     */
+    list_init(&tokens);
+    content = "char function()"
+              "{"
+              "    for (i=1;i<5;i++)"
+              "    {"
+              "    }"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    /*
+     * parse function while loop
+     */
+    list_init(&tokens);
+    content = "char function()"
+              "{"
+              "    while (a == b)"
               "    {"
               "    }"
               "}";

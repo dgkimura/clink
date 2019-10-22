@@ -1570,6 +1570,12 @@ token_to_astnode(struct token *token)
         node->type = AST_PLUS;
         node->constant = token;
     }
+    else if (token->type == TOK_PLUS_PLUS)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_PLUS_PLUS;
+        node->constant = token;
+    }
     else if (token->type == TOK_PLUS_EQUAL)
     {
         node = malloc(sizeof(struct astnode));
@@ -1580,6 +1586,12 @@ token_to_astnode(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MINUS;
+        node->constant = token;
+    }
+    else if (token->type == TOK_MINUS_MINUS)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_MINUS_MINUS;
         node->constant = token;
     }
     else if (token->type == TOK_MINUS_EQUAL)
