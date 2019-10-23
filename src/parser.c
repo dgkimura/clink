@@ -1,3 +1,14 @@
+/*
+ * Provides a bottom-up CLR(1) parser. This involves 3 main steps:
+ *
+ * 1) Given a grammar, construct a state machine. This performed in
+ *    `generate_states()`.
+ * 2) Given a state machine, construct a parse table. This is performed in
+ *    `init_parsetable()`.
+ * 3) Given a parse table, construct the AST (abstract syntax tree). This is
+ *    performed in `parse()`.
+ */
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +34,11 @@ static struct state temp_states[MAX_STATES];
 
 #define NUM_RULES 199
 
+/*
+ * List of rules that defines the grammar for the parser. It is a copy of the C
+ * grammar as defined by K&R in "C Programming Language" 2nd edition reference
+ * manual.
+ */
 struct rule grammar[NUM_RULES] =
 {
     /* translation-unit: */
