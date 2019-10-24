@@ -557,6 +557,35 @@ START_TEST(test_parser_can_parse_conditional_statements)
 }
 END_TEST
 
+
+START_TEST(test_parser_can_parse_assigment_operations)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    char *content;
+    list_init(&tokens);
+
+    init_parsetable();
+
+    /*
+     * assigment operations
+     */
+    content = "char function()"
+              "{"
+              "    /* assignment operations */"
+              "    a += b;"
+              "    a *= b;"
+              "    a -= b;"
+              "    a /= b;"
+              "    a %= b;"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
 START_TEST(test_list_append)
 {
     struct listnode *a_list;
@@ -795,6 +824,7 @@ main(void)
     tcase_add_test(testcase, test_parser_can_parse_struct);
     tcase_add_test(testcase, test_parser_can_parse_arithmatic_statements);
     tcase_add_test(testcase, test_parser_can_parse_conditional_statements);
+    tcase_add_test(testcase, test_parser_can_parse_assigment_operations);
     tcase_add_test(testcase, test_list_append);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
