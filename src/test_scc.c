@@ -444,7 +444,7 @@ START_TEST(test_parser_can_parse_function)
      * parse function for loop with parameters
      */
     list_init(&tokens);
-    content = "char function()"
+    content = "char function(int i)"
               "{"
               "    for (i=1;i<5;i++)"
               "    {"
@@ -459,7 +459,7 @@ START_TEST(test_parser_can_parse_function)
      * parse function while loop
      */
     list_init(&tokens);
-    content = "char function()"
+    content = "char function(char a, char b)"
               "{"
               "    while (a == b)"
               "    {"
