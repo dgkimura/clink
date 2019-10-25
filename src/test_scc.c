@@ -490,11 +490,10 @@ START_TEST(test_parser_can_parse_struct)
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
 
-    list_init(&tokens);
-
     /*
      * parse simple struct
      */
+    list_init(&tokens);
     content = "struct identifier"
               "{"
               "    int identifier;"
@@ -562,6 +561,36 @@ START_TEST(test_parser_can_parse_conditional_statements)
               "    else"
               "    {"
               "        a = 4;"
+              "    }"
+              "    /* switch case statement */"
+              "    switch (a)"
+              "    {"
+              "        case 1:"
+              "        case 2:"
+              "        {"
+              "            break;"
+              "        }"
+              "    }"
+              "}";
+    do_tokenizing(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    /*
+     * switch case statements
+     */
+    list_init(&tokens);
+    content = "char function()"
+              "{"
+              "    /* switch case statement */"
+              "    switch (a)"
+              "    {"
+              "        case 1:"
+              "        case 2:"
+              "        {"
+              "            break;"
+              "        }"
               "    }"
               "}";
     do_tokenizing(content, strlen(content), &tokens);
