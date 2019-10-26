@@ -1,70 +1,120 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "parser.h"
 #include "utilities.h"
 
 void
-print_state(struct state *s)
+list_init(
+    struct listnode **head)
 {
-    struct listnode *items, *lookaheads;
-    struct item *item;
-    int i;
-
-    printf("state %d\n", s->identifier);
-    for (items=s->items; items!=NULL; items=items->next)
-    {
-        item = (struct item *)items->data;
-        printf("  (%d,%d)", (int)(item->rewrite_rule-get_grammar()), item->cursor_position);
-
-        for (lookaheads=item->lookahead; lookaheads!=NULL; lookaheads=lookaheads->next)
-        {
-            printf(" %d", (int)(lookaheads->data));
-        }
-        printf("\n");
-    }
+    *head = NULL;
 }
 
 void
-print_parsetable(struct parsetable_item *table)
+list_prepend(
+    struct listnode **head,
+    void *data)
 {
-    int i, j, num_states = 750; // FIXME: expose total states (state_identifier)..
-    struct parsetable_item *cell;
+    struct listnode *t = malloc(sizeof(struct listnode));
+    t->data = data;
+    t->next = *head;
 
-    printf("parse table:\n");
-
-    for (i=0; i<NUM_SYMBOLS; i++)
+    if (*head != NULL)
     {
-        printf("%3d ,", i);
+        t->tail = (*head)->tail;
     }
-    printf("\n");
-    for (i=0; i<NUM_SYMBOLS; i++)
-    {
-        printf("-----");
-    }
-    printf("\n");
 
-    for (i=0; i<num_states; i++)
+    *head = t;
+}
+
+void
+list_append(
+    struct listnode **head,
+    void *data)
+{
+    struct listnode *t = malloc(sizeof(struct listnode));
+    t->data = data;
+    t->next = NULL;
+
+    if (*head != NULL)
     {
-        for (j=0; j<NUM_SYMBOLS; j++)
+        (*head)->tail->next = t;
+        (*head)->tail = t;
+    }
+    else
+    {
+        (*head) = t;
+        (*head)->tail = t;
+    }
+}
+
+int
+list_equal(struct listnode *a, struct listnode *b)
+{
+    struct listnode *_a, *_b;
+    int match = 0;
+
+    if (a == b)
+    {
+        return 1;
+    }
+
+    for (_a=a; _a!=NULL; _a=_a->next)
+    {
+        for (_b=b; _b!=NULL; _b=_b->next)
         {
-            cell = table + (i * NUM_SYMBOLS) + j;
-            if (cell->shift)
+            if (_a->data == _b->data)
             {
-                printf("%3ds,", cell->state);
-            }
-            else if (cell->reduce)
-            {
-                printf("%3ldr,", cell->rule-get_grammar());
-            }
-            else if (cell->state)
-            {
-                printf("%3d ,", cell->state);
-            }
-            else
-            {
-                printf("    ,");
+                match = 1;
+                break;
             }
         }
-        printf("\n");
+
+        if (!match)
+        {
+            /*
+             * a contained data that b does not contain.
+             */
+            return 0;
+        }
     }
+
+    for (_b=b; _b!=NULL; _b=_b->next)
+    {
+        for (_a=a; _a!=NULL; _a=_a->next)
+        {
+            if (_a->data == _b->data)
+            {
+                match = 1;
+                break;
+            }
+        }
+
+        if (!match)
+        {
+            /*
+             * b contained data that a does not contain.
+             */
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+struct listnode *
+list_findkey(struct listnode *head, char *key)
+{
+    struct listnode *current = head;
+
+    while (current != NULL)
+    {
+        if (strcmp(key, ((struct pair *)current->data)->key) == 0)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+    return current;
 }

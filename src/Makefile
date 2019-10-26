@@ -6,21 +6,26 @@ ifeq ($(UNAME_S), Darwin)
 	TEST_LIBS =-lcheck
 endif
 
-TEST_SRCS = $(wildcard test_*.c)
-TEST_OBJS = $(TEST_SRCS:.c=.o)
-
-SRCS = $(filter-out main.c, $(filter-out $(TEST_SRCS), $(wildcard *.c)))
-OBJS = $(SRCS:.c=.o)
 CFLAGS = -g
 
 all: scc test_scc
 
-scc: main.o $(OBJS)
-	$(CC) -g -o $@ $^
+.ONESHELL:
+scc:
+ifeq (,$(wildcard parsetable.h))
+	$(CC) -DGENPT=1 parser.c utilities.c -o genpt
+	./genpt
+endif
+	$(CC) -g -o main.o -c main.c
+	$(CC) -g -o parser.o -c parser.c
+	$(CC) -g -o scanner.o -c scanner.c
+	$(CC) -g -o utilities.o -c utilities.c
+	$(CC) main.o parser.o scanner.o utilities.o -o scc
 
-test_scc: $(TEST_OBJS) $(OBJS)
-	$(CC) -g $^ -o $@ $(TEST_LIBS)
+test_scc: scc
+	$(CC) -g -o test_scc.o -c test_scc.c
+	$(CC) parser.o scanner.o utilities.o test_scc.o -o test_scc ${TEST_LIBS}
 
 .PHONY: clean
 clean:
-	rm -f $(OBJS) $(TEST_OBJS) main.o scc
+	rm -f *.o scc parsetable.h genpt

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "list.h"
 #include "scanner.h"
 
 static enum token_t reserved_word_token(char *str, size_t len);

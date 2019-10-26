@@ -2,7 +2,7 @@
 
 #include <check.h>
 
-#include "list.h"
+#include "utilities.h"
 #include "scanner.h"
 #include "parser.h"
 
@@ -322,43 +322,12 @@ START_TEST(test_generate_transitions_increments_cursor_position)
 }
 END_TEST
 
-START_TEST(test_parser_state_contains_item)
-{
-    struct state *state;
-    struct item item;
-
-    item.rewrite_rule = NULL;
-    item.cursor_position = 42;
-    item.lookahead = NULL;
-
-    state = generate_states();
-
-    ck_assert_int_eq(0, state_contains_item(state, &item));
-    ck_assert_int_eq(1, state_contains_item(state, (struct item *)state->items->data));
-}
-END_TEST
-
-START_TEST(test_parser_generate_states)
-{
-    struct state *state;
-
-    state = generate_states();
-
-    ck_assert_int_eq(0, state->identifier);
-    ck_assert_int_eq(0, index_of_state(state));
-    ck_assert_int_eq(1, index_of_state(state->links[2]));
-    ck_assert_int_eq(2, index_of_state(state->links[12]));
-}
-END_TEST
-
 START_TEST(test_parser_can_parse_simple_declaration)
 {
     struct astnode *ast;
     struct listnode *tokens;
     char *content;
     list_init(&tokens);
-
-    init_parsetable();
 
     /*
      * parse global variable declaration
@@ -389,8 +358,6 @@ START_TEST(test_parser_can_parse_multiple_simple_declarations)
     char *content;
     list_init(&tokens);
 
-    init_parsetable();
-
     /*
      * parse global variable declaration
      */
@@ -417,8 +384,6 @@ START_TEST(test_parser_can_parse_function)
               "{"
               "}";
     do_tokenizing(content, strlen(content), &tokens);
-
-    init_parsetable();
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -485,8 +450,6 @@ START_TEST(test_parser_can_parse_struct)
     content = "struct identifier;";
     do_tokenizing(content, strlen(content), &tokens);
 
-    init_parsetable();
-
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
 
@@ -513,8 +476,6 @@ START_TEST(test_parser_can_parse_arithmatic_statements)
     char *content;
     list_init(&tokens);
 
-    init_parsetable();
-
     /*
      * parse expressions
      */
@@ -536,8 +497,6 @@ START_TEST(test_parser_can_parse_conditional_statements)
     struct listnode *tokens;
     char *content;
     list_init(&tokens);
-
-    init_parsetable();
 
     /*
      * parse expressions
@@ -607,8 +566,6 @@ START_TEST(test_parser_can_parse_assigment_operations)
     struct listnode *tokens;
     char *content;
     list_init(&tokens);
-
-    init_parsetable();
 
     /*
      * assigment operations
@@ -859,8 +816,6 @@ main(void)
     tcase_add_test(testcase, test_generate_items_on_postfix_expression);
     tcase_add_test(testcase, test_generate_items_on_unary_expression);
     tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
-    tcase_add_test(testcase, test_parser_state_contains_item);
-    tcase_add_test(testcase, test_parser_generate_states);
     tcase_add_test(testcase, test_parser_can_parse_simple_declaration);
     tcase_add_test(testcase, test_parser_can_parse_multiple_simple_declarations);
     tcase_add_test(testcase, test_parser_can_parse_function);
