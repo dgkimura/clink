@@ -1,4 +1,5 @@
 #include "scanner.h"
+#include "parser.h"
 
 int
 main(int argc, char *agv[])
@@ -6,8 +7,9 @@ main(int argc, char *agv[])
     int total_tokens;
     struct listnode *tokens;
 
-    do_preprocessing("test.c", "_test.c");
-    do_tokenizing("_test.c", 0, &tokens);
+    preprocess("test.c", "_test.c");
+    scan("_test.c", 0, &tokens);
+    parse(tokens);
 
     return 0;
 }

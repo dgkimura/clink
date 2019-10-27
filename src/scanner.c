@@ -65,7 +65,7 @@ reserved_word_token(char *str, size_t len)
 }
 
 void
-do_preprocessing(char *infile, char *outfile)
+preprocess(char *infile, char *outfile)
 {
     char *in_content;
     char *out_content;
@@ -85,7 +85,7 @@ do_preprocessing(char *infile, char *outfile)
 }
 
 void
-do_tokenizing(char *content, size_t content_len, struct listnode **tokens)
+scan(char *content, size_t content_len, struct listnode **tokens)
 {
     struct token *tok;
     size_t i, tok_start, tok_end, tok_size;

@@ -333,7 +333,7 @@ START_TEST(test_parser_can_parse_simple_declaration)
      * parse global variable declaration
      */
     content = "int identifier;";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -344,7 +344,7 @@ START_TEST(test_parser_can_parse_simple_declaration)
      * parse global variable declaration with multiple specifiers
      */
     content = "static int identifier;";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -363,7 +363,7 @@ START_TEST(test_parser_can_parse_multiple_simple_declarations)
      */
     content = "int identifier;"
               "long identifier;";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -383,7 +383,7 @@ START_TEST(test_parser_can_parse_function)
     content = "char function()"
               "{"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -400,7 +400,7 @@ START_TEST(test_parser_can_parse_function)
               "    {"
               "    }"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -415,7 +415,7 @@ START_TEST(test_parser_can_parse_function)
               "    {"
               "    }"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -430,7 +430,7 @@ START_TEST(test_parser_can_parse_function)
               "    {"
               "    }"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -448,7 +448,7 @@ START_TEST(test_parser_can_parse_struct)
      * parse empty struct
      */
     content = "struct identifier;";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -462,7 +462,7 @@ START_TEST(test_parser_can_parse_struct)
               "    int identifier;"
               "    char identifier;"
               "};";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -484,7 +484,7 @@ START_TEST(test_parser_can_parse_arithmatic_statements)
               "    int a;"
               "    a = b + c * d;"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -531,7 +531,7 @@ START_TEST(test_parser_can_parse_conditional_statements)
               "        }"
               "    }"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -552,7 +552,7 @@ START_TEST(test_parser_can_parse_conditional_statements)
               "        }"
               "    }"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -579,7 +579,7 @@ START_TEST(test_parser_can_parse_assigment_operations)
               "    a /= b;"
               "    a %= b;"
               "}";
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
@@ -606,7 +606,7 @@ START_TEST(test_scanner_can_parse_integer_token)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_INTEGER, ((struct token *)tokens->data)->type);
     ck_assert_str_eq("1234", ((struct token *)tokens->data)->value);
@@ -619,7 +619,7 @@ START_TEST(test_scanner_can_parse_string_token)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_IDENTIFIER, ((struct token *)tokens->data)->type);
     ck_assert_str_eq("abcd", ((struct token *)tokens->data)->value);
@@ -632,7 +632,7 @@ START_TEST(test_scanner_can_parse_string_token_with_integers)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_IDENTIFIER, ((struct token *)tokens->data)->type);
     ck_assert_str_eq("abc123", ((struct token *)tokens->data)->value);
@@ -645,7 +645,7 @@ START_TEST(test_scanner_can_parse_paren)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_LPAREN, ((struct token *)tokens->data)->type);
     ck_assert_int_eq(TOK_RPAREN, ((struct token *)tokens->next->data)->type);
@@ -658,7 +658,7 @@ START_TEST(test_scanner_can_parse_two_braces)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_LBRACE, ((struct token *)tokens->data)->type);
     ck_assert_int_eq(TOK_RBRACE, ((struct token *)tokens->next->data)->type);
@@ -671,7 +671,7 @@ START_TEST(test_scanner_can_parse_two_brackets)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_LBRACKET, ((struct token *)tokens->data)->type);
     ck_assert_int_eq(TOK_RBRACKET, ((struct token *)tokens->next->data)->type);
@@ -684,7 +684,7 @@ START_TEST(test_scanner_can_parse_special_characters)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_SEMICOLON, ((struct token *)tokens->data)->type);
     ck_assert_int_eq(TOK_EQUAL, ((struct token *)tokens->next->data)->type);
@@ -711,7 +711,7 @@ START_TEST(test_scanner_can_parse_combination_tokens)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_PLUS_PLUS, ((struct token *)tokens->data)->type);
     ck_assert_int_eq(TOK_PLUS_EQUAL, ((struct token *)tokens->next->data)->type);
@@ -736,7 +736,7 @@ START_TEST(test_scanner_ignores_comment_contents)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_INTEGER, ((struct token *)tokens->data)->type);
     ck_assert_str_eq("123", ((struct token *)tokens->data)->value);
@@ -750,7 +750,7 @@ START_TEST(test_scanner_ignores_comment_contents_around_strings)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_IDENTIFIER, ((struct token *)tokens->data)->type);
     ck_assert_str_eq("abc", ((struct token *)tokens->data)->value);
@@ -764,7 +764,7 @@ START_TEST(test_scanner_can_parse_reserved_words)
     struct listnode *tokens;
     list_init(&tokens);
 
-    do_tokenizing(content, strlen(content), &tokens);
+    scan(content, strlen(content), &tokens);
 
     ck_assert_int_eq(TOK_INT, ((struct token *)tokens->data)->type);
     ck_assert_int_eq(TOK_CHAR, ((struct token *)tokens->next->data)->type);

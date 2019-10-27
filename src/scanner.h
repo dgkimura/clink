@@ -94,11 +94,11 @@ struct token
     char *value;
 };
 
-void do_preprocessing(char *infile, char *outfile);
+void preprocess(char *infile, char *outfile);
 
 /*
  * Given a string of code, constructs a list of tokens
  */
-void do_tokenizing(char *content, size_t content_len, struct listnode **tokens);
+void scan(char *content, size_t content_len, struct listnode **tokens);
 
 #endif

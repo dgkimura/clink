@@ -28,4 +28,4 @@ test_scc: scc
 
 .PHONY: clean
 clean:
-	rm -f *.o scc parsetable.h genpt
+	rm -f *.o scc parsetable.h test_scc genpt
