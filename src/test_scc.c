@@ -434,6 +434,20 @@ START_TEST(test_parser_can_parse_function)
 
     ast = parse(tokens);
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    /*
+     * parse function goto
+     */
+    list_init(&tokens);
+    content = "char function()"
+              "{"
+              "label1:"
+              "    goto label1;"
+              "}";
+    scan(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
 }
 END_TEST
 
