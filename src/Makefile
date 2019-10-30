@@ -19,12 +19,13 @@ endif
 	$(CC) -g -o main.o -c main.c
 	$(CC) -g -o parser.o -c parser.c
 	$(CC) -g -o scanner.o -c scanner.c
+	$(CC) -g -o generator.o -c generator.c
 	$(CC) -g -o utilities.o -c utilities.c
-	$(CC) main.o parser.o scanner.o utilities.o -o scc
+	$(CC) main.o parser.o scanner.o generator.o utilities.o -o scc
 
 test_scc: scc
 	$(CC) -g -o test_scc.o -c test_scc.c
-	$(CC) parser.o scanner.o utilities.o test_scc.o -o test_scc ${TEST_LIBS}
+	$(CC) parser.o scanner.o generator.o utilities.o test_scc.o -o test_scc ${TEST_LIBS}
 
 .PHONY: clean
 clean:
