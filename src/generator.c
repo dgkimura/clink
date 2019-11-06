@@ -1,7 +1,12 @@
 #include "generator.h"
 #include "utilities.h"
 
-struct listnode *symbol_table;
+struct symbol
+{
+    char *name;
+};
+
+struct symbol symbol_table[8192];
 
 void *
 generate(struct astnode *ast)
