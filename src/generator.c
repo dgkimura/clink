@@ -8,8 +8,8 @@ struct symbol
 
 struct symbol symbol_table[8192];
 
-void *
-generate(struct astnode *ast)
+static void *
+generate_code(struct astnode *ast)
 {
     if (ast->type == AST_CONSTANT)
     {
@@ -17,4 +17,15 @@ generate(struct astnode *ast)
     }
 
     return NULL;
+}
+
+static void
+generate_symbol_table(struct astnode *ast)
+{
+}
+
+void
+generate(struct astnode *ast)
+{
+	generate_code(ast);
 }
