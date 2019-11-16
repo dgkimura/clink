@@ -559,427 +559,427 @@ token_to_astnode(struct token *token)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_INTEGER_CONSTANT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_IDENTIFIER)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_IDENTIFIER;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_PLUS)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_PLUS;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_PLUS_PLUS)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_PLUS_PLUS;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_PLUS_EQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_PLUS_EQUAL;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_MINUS)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MINUS;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_MINUS_MINUS)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MINUS_MINUS;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_MINUS_EQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MINUS_EQUAL;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_AMPERSAND)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_AMPERSAND;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_AMPERSAND_AMPERSAND)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_AMPERSAND_AMPERSAND;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_ASTERISK)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_ASTERISK;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_ASTERISK_EQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_ASTERISK_EQUAL;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_BACKSLASH)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_BACKSLASH;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_BACKSLASH_EQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_BACKSLASH_EQUAL;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_CARET)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_CARET;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_COMMA)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_COMMA;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_ELLIPSIS)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_ELLIPSIS;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_MOD)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MOD;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_MOD_EQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_MOD_EQUAL;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_QUESTIONMARK)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_QUESTIONMARK;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_COLON)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_COLON;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_SEMICOLON)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SEMICOLON;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_LPAREN)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_LPAREN;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_RPAREN)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_RPAREN;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_LBRACKET)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_LBRACKET;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_RBRACKET)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_RBRACKET;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_LBRACE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_LBRACE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_RBRACE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_RBRACE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_VERTICALBAR)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_VERTICALBAR;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_VERTICALBAR_VERTICALBAR)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_VERTICALBAR_VERTICALBAR;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_SHIFTLEFT)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SHIFTLEFT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_SHIFTRIGHT)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SHIFTRIGHT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_LESSTHAN)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_LT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_GREATERTHAN)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_GT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_LESSTHANEQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_LTEQ;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_GREATERTHANEQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_GTEQ;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_EQ)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_EQ;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_NEQ)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_NEQ;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_EQUAL)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_EQUAL;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_VOID)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_VOID;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_SHORT)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SHORT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_INT)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_INT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_CHAR)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_CHAR;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_LONG)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_LONG;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_FLOAT)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_FLOAT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_DOUBLE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_DOUBLE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_SIGNED)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SIGNED;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_UNSIGNED)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_UNSIGNED;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_AUTO)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_AUTO;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_REGISTER)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_REGISTER;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_STATIC)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_STATIC;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_EXTERN)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_EXTERN;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_TYPEDEF)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_TYPEDEF;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_GOTO)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_GOTO;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_CONTINUE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_CONTINUE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_BREAK)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_BREAK;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_RETURN)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_RETURN;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_FOR)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_FOR;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_DO)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_DO;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_WHILE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_WHILE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_IF)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_IF;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_ELSE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_ELSE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_SWITCH)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_SWITCH;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_CASE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_CASE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_DEFAULT)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_DEFAULT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_ENUM)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_ENUM;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_STRUCT)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_STRUCT;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_UNION)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_UNION;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_CONST)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_CONST;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_VOLATILE)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_VOLATILE;
-        node->constant = token;
+        node->token = token;
     }
     else if (token->type == TOK_EOF)
     {
         node = malloc(sizeof(struct astnode));
         node->type = AST_INVALID;
-        node->constant = token;
+        node->token = token;
     }
 
     return node;

@@ -171,13 +171,8 @@ struct rule
 struct astnode
 {
     enum astnode_t type;
-    union
-    {
-        struct
-        {
-            struct token *constant;
-        };
-    };
+    struct token *token;
+
     struct listnode *children;
 };
 
