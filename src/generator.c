@@ -42,7 +42,7 @@ find_symbol(const char *name)
     return symbol;
 }
 
-struct astnode *
+static struct astnode *
 get_node(struct listnode *children, enum astnode_t type)
 {
     struct listnode *next;
@@ -59,6 +59,42 @@ get_node(struct listnode *children, enum astnode_t type)
     return NULL;
 }
 
+static void
+generate_symbol_table(struct astnode *ast)
+{
+    struct astnode *node;
+    struct token *token;
+    enum token_t type;
+
+    if (ast == NULL)
+    {
+        return;
+    }
+
+    if (ast->type == AST_STRUCT_OR_UNION_SPECIFIER)
+    {
+        node = get_node(ast->children, AST_IDENTIFIER);
+        type = get_node(ast->children, AST_STRUCT_OR_UNION)->token->type;
+
+        if (node == NULL)
+        {
+            /* anonymous struct or union */
+            return;
+        }
+
+        global_symbol_table[global_symbol_table_index].identifier = node->token;
+        global_symbol_table[global_symbol_table_index].type = type;
+
+        global_symbol_table_index += 1;
+    }
+    if (ast->type == AST_FUNCTION_DEFINITION)
+    {
+        /* iterate AST_PARAMETER_TYPE_LIST insert into local symbol table */
+        /* iterate AST_DECLARATION_LIST insert into local symbol table */
+        node = get_node(ast->children, AST_DECLARATION_LIST);
+    }
+}
+
 static void *
 generate_code(struct astnode *ast)
 {
@@ -68,30 +104,6 @@ generate_code(struct astnode *ast)
     }
 
     return NULL;
-}
-
-static void
-generate_symbol_table(struct astnode *ast)
-{
-    struct token *token;
-    enum token_t type;
-
-    if (ast->type == AST_STRUCT_OR_UNION_SPECIFIER)
-    {
-        token = get_node(ast->children, AST_IDENTIFIER)->token;
-        type = get_node(ast->children, AST_STRUCT_OR_UNION)->token->type;
-
-        if (token == NULL)
-        {
-            /* anonymous struct or union */
-            return;
-        }
-
-        global_symbol_table[global_symbol_table_index].identifier = token;
-        global_symbol_table[global_symbol_table_index].type = type;
-
-        global_symbol_table_index += 1;
-    }
 }
 
 void
