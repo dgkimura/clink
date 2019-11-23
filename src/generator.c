@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 
 #include "generator.h"
@@ -95,20 +96,14 @@ generate_symbol_table(struct astnode *ast)
     }
 }
 
-static void *
-generate_code(struct astnode *ast)
+static void
+visit_translation_unit(struct astnode *ast)
 {
-    if (ast->type == AST_CONSTANT)
-    {
-        return ast->token;
-    }
-
-    return NULL;
+    assert(ast->type == AST_TRANSLATION_UNIT);
 }
 
 void
 generate(struct astnode *ast)
 {
-    generate_symbol_table(ast);
-    generate_code(ast);
+    visit_translation_unit(ast);
 }
