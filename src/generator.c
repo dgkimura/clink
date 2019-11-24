@@ -97,9 +97,50 @@ generate_symbol_table(struct astnode *ast)
 }
 
 static void
+visit_function_definition(struct astnode *ast)
+{
+    assert(ast->type == AST_FUNCTION_DEFINITION);
+
+    /* add to local symbol table */
+}
+
+static void
+visit_external_declaration(struct astnode *ast)
+{
+    assert(ast->type == AST_EXTERNAL_DECLARATION);
+
+    /* add to global symbol table */
+}
+
+static void
 visit_translation_unit(struct astnode *ast)
 {
+    struct listnode *child;
+
     assert(ast->type == AST_TRANSLATION_UNIT);
+
+
+    for (child=ast->children; child!=NULL; child=child->next)
+    {
+        switch (((struct astnode *)child->data)->type)
+        {
+            case AST_TRANSLATION_UNIT:
+            {
+                visit_translation_unit(child);
+                break;
+            }
+            case AST_EXTERNAL_DECLARATION:
+            {
+                visit_external_declaration(child);
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
 }
 
 void
