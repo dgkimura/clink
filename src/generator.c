@@ -61,39 +61,11 @@ get_node(struct listnode *children, enum astnode_t type)
 }
 
 static void
-generate_symbol_table(struct astnode *ast)
+visit_declaration(struct astnode *ast)
 {
-    struct astnode *node;
-    struct token *token;
-    enum token_t type;
+    assert(ast->type == AST_DECLARATION);
 
-    if (ast == NULL)
-    {
-        return;
-    }
-
-    if (ast->type == AST_STRUCT_OR_UNION_SPECIFIER)
-    {
-        node = get_node(ast->children, AST_IDENTIFIER);
-        type = get_node(ast->children, AST_STRUCT_OR_UNION)->token->type;
-
-        if (node == NULL)
-        {
-            /* anonymous struct or union */
-            return;
-        }
-
-        global_symbol_table[global_symbol_table_index].identifier = node->token;
-        global_symbol_table[global_symbol_table_index].type = type;
-
-        global_symbol_table_index += 1;
-    }
-    if (ast->type == AST_FUNCTION_DEFINITION)
-    {
-        /* iterate AST_PARAMETER_TYPE_LIST insert into local symbol table */
-        /* iterate AST_DECLARATION_LIST insert into local symbol table */
-        node = get_node(ast->children, AST_DECLARATION_LIST);
-    }
+    /* add to local symbol table */
 }
 
 static void
@@ -107,31 +79,58 @@ visit_function_definition(struct astnode *ast)
 static void
 visit_external_declaration(struct astnode *ast)
 {
+    /* add to global symbol table */
+
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_EXTERNAL_DECLARATION);
 
-    /* add to global symbol table */
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_FUNCTION_DEFINITION:
+            {
+                visit_function_definition(next);
+                break;
+            }
+            case AST_DECLARATION:
+            {
+                visit_declaration(next);
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
 }
 
 static void
 visit_translation_unit(struct astnode *ast)
 {
-    struct listnode *child;
+    struct listnode *list;
+    struct astnode *next;
 
     assert(ast->type == AST_TRANSLATION_UNIT);
 
-
-    for (child=ast->children; child!=NULL; child=child->next)
+    for (list=ast->children; list!=NULL; list=list->next)
     {
-        switch (((struct astnode *)child->data)->type)
+        next = (struct astnode *)list->data;
+        switch (((struct astnode *)list->data)->type)
         {
             case AST_TRANSLATION_UNIT:
             {
-                visit_translation_unit(child);
+                visit_translation_unit(next);
                 break;
             }
             case AST_EXTERNAL_DECLARATION:
             {
-                visit_external_declaration(child);
+                visit_external_declaration(next);
                 break;
             }
             default:
