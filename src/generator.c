@@ -69,11 +69,73 @@ visit_declaration(struct astnode *ast)
 }
 
 static void
-visit_function_definition(struct astnode *ast)
+visit_declaration_specifiers(struct astnode *ast)
 {
     assert(ast->type == AST_FUNCTION_DEFINITION);
+}
 
+static void
+visit_declarator(struct astnode *ast)
+{
+    assert(ast->type == AST_DECLARATOR);
+}
+
+static void
+visit_declaration_list(struct astnode *ast)
+{
+    assert(ast->type == AST_DECLARATION_LIST);
+}
+
+static void
+visit_compound_statement(struct astnode *ast)
+{
+    assert(ast->type == AST_COMPOUND_STATEMENT);
+}
+
+static void
+visit_function_definition(struct astnode *ast)
+{
     /* add to local symbol table */
+
+    assert(ast->type == AST_FUNCTION_DEFINITION);
+
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_EXTERNAL_DECLARATION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_DECLARATION_SPECIFIERS:
+            {
+                visit_declaration_specifiers(next);
+                break;
+            }
+            case AST_DECLARATOR:
+            {
+                visit_declarator(next);
+                break;
+            }
+            case AST_DECLARATION_LIST:
+            {
+                visit_declaration_list(next);
+                break;
+            }
+            case AST_COMPOUND_STATEMENT:
+            {
+                visit_compound_statement(next);
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
 }
 
 static void
