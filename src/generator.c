@@ -71,7 +71,49 @@ visit_declaration(struct astnode *ast)
 static void
 visit_declaration_specifiers(struct astnode *ast)
 {
-    assert(ast->type == AST_FUNCTION_DEFINITION);
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_DECLARATION_SPECIFIERS);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_STORAGE_CLASS_SPECIFIER:
+            {
+                /*
+                 * next->next->type:
+                 *     AST_AUTO|AST_REGISTER|AST_STATIC|AST_EXTERN|AST_TYPEDEF
+                 */
+                break;
+            }
+            case AST_TYPE_SPECIFIER:
+            {
+                /*
+                 * next->next->type:
+                 *     AST_CHAR|AST_SHORT|AST_INT|AST_LONG|AST_FLOAT|AST_DOUBLE|
+                 *     AST_SIGNED|AST_UNSIGNED|AST_STRUCT_OR_UNION_SPECIFIER|
+                 *     AST_ENUM_SPECIFIER|AST_TYPEDEF_NAME
+                 */
+                break;
+            }
+            case AST_TYPE_QUALIFIER:
+            {
+                /*
+                 * next->next->type:
+                 *     AST_CONST|AST_VOLATILE
+                 */
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
 }
 
 static void
@@ -97,12 +139,10 @@ visit_function_definition(struct astnode *ast)
 {
     /* add to local symbol table */
 
-    assert(ast->type == AST_FUNCTION_DEFINITION);
-
     struct listnode *list;
     struct astnode *next;
 
-    assert(ast->type == AST_EXTERNAL_DECLARATION);
+    assert(ast->type == AST_FUNCTION_DEFINITION);
 
     for (list=ast->children; list!=NULL; list=list->next)
     {
