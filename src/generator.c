@@ -125,7 +125,33 @@ visit_declarator(struct astnode *ast)
 static void
 visit_declaration_list(struct astnode *ast)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_DECLARATION_LIST);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_DECLARATION:
+            {
+                visit_declaration(next);
+                break;
+            }
+            case AST_DECLARATION_LIST:
+            {
+                visit_declaration_list(next);
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
 }
 
 static void
