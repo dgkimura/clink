@@ -10,6 +10,12 @@ struct symbol
     enum token_t type;
 };
 
+enum scope
+{
+    LOCAL,
+    GLOBAL
+};
+
 int global_symbol_table_index = 0;
 struct symbol global_symbol_table[8192];
 
@@ -61,7 +67,7 @@ get_node(struct listnode *children, enum astnode_t type)
 }
 
 static void
-visit_declaration(struct astnode *ast)
+visit_declaration(struct astnode *ast, enum scope scope)
 {
     assert(ast->type == AST_DECLARATION);
 
@@ -137,7 +143,7 @@ visit_declaration_list(struct astnode *ast)
         {
             case AST_DECLARATION:
             {
-                visit_declaration(next);
+                visit_declaration(next, LOCAL);
                 break;
             }
             case AST_DECLARATION_LIST:
@@ -266,7 +272,7 @@ visit_external_declaration(struct astnode *ast)
             }
             case AST_DECLARATION:
             {
-                visit_declaration(next);
+                visit_declaration(next, GLOBAL);
                 break;
             }
             default:
