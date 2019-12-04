@@ -22,6 +22,9 @@ struct symbol global_symbol_table[8192];
 int local_symbol_table_index = 0;
 struct symbol local_symbol_table[8192];
 
+static void visit_declaration_specifiers(struct astnode *ast);
+static void visit_declarator(struct astnode *ast);
+
 static struct symbol *
 find_symbol(const char *name)
 {
@@ -67,11 +70,47 @@ get_node(struct listnode *children, enum astnode_t type)
 }
 
 static void
+visit_init_declarator_list(struct astnode *ast)
+{
+    assert(ast->type == AST_INIT_DECLARATOR_LIST);
+}
+
+static void
 visit_declaration(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_DECLARATION);
 
     /* add to local symbol table */
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_DECLARATION_SPECIFIERS:
+            {
+                visit_declaration_specifiers(ast);
+                break;
+            }
+            case AST_INIT_DECLARATOR_LIST:
+            {
+                visit_init_declarator_list(ast);
+                break;
+            }
+            case AST_SEMICOLON:
+            {
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
 }
 
 static void
