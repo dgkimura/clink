@@ -23,7 +23,7 @@ int local_symbol_table_index = 0;
 struct symbol local_symbol_table[8192];
 
 static void visit_declaration_specifiers(struct astnode *ast);
-static void visit_declarator(struct astnode *ast);
+static void visit_declarator(struct astnode *ast, enum scope scope);
 
 static struct symbol *
 find_symbol(const char *name)
@@ -162,7 +162,7 @@ visit_declaration_specifiers(struct astnode *ast)
 }
 
 static void
-visit_declarator(struct astnode *ast)
+visit_declarator(struct astnode *ast, enum scope scope)
 {
     assert(ast->type == AST_DECLARATOR);
 }
@@ -267,7 +267,7 @@ visit_function_definition(struct astnode *ast)
             }
             case AST_DECLARATOR:
             {
-                visit_declarator(next);
+                visit_declarator(next, GLOBAL);
                 break;
             }
             case AST_DECLARATION_LIST:
