@@ -24,6 +24,8 @@ struct symbol local_symbol_table[8192];
 
 static void visit_declaration_specifiers(struct astnode *ast);
 static void visit_declarator(struct astnode *ast, enum scope scope);
+static void visit_statement(struct astnode *ast);
+static void visit_statement_list(struct astnode *ast);
 
 static struct symbol *
 find_symbol(const char *name)
@@ -200,41 +202,15 @@ visit_declaration_list(struct astnode *ast)
 }
 
 static void
-visit_statement(struct astnode *ast)
+visit_labeled_statement(struct astnode *ast)
 {
-    assert(ast->type == AST_STATEMENT);
+    assert(ast->type == AST_LABELED_STATEMENT);
 }
 
 static void
-visit_statement_list(struct astnode *ast)
+visit_expression_statement(struct astnode *ast)
 {
-    struct listnode *list;
-    struct astnode *next;
-
-    assert(ast->type == AST_STATEMENT_LIST);
-
-    for (list=ast->children; list!=NULL; list=list->next)
-    {
-        next = (struct astnode *)list->data;
-        switch (next->type)
-        {
-            case AST_STATEMENT:
-            {
-                visit_statement(next);
-                break;
-            }
-            case AST_STATEMENT_LIST:
-            {
-                visit_statement_list(next);
-                break;
-            }
-            default:
-            {
-                assert(1);
-                break;
-            }
-        }
-    }
+    assert(ast->type == AST_EXPRESSION_STATEMENT);
 }
 
 static void
@@ -261,6 +237,108 @@ visit_compound_statement(struct astnode *ast)
             case AST_DECLARATION_LIST:
             {
                 visit_declaration_list(next);
+                break;
+            }
+            case AST_STATEMENT_LIST:
+            {
+                visit_statement_list(next);
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
+}
+
+static void
+visit_selection_statement(struct astnode *ast)
+{
+    assert(ast->type == AST_SELECTION_STATEMENT);
+}
+
+static void
+visit_iteration_statement(struct astnode *ast)
+{
+    assert(ast->type == AST_ITERATION_STATEMENT);
+}
+
+static void
+visit_jump_statement(struct astnode *ast)
+{
+    assert(ast->type == AST_JUMP_STATEMENT);
+}
+
+static void
+visit_statement(struct astnode *ast)
+{
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_STATEMENT);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_LABELED_STATEMENT:
+            {
+                visit_labeled_statement(next);
+                break;
+            }
+            case AST_EXPRESSION_STATEMENT:
+            {
+                visit_expression_statement(next);
+                break;
+            }
+            case AST_COMPOUND_STATEMENT:
+            {
+                visit_compound_statement(next);
+                break;
+            }
+            case AST_SELECTION_STATEMENT:
+            {
+                visit_selection_statement(next);
+                break;
+            }
+            case AST_ITERATION_STATEMENT:
+            {
+                visit_iteration_statement(next);
+                break;
+            }
+            case AST_JUMP_STATEMENT:
+            {
+                visit_jump_statement(next);
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
+}
+
+static void
+visit_statement_list(struct astnode *ast)
+{
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_STATEMENT_LIST);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_STATEMENT:
+            {
+                visit_statement(next);
                 break;
             }
             case AST_STATEMENT_LIST:
