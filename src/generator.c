@@ -85,8 +85,6 @@ visit_declaration(struct astnode *ast, enum scope scope)
 
     assert(ast->type == AST_DECLARATION);
 
-    /* add to local symbol table */
-
     for (list=ast->children; list!=NULL; list=list->next)
     {
         next = (struct astnode *)list->data;
@@ -99,6 +97,10 @@ visit_declaration(struct astnode *ast, enum scope scope)
             }
             case AST_INIT_DECLARATOR_LIST:
             {
+                /*
+                 * If this is a named declaration then it will parse an
+                 * identifer inside the init declarator list
+                 */
                 visit_init_declarator_list(ast);
                 break;
             }
@@ -377,11 +379,20 @@ visit_function_definition(struct astnode *ast)
             }
             case AST_DECLARATOR:
             {
+                /*
+                 * If this is a named function then it will parse an identifer
+                 * inside the declarator
+                 */
                 visit_declarator(next, GLOBAL);
                 break;
             }
             case AST_DECLARATION_LIST:
             {
+                /*
+                 * If there are identifiers in the declaration list then add
+                 * them to the local symbol table. Those symbols can then later
+                 * be referenced in the compound statements.
+                 */
                 visit_declaration_list(next);
                 break;
             }
