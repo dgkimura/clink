@@ -476,6 +476,9 @@ visit_translation_unit(struct astnode *ast)
     }
 }
 
+/*
+ * Given an abstract syntax tree, construct symbol tables and generate code.
+ */
 void
 generate(struct astnode *ast)
 {
