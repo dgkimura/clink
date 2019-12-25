@@ -22,7 +22,7 @@ struct symbol global_symbol_table[8192];
 int local_symbol_table_index = 0;
 struct symbol local_symbol_table[8192];
 
-static void visit_declaration_specifiers(struct astnode *ast);
+static void visit_declaration_specifiers(struct astnode *ast, enum scope scope);
 static void visit_declarator(struct astnode *ast, enum scope scope);
 static void visit_statement(struct astnode *ast);
 static void visit_statement_list(struct astnode *ast);
@@ -92,7 +92,7 @@ visit_declaration(struct astnode *ast, enum scope scope)
         {
             case AST_DECLARATION_SPECIFIERS:
             {
-                visit_declaration_specifiers(ast);
+                visit_declaration_specifiers(ast, scope);
                 break;
             }
             case AST_INIT_DECLARATOR_LIST:
@@ -118,7 +118,7 @@ visit_declaration(struct astnode *ast, enum scope scope)
 }
 
 static void
-visit_declaration_specifiers(struct astnode *ast)
+visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 {
     struct listnode *list;
     struct astnode *next;
@@ -374,7 +374,7 @@ visit_function_definition(struct astnode *ast)
         {
             case AST_DECLARATION_SPECIFIERS:
             {
-                visit_declaration_specifiers(next);
+                visit_declaration_specifiers(next, GLOBAL);
                 break;
             }
             case AST_DECLARATOR:
