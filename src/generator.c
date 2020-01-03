@@ -72,7 +72,7 @@ get_node(struct listnode *children, enum astnode_t type)
 }
 
 static void
-visit_init_declarator_list(struct astnode *ast)
+visit_init_declarator_list(struct astnode *ast, enum scope scope)
 {
     assert(ast->type == AST_INIT_DECLARATOR_LIST);
 }
@@ -101,7 +101,7 @@ visit_declaration(struct astnode *ast, enum scope scope)
                  * If this is a named declaration then it will parse an
                  * identifer inside the init declarator list
                  */
-                visit_init_declarator_list(ast);
+                visit_init_declarator_list(ast, scope);
                 break;
             }
             case AST_SEMICOLON:
