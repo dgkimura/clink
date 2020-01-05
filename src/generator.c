@@ -6,8 +6,14 @@
 
 struct symbol
 {
+    /* String identifier of the symbol.. */
     struct token *identifier;
-    enum token_t type;
+
+    /* List of enum token_t attributes of the symbol. */
+    struct listnode *attributes;
+
+    /* If currently being evaluated then 1 else 0. */
+    int current;
 };
 
 enum scope
