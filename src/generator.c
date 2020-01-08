@@ -11,10 +11,9 @@ struct symbol
 
     /* List of enum token_t attributes of the symbol. */
     struct listnode *attributes;
-
-    /* If currently being evaluated then 1 else 0. */
-    int current;
 };
+
+enum token_t current_symbol_attributes[10];
 
 enum scope
 {
