@@ -4,16 +4,22 @@
 #include "generator.h"
 #include "utilities.h"
 
+#define MAX_SYMBOL_ATTRIBUTES 10
+
 struct symbol
 {
     /* String identifier of the symbol.. */
     struct token *identifier;
 
-    /* List of enum token_t attributes of the symbol. */
-    struct listnode *attributes;
+    /* Attributes of the symbol. */
+    enum token_t attributes[MAX_SYMBOL_ATTRIBUTES];
 };
 
-enum token_t current_symbol_attributes[10];
+/*
+ * Temporarily holds the attributes of a symbol during AST iteration when name
+ * of symbol(s) is not yet known.
+ */
+enum token_t current_symbol_attributes[MAX_SYMBOL_ATTRIBUTES];
 
 enum scope
 {
