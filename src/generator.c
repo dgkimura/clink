@@ -19,6 +19,7 @@ struct symbol
  * Temporarily holds the attributes of a symbol during AST iteration when name
  * of symbol(s) is not yet known.
  */
+int index_current_symbol_attributes;
 enum token_t current_symbol_attributes[MAX_SYMBOL_ATTRIBUTES];
 
 enum scope
@@ -129,12 +130,160 @@ visit_declaration(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_storage_class_specifier(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_STORAGE_CLASS_SPECIFIER);
+
+    switch (ast->type)
+    {
+        case AST_AUTO:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_AUTO;
+            break;
+        }
+        case AST_REGISTER:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_REGISTER;
+            break;
+        }
+        case AST_STATIC:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_STATIC;
+            break;
+        }
+        case AST_EXTERN:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_EXTERN;
+            break;
+        }
+        case AST_TYPEDEF:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_TYPEDEF;
+            break;
+        }
+        default:
+        {
+            assert(1);
+            break;
+        }
+    }
+}
+
+static void
+visit_struct_or_union_specifier(struct astnode *ast, enum scope scope)
+{
+}
+
+static void
+visit_enum_specifier(struct astnode *ast, enum scope scope)
+{
+}
+
+static void
+visit_type_specifier(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_TYPE_SPECIFIER);
+
+    switch (ast->type)
+    {
+        case AST_CHAR:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_CHAR;
+            break;
+        }
+        case AST_SHORT:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_SHORT;
+            break;
+        }
+        case AST_INT:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_INT;
+            break;
+        }
+        case AST_LONG:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_LONG;
+            break;
+        }
+        case AST_FLOAT:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_FLOAT;
+            break;
+        }
+        case AST_DOUBLE:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_DOUBLE;
+            break;
+        }
+        case AST_SIGNED:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_SIGNED;
+            break;
+        }
+        case AST_UNSIGNED:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_UNSIGNED;
+            break;
+        }
+        case AST_STRUCT_OR_UNION_SPECIFIER:
+        {
+            visit_struct_or_union_specifier(ast, scope);
+            break;
+        }
+        case AST_ENUM_SPECIFIER:
+        {
+            visit_enum_specifier(ast, scope);
+            break;
+        }
+        case AST_TYPEDEF_NAME:
+        {
+            /* TODO: What is this? */
+            break;
+        }
+        default:
+        {
+            assert(1);
+            break;
+        }
+    }
+}
+
+static void
+visit_type_qualifier(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_TYPE_QUALIFIER);
+
+    switch (ast->type)
+    {
+        case AST_CONST:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_CONST;
+            break;
+        }
+        case AST_VOLATILE:
+        {
+            current_symbol_attributes[index_current_symbol_attributes++] = TOK_VOLATILE;
+            break;
+        }
+        default:
+        {
+            assert(1);
+            break;
+        }
+    }
+}
+
+static void
 visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 {
     struct listnode *list;
     struct astnode *next;
 
     assert(ast->type == AST_DECLARATION_SPECIFIERS);
+
+    index_current_symbol_attributes = 0;
+    memset(current_symbol_attributes, 0, sizeof(enum token_t) * MAX_SYMBOL_ATTRIBUTES);
 
     for (list=ast->children; list!=NULL; list=list->next)
     {
@@ -143,29 +292,25 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
         {
             case AST_STORAGE_CLASS_SPECIFIER:
             {
-                /*
-                 * next->next->type:
-                 *     AST_AUTO|AST_REGISTER|AST_STATIC|AST_EXTERN|AST_TYPEDEF
-                 */
+                visit_storage_class_specifier(next, scope);
                 break;
             }
             case AST_TYPE_SPECIFIER:
             {
-                /*
-                 * next->next->type:
-                 *     AST_CHAR|AST_SHORT|AST_INT|AST_LONG|AST_FLOAT|AST_DOUBLE|
-                 *     AST_SIGNED|AST_UNSIGNED|AST_STRUCT_OR_UNION_SPECIFIER|
-                 *     AST_ENUM_SPECIFIER|AST_TYPEDEF_NAME
-                 */
+                visit_type_specifier(next, scope);
                 break;
             }
             case AST_TYPE_QUALIFIER:
             {
-                /*
-                 * next->next->type:
-                 *     AST_CONST|AST_VOLATILE
-                 */
+                visit_type_qualifier(next, scope);
                 break;
+            }
+            case AST_DECLARATION_SPECIFIERS:
+            {
+                /*
+                 * Recursive when declaration has multiple specifiers.
+                 */
+                visit_declaration_specifiers(ast, scope);
             }
             default:
             {
