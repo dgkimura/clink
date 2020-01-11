@@ -84,9 +84,44 @@ get_node(struct listnode *children, enum astnode_t type)
 }
 
 static void
+visit_init_declarator(struct astnode *ast, enum scope scope)
+{
+}
+
+static void
 visit_init_declarator_list(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_INIT_DECLARATOR_LIST);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_INIT_DECLARATOR:
+            {
+                visit_init_declarator(next, scope);
+                break;
+            }
+            case AST_COMMA:
+            {
+                break;
+            }
+            case AST_INIT_DECLARATOR_LIST:
+            {
+                visit_init_declarator_list(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(1);
+                break;
+            }
+        }
+    }
 }
 
 static void
@@ -104,7 +139,7 @@ visit_declaration(struct astnode *ast, enum scope scope)
         {
             case AST_DECLARATION_SPECIFIERS:
             {
-                visit_declaration_specifiers(ast, scope);
+                visit_declaration_specifiers(next, scope);
                 break;
             }
             case AST_INIT_DECLARATOR_LIST:
@@ -113,7 +148,7 @@ visit_declaration(struct astnode *ast, enum scope scope)
                  * If this is a named declaration then it will parse an
                  * identifer inside the init declarator list
                  */
-                visit_init_declarator_list(ast, scope);
+                visit_init_declarator_list(next, scope);
                 break;
             }
             case AST_SEMICOLON:
