@@ -117,7 +117,7 @@ visit_init_declarator_list(struct astnode *ast, enum scope scope)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -157,7 +157,7 @@ visit_declaration(struct astnode *ast, enum scope scope)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -198,7 +198,7 @@ visit_storage_class_specifier(struct astnode *ast, enum scope scope)
         }
         default:
         {
-            assert(1);
+            assert(0);
             break;
         }
     }
@@ -278,7 +278,7 @@ visit_type_specifier(struct astnode *ast, enum scope scope)
         }
         default:
         {
-            assert(1);
+            assert(0);
             break;
         }
     }
@@ -303,7 +303,7 @@ visit_type_qualifier(struct astnode *ast, enum scope scope)
         }
         default:
         {
-            assert(1);
+            assert(0);
             break;
         }
     }
@@ -349,7 +349,7 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -387,7 +387,7 @@ visit_declaration_list(struct astnode *ast)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -439,7 +439,7 @@ visit_compound_statement(struct astnode *ast)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -509,7 +509,7 @@ visit_statement(struct astnode *ast)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -541,7 +541,7 @@ visit_statement_list(struct astnode *ast)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -594,7 +594,7 @@ visit_function_definition(struct astnode *ast)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -628,7 +628,7 @@ visit_external_declaration(struct astnode *ast)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
@@ -660,7 +660,7 @@ visit_translation_unit(struct astnode *ast)
             }
             default:
             {
-                assert(1);
+                assert(0);
                 break;
             }
         }
