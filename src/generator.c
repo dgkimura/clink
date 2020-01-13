@@ -84,8 +84,45 @@ get_node(struct listnode *children, enum astnode_t type)
 }
 
 static void
+visit_initializer(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_INITIALIZER);
+}
+
+static void
 visit_init_declarator(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_INIT_DECLARATOR);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_DECLARATOR:
+            {
+                visit_declarator(next, scope);
+                break;
+            }
+            case AST_EQUAL:
+            {
+                break;
+            }
+            case AST_INITIALIZER:
+            {
+                visit_initializer(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
