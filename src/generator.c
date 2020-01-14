@@ -394,9 +394,40 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_direct_declarator(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_DIRECT_DECLARATOR);
+}
+
+static void
 visit_declarator(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_DECLARATOR);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_DIRECT_DECLARATOR:
+            {
+                visit_direct_declarator(next, LOCAL);
+                break;
+            }
+            case AST_POINTER:
+            {
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
