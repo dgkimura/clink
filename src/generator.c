@@ -394,9 +394,86 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_constant_expression(struct astnode *ast, enum scope scope)
+{
+}
+
+static void
+visit_parameter_type_list(struct astnode *ast, enum scope scope)
+{
+}
+
+static void
+visit_identifier_list(struct astnode *ast, enum scope scope)
+{
+}
+
+static void
 visit_direct_declarator(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_DIRECT_DECLARATOR);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_IDENTIFIER:
+            {
+                /* TODO: create to symbol table entry */
+                break;
+            }
+            case AST_LPAREN:
+            {
+                break;
+            }
+            case AST_DECLARATOR:
+            {
+                visit_declarator(next, scope);
+                break;
+            }
+            case AST_RPAREN:
+            {
+                break;
+            }
+            case AST_DIRECT_DECLARATOR:
+            {
+                visit_direct_declarator(next, scope);
+                break;
+            }
+            case AST_LBRACKET:
+            {
+                break;
+            }
+            case AST_RBRACKET:
+            {
+                break;
+            }
+            case AST_CONSTANT_EXPRESSION:
+            {
+                visit_constant_expression(next, scope);
+                break;
+            }
+            case AST_PARAMETER_TYPE_LIST:
+            {
+                visit_parameter_type_list(next, scope);
+                break;
+            }
+            case AST_IDENTIFIER_LIST:
+            {
+                visit_identifier_list(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
