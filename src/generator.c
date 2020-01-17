@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "generator.h"
@@ -9,7 +10,7 @@
 struct symbol
 {
     /* String identifier of the symbol.. */
-    struct token *identifier;
+    char *identifier;
 
     /* Attributes of the symbol. */
     enum token_t attributes[MAX_SYMBOL_ATTRIBUTES];
@@ -39,6 +40,25 @@ static void visit_declarator(struct astnode *ast, enum scope scope);
 static void visit_statement(struct astnode *ast);
 static void visit_statement_list(struct astnode *ast);
 
+static void
+insert_symbol(char *name, enum scope scope)
+{
+    struct symbol *s = malloc(sizeof(struct symbol));
+    memset(s, 0, sizeof(struct symbol));
+
+    s->identifier = name;
+    memcpy(s->attributes, current_symbol_attributes, MAX_SYMBOL_ATTRIBUTES);
+
+    if (scope == LOCAL)
+    {
+        local_symbol_table[local_symbol_table_index++] = *s;
+    }
+    else if (scope == GLOBAL)
+    {
+        global_symbol_table[global_symbol_table_index++] = *s;
+    }
+}
+
 static struct symbol *
 find_symbol(const char *name)
 {
@@ -47,7 +67,7 @@ find_symbol(const char *name)
 
     for (i=0; i<global_symbol_table_index; i++)
     {
-        if (strcmp(global_symbol_table[i].identifier->value, name) == 0)
+        if (strcmp(global_symbol_table[i].identifier, name) == 0)
         {
             symbol = &global_symbol_table[i];
             break;
@@ -56,7 +76,7 @@ find_symbol(const char *name)
 
     for (i=0; i<local_symbol_table_index; i++)
     {
-        if (strcmp(local_symbol_table[i].identifier->value, name) == 0)
+        if (strcmp(local_symbol_table[i].identifier, name) == 0)
         {
             symbol = &local_symbol_table[i];
             break;
@@ -423,7 +443,7 @@ visit_direct_declarator(struct astnode *ast, enum scope scope)
         {
             case AST_IDENTIFIER:
             {
-                /* TODO: create to symbol table entry */
+                insert_symbol(next->token->value, scope);
                 break;
             }
             case AST_LPAREN:
