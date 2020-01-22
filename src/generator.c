@@ -426,6 +426,37 @@ visit_parameter_type_list(struct astnode *ast, enum scope scope)
 static void
 visit_identifier_list(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_IDENTIFIER_LIST);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_IDENTIFIER_LIST:
+            {
+                visit_identifier_list(next, scope);
+                break;
+            }
+            case AST_COMMA:
+            {
+                break;
+            }
+            case AST_IDENTIFIER:
+            {
+                insert_symbol(next->token->value, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
