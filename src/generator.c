@@ -419,8 +419,80 @@ visit_constant_expression(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_parameter_declaration(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_PARAMETER_DECLARATION);
+}
+
+static void
+visit_parameter_list(struct astnode *ast, enum scope scope)
+{
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_PARAMETER_LIST);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_PARAMETER_DECLARATION:
+            {
+                visit_parameter_declaration(next, scope);
+                break;
+            }
+            case AST_COMMA:
+            {
+                break;
+            }
+            case AST_PARAMETER_LIST:
+            {
+                visit_parameter_list(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
+}
+
+static void
 visit_parameter_type_list(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_PARAMETER_TYPE_LIST);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_PARAMETER_LIST:
+            {
+                visit_parameter_list(next, scope);
+                break;
+            }
+            case AST_COMMA:
+            {
+                break;
+            }
+            case AST_ELLIPSIS:
+            {
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
