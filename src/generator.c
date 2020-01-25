@@ -264,11 +264,58 @@ visit_storage_class_specifier(struct astnode *ast, enum scope scope)
 static void
 visit_struct_or_union_specifier(struct astnode *ast, enum scope scope)
 {
+    assert(ast->type == AST_STRUCT_OR_UNION_SPECIFIER);
+}
+
+static void
+visit_enumerator_list(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_ENUMERATOR_LIST);
 }
 
 static void
 visit_enum_specifier(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_ENUM_SPECIFIER);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_ENUM:
+            {
+                current_symbol_attributes[index_current_symbol_attributes++] = TOK_ENUM;
+                break;
+            }
+            case AST_IDENTIFIER:
+            {
+                insert_symbol(next->token->value, scope);
+                break;
+            }
+            case AST_LBRACE:
+            {
+                break;
+            }
+            case AST_ENUMERATOR_LIST:
+            {
+                visit_enumerator_list(next, scope);
+                break;
+            }
+            case AST_RBRACE:
+            {
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
