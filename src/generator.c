@@ -268,9 +268,45 @@ visit_struct_or_union_specifier(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_enumerator(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_ENUMERATOR);
+}
+
+static void
 visit_enumerator_list(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_ENUMERATOR_LIST);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_ENUMERATOR:
+            {
+                visit_enumerator(next, scope);
+                break;
+            }
+            case AST_COMMA:
+            {
+                break;
+            }
+            case AST_ENUMERATOR_LIST:
+            {
+                visit_enumerator_list(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
