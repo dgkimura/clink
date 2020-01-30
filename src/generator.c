@@ -39,6 +39,7 @@ static void visit_declaration_specifiers(struct astnode *ast, enum scope scope);
 static void visit_declarator(struct astnode *ast, enum scope scope);
 static void visit_statement(struct astnode *ast);
 static void visit_statement_list(struct astnode *ast);
+static void visit_constant_expression(struct astnode *ast, enum scope scope);
 
 static void
 insert_symbol(char *name, enum scope scope)
@@ -528,9 +529,75 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_conditional_expression(struct astnode *ast, enum scope scope)
+{
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_CONDITIONAL_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_LOGICAL_OR_EXPRESSION:
+            {
+                /*TODO: */
+                break;
+            }
+            case AST_QUESTIONMARK:
+            {
+                break;
+            }
+            case AST_EXPRESSION:
+            {
+                /*TODO: */
+                break;
+            }
+            case AST_COLON:
+            {
+                break;
+            }
+            case AST_CONDITIONAL_EXPRESSION:
+            {
+                visit_conditional_expression(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
+}
+
+static void
 visit_constant_expression(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_CONSTANT_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_CONDITIONAL_EXPRESSION:
+            {
+                visit_conditional_expression(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
