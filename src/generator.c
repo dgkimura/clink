@@ -270,7 +270,38 @@ visit_struct_or_union_specifier(struct astnode *ast, enum scope scope)
 static void
 visit_enumerator(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_ENUMERATOR);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_IDENTIFIER:
+            {
+                insert_symbol(next->token->value, scope);
+                break;
+            }
+            case AST_EQUAL:
+            {
+                break;
+            }
+            case AST_CONSTANT_EXPRESSION:
+            {
+                visit_constant_expression(next, scope);
+                /* TODO: find_symbol and add constant */
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
@@ -499,6 +530,7 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 static void
 visit_constant_expression(struct astnode *ast, enum scope scope)
 {
+    assert(ast->type == AST_CONSTANT_EXPRESSION);
 }
 
 static void
