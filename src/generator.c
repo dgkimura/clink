@@ -529,6 +529,48 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_logical_or_expression(struct astnode *ast, enum scope scope)
+{
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_LOGICAL_OR_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_LOGICAL_OR_EXPRESSION:
+            {
+                visit_logical_or_expression(next, scope);
+                break;
+            }
+            case AST_VERTICALBAR_VERTICALBAR:
+            {
+                break;
+            }
+            case AST_LOGICAL_AND_EXPRESSION:
+            {
+                /*TODO:*/
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
+}
+
+static void
+visit_expression(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_EXPRESSION);
+}
+
+static void
 visit_conditional_expression(struct astnode *ast, enum scope scope)
 {
     struct listnode *list;
@@ -543,7 +585,7 @@ visit_conditional_expression(struct astnode *ast, enum scope scope)
         {
             case AST_LOGICAL_OR_EXPRESSION:
             {
-                /*TODO: */
+                visit_logical_or_expression(next, scope);
                 break;
             }
             case AST_QUESTIONMARK:
@@ -552,7 +594,7 @@ visit_conditional_expression(struct astnode *ast, enum scope scope)
             }
             case AST_EXPRESSION:
             {
-                /*TODO: */
+                visit_expression(next, scope);
                 break;
             }
             case AST_COLON:
