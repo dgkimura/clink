@@ -529,9 +529,45 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_and_expression(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_AND_EXPRESSION);
+}
+
+static void
 visit_exclusive_or_expression(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_EXCLUSIVE_OR_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_EXCLUSIVE_OR_EXPRESSION:
+            {
+                visit_exclusive_or_expression(next, scope);
+                break;
+            }
+            case AST_CARET:
+            {
+                break;
+            }
+            case AST_AND_EXPRESSION:
+            {
+                visit_and_expression(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
