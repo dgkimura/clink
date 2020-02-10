@@ -529,9 +529,46 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_additive_expression(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_ADDITIVE_EXPRESSION);
+}
+
+static void
 visit_shift_expression(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_SHIFT_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_SHIFT_EXPRESSION:
+            {
+                visit_shift_expression(next, scope);
+                break;
+            }
+            case AST_SHIFTLEFT:
+            case AST_SHIFTRIGHT:
+            {
+                break;
+            }
+            case AST_ADDITIVE_EXPRESSION:
+            {
+                visit_additive_expression(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
