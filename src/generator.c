@@ -529,9 +529,48 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_shift_expression(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_SHIFT_EXPRESSION);
+}
+
+static void
 visit_relational_expression(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_RELATIONAL_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_RELATIONAL_EXPRESSION:
+            {
+                visit_relational_expression(next, scope);
+                break;
+            }
+            case AST_LT:
+            case AST_GT:
+            case AST_LTEQ:
+            case AST_GTEQ:
+            {
+                break;
+            }
+            case AST_SHIFT_EXPRESSION:
+            {
+                visit_shift_expression(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
