@@ -40,6 +40,7 @@ static void visit_declarator(struct astnode *ast, enum scope scope);
 static void visit_statement(struct astnode *ast);
 static void visit_statement_list(struct astnode *ast);
 static void visit_constant_expression(struct astnode *ast, enum scope scope);
+static void visit_cast_expression(struct astnode *ast, enum scope scope);
 
 static void
 insert_symbol(char *name, enum scope scope)
@@ -529,9 +530,58 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_postfix_expression(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_POSTFIX_EXPRESSION);
+}
+
+static void
 visit_unary_expression(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_UNARY_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_PLUS_PLUS:
+            case AST_MINUS_MINUS:
+            {
+                break;
+            }
+            case AST_UNARY_EXPRESSION:
+            {
+                visit_unary_expression(next, scope);
+                break;
+            }
+            case AST_AMPERSAND:
+            case AST_ASTERISK:
+            case AST_PLUS:
+            case AST_MINUS:
+            {
+                break;
+            }
+            case AST_CAST_EXPRESSION:
+            {
+                visit_cast_expression(next, scope);
+                break;
+            }
+            case AST_POSTFIX_EXPRESSION:
+            {
+                visit_postfix_expression(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
