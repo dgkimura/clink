@@ -530,9 +530,52 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_primary_expression(struct astnode *ast, enum scope scope)
+{
+    assert(ast->type == AST_PRIMARY_EXPRESSION);
+}
+
+static void
 visit_postfix_expression(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_POSTFIX_EXPRESSION);
+
+    for (list=ast->children; list!=NULL; list=list->next)
+    {
+        next = (struct astnode *)list->data;
+        switch (next->type)
+        {
+            case AST_POSTFIX_EXPRESSION:
+            {
+                visit_postfix_expression(next, scope);
+                break;
+            }
+            case AST_ARROW:
+            case AST_PLUS_PLUS:
+            case AST_MINUS_MINUS:
+            {
+                break;
+            }
+            case AST_IDENTIFIER:
+            {
+                /* TODO: find_symbol() */
+                break;
+            }
+            case AST_PRIMARY_EXPRESSION:
+            {
+                visit_primary_expression(next, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+        }
+    }
 }
 
 static void
