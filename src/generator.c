@@ -530,9 +530,36 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_constant(struct astnode *ast, enum scope scope)
+{
+}
+
+static void
 visit_primary_expression(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
     assert(ast->type == AST_PRIMARY_EXPRESSION);
+
+    switch (((struct astnode *)ast->children->data)->type)
+    {
+            case AST_IDENTIFIER:
+            {
+                /* TODO: find_symbol() */
+                break;
+            }
+            case AST_CONSTANT:
+            {
+                visit_constant((struct astnode *)ast->children->data, scope);
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+    }
 }
 
 static void
