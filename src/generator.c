@@ -14,6 +14,12 @@ struct symbol
 
     /* Attributes of the symbol. */
     enum token_t attributes[MAX_SYMBOL_ATTRIBUTES];
+
+    /*
+     * Offset of the symbol. For parameters and local variables this will be an
+     * offset from ebp.
+     */
+    int offset;
 };
 
 /*
