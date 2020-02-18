@@ -49,6 +49,11 @@ static void visit_constant_expression(struct astnode *ast, enum scope scope);
 static void visit_cast_expression(struct astnode *ast, enum scope scope);
 
 static void
+write_assembly(char *code)
+{
+}
+
+static void
 insert_symbol(char *name, enum scope scope)
 {
     struct symbol *s = malloc(sizeof(struct symbol));
