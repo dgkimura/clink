@@ -12,7 +12,7 @@ main(int argc, char *agv[])
     preprocess("test.c", "_test.c");
     scan("_test.c", 0, &tokens);
     ast = parse(tokens);
-    generate(ast);
+    generate(ast, "test.s");
 
     return 0;
 }

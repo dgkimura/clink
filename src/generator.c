@@ -48,6 +48,8 @@ static void visit_statement_list(struct astnode *ast);
 static void visit_constant_expression(struct astnode *ast, enum scope scope);
 static void visit_cast_expression(struct astnode *ast, enum scope scope);
 
+static char *assembly_filename;
+
 static void
 write_assembly(char *code)
 {
@@ -1659,7 +1661,8 @@ visit_translation_unit(struct astnode *ast)
  * Given an abstract syntax tree, construct symbol tables and generate code.
  */
 void
-generate(struct astnode *ast)
+generate(struct astnode *ast, char *outfile)
 {
+    assembly_filename = outfile;
     visit_translation_unit(ast);
 }

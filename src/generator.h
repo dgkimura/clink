@@ -3,6 +3,6 @@
 
 #include "parser.h"
 
-void generate(struct astnode *ast);
+void generate(struct astnode *ast, char *outfile);
 
 #endif
