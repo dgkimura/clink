@@ -157,6 +157,8 @@ enum astnode_t
     AST_TRANSLATION_UNIT
 };
 
+typedef struct astnode * (*astnode_constructor) (struct listnode *list);
+
 #define MAX_ASTNODES 9
 
 struct rule
@@ -164,6 +166,7 @@ struct rule
     enum astnode_t type;
     int length_of_nodes;
     enum astnode_t nodes[MAX_ASTNODES];
+    astnode_constructor func;
 };
 
 #define NUM_RULES 199
