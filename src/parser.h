@@ -177,6 +177,11 @@ struct astnode
     struct token *token;
 
     struct listnode *children;
+
+    union
+    {
+        int int_value;
+    };
 };
 
 /*

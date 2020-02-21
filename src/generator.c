@@ -1,4 +1,6 @@
 #include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -48,11 +50,15 @@ static void visit_statement_list(struct astnode *ast);
 static void visit_constant_expression(struct astnode *ast, enum scope scope);
 static void visit_cast_expression(struct astnode *ast, enum scope scope);
 
-static char *assembly_filename;
+static FILE *assembly_filename;
 
 static void
-write_assembly(char *code)
+write_assembly(char *format, ...)
 {
+    va_list args;
+    va_start(args, format);
+    vfprintf(assembly_filename, format, args);
+    va_end(args);
 }
 
 static void
@@ -545,6 +551,29 @@ visit_declaration_specifiers(struct astnode *ast, enum scope scope)
 static void
 visit_constant(struct astnode *ast, enum scope scope)
 {
+    struct listnode *list;
+    struct astnode *next;
+
+    assert(ast->type == AST_CONSTANT);
+
+    switch (((struct astnode *)ast->children->data)->type)
+    {
+            case AST_INTEGER_CONSTANT:
+            {
+                write_assembly("mov $%d %rax", ast->int_value);
+                break;
+            }
+            case AST_CHARACTER_CONSTANT:
+            {
+                /* TODO: */
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+    }
 }
 
 static void
@@ -1663,6 +1692,6 @@ visit_translation_unit(struct astnode *ast)
 void
 generate(struct astnode *ast, char *outfile)
 {
-    assembly_filename = outfile;
+    assembly_filename = fopen(outfile, "w");
     visit_translation_unit(ast);
 }
