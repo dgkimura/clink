@@ -181,6 +181,13 @@ struct astnode
     union
     {
         int int_value;
+
+        struct
+        {
+            enum astnode_t op;
+            struct astnode *left;
+            struct astnode *right;
+        };
     };
 };
 

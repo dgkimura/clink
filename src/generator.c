@@ -769,31 +769,29 @@ visit_additive_expression(struct astnode *ast, enum scope scope)
 
     assert(ast->type == AST_ADDITIVE_EXPRESSION);
 
-    for (list=ast->children; list!=NULL; list=list->next)
+    switch (ast->op)
     {
-        next = (struct astnode *)list->data;
-        switch (next->type)
+        case AST_MINUS:
+        case AST_PLUS:
         {
-            case AST_ADDITIVE_EXPRESSION:
+            visit_additive_expression(ast->left, scope);
+            write_assembly("push %rax");
+            visit_multiplicative_expression(ast->right, scope);
+            write_assembly("mov %rax %rcx");
+            write_assembly("pop %rax");
+            if (ast->op == AST_PLUS)
             {
-                visit_additive_expression(next, scope);
-                break;
+                write_assembly("add %rcx %rax");
             }
-            case AST_PLUS:
-            case AST_MINUS:
+            else if (ast->op == AST_MINUS)
             {
-                break;
+                write_assembly("sub %rcx %rax");
             }
-            case AST_MULTIPLICATIVE_EXPRESSION:
-            {
-                visit_multiplicative_expression(next, scope);
-                break;
-            }
-            default:
-            {
-                assert(0);
-                break;
-            }
+            break;
+        }
+        default:
+            visit_multiplicative_expression(next, scope);
+            break;
         }
     }
 }
