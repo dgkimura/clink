@@ -1023,9 +1023,7 @@ parse(struct listnode *tokens)
         }
         else if (cell->reduce)
         {
-            root = malloc(sizeof(struct astnode));
-            memset(root, 0, sizeof(struct astnode));
-
+            root = cell->rule->create(stack);
             root->type = cell->rule->type;
 
             /*
@@ -1069,6 +1067,15 @@ parse(struct listnode *tokens)
     }
 
     return root;
+}
+
+struct astnode *
+create_(struct listnode *list)
+{
+    struct astnode *node;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+    return node;
 }
 
 #ifdef GENPT

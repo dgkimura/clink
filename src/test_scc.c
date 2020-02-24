@@ -269,11 +269,11 @@ START_TEST(test_generate_items_on_postfix_expression)
     generate_items(AST_POSTFIX_EXPRESSION, NULL, &items);
 
     assert_rules_equal(
-        (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
+        (struct rule) { AST_POSTFIX_EXPRESSION, create_, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
         *((struct item *)items->data)->rewrite_rule);
 
     assert_rules_equal(
-        (struct rule) { AST_POSTFIX_EXPRESSION, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
+        (struct rule) { AST_POSTFIX_EXPRESSION, create_, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
         *((struct item *)items->next->data)->rewrite_rule);
     ck_assert_int_eq(AST_ARROW, (int)((struct item *)items->next->data)->lookahead->data);
 }
@@ -287,16 +287,16 @@ START_TEST(test_generate_items_on_unary_expression)
     generate_items(AST_UNARY_EXPRESSION, NULL, &items);
 
     assert_rules_equal(
-        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_PLUS_PLUS, AST_UNARY_EXPRESSION } },
+        (struct rule){ AST_UNARY_EXPRESSION, create_, 2, { AST_PLUS_PLUS, AST_UNARY_EXPRESSION } },
         *((struct item *)items->data)->rewrite_rule);
     assert_rules_equal(
-        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_MINUS_MINUS, AST_UNARY_EXPRESSION } },
+        (struct rule){ AST_UNARY_EXPRESSION, create_, 2, { AST_MINUS_MINUS, AST_UNARY_EXPRESSION } },
         *((struct item *)items->next->data)->rewrite_rule);
     assert_rules_equal(
-        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_AMPERSAND, AST_CAST_EXPRESSION } },
+        (struct rule){ AST_UNARY_EXPRESSION, create_, 2, { AST_AMPERSAND, AST_CAST_EXPRESSION } },
         *((struct item *)items->next->next->data)->rewrite_rule);
     assert_rules_equal(
-        (struct rule){ AST_UNARY_EXPRESSION, 2, { AST_ASTERISK, AST_CAST_EXPRESSION } },
+        (struct rule){ AST_UNARY_EXPRESSION, create_, 2, { AST_ASTERISK, AST_CAST_EXPRESSION } },
         *((struct item *)items->next->next->next->data)->rewrite_rule);
 }
 END_TEST
@@ -310,7 +310,7 @@ START_TEST(test_generate_transitions_increments_cursor_position)
     memset(state, 0, sizeof(struct state));
 
     item = malloc(sizeof(struct item));;
-    item->rewrite_rule = &(struct rule) { AST_CONSTANT, 1, { AST_INTEGER_CONSTANT} };
+    item->rewrite_rule = &(struct rule) { AST_CONSTANT, create_, 1, { AST_INTEGER_CONSTANT} };
     item->cursor_position = 0;
 
     list_append(&state->items, item);
