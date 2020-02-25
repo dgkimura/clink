@@ -1078,6 +1078,23 @@ create_(struct listnode *list)
     return node;
 }
 
+struct astnode *
+create_binary_op(struct listnode *list)
+{
+    struct astnode *node;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    node->left = list->data;
+    /*
+     * next = token
+     * next->next = next state
+     * next->next->next = next token
+     */
+    node->right = list->next->next->next->next->data;
+    return node;
+}
+
 #ifdef GENPT
 int
 main(int argc, char *agv[])

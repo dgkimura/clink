@@ -1123,13 +1123,13 @@ struct rule grammar[NUM_RULES] =
     /* additive-expression: */
     {
         AST_ADDITIVE_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_ADDITIVE_EXPRESSION, AST_PLUS, AST_MULTIPLICATIVE_EXPRESSION }
     },
     {
         AST_ADDITIVE_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_ADDITIVE_EXPRESSION, AST_MINUS, AST_MULTIPLICATIVE_EXPRESSION }
     },

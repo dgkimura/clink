@@ -790,6 +790,7 @@ visit_additive_expression(struct astnode *ast, enum scope scope)
             break;
         }
         default:
+        {
             visit_multiplicative_expression(next, scope);
             break;
         }

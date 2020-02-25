@@ -304,4 +304,7 @@ parse(struct listnode *tokens);
 struct astnode *
 create_(struct listnode *list);
 
+struct astnode *
+create_binary_op(struct listnode *list);
+
 #endif
