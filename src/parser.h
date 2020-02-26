@@ -187,6 +187,47 @@ struct astnode
             struct astnode *left;
             struct astnode *right;
         };
+
+        /*
+         * Declarator
+         */
+        struct
+        {
+            /*
+             * Storage specifiers - there are 5 specifiers:
+             *     auto, register, static, extern, typedef
+             */
+            enum astnode_t storage_class_specifiers[5];
+
+            /*
+             * Type specifiers - there are 12 specifiers:
+             *      void, char, short, long, ... typedef name
+             */
+            enum astnode_t type_specifiers[12];
+
+            /*
+             * Type qualifier - there are 2 specifiers:
+             *      const, volatile
+             */
+            enum astnode_t type_qualifier[2];
+
+            /*
+             * Name of the declaration
+             */
+            char *declaration_name;
+
+            /*
+             * If array, size of array
+             * If function declarator, number of args
+             */
+            unsigned int declaration_size;
+
+            /*
+             * Function arguments. Array of declarators where size is defined by
+             * declaration_size.
+             */
+            struct astnode *args;
+        };
     };
 };
 
