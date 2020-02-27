@@ -228,6 +228,27 @@ struct astnode
              */
             struct astnode *args;
         };
+
+        /*
+         * Function definition
+         */
+        struct
+        {
+            /*
+             * Contains specifiers and function args
+             */
+            struct astnode *function_declarator;
+
+            /*
+             * List of variable declarations
+             */
+            struct astnode *declaration_list;
+
+            /*
+             * List of function statements
+             */
+            struct astnode *statement_list;
+        };
     };
 };
 
