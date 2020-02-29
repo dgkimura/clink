@@ -49,6 +49,20 @@ list_append(
     }
 }
 
+void *
+list_item(struct listnode **head, int index)
+{
+    int i;
+    struct listnode *t = *head;
+
+    for (i=0; i<index; i++)
+    {
+        t = t->next;
+    }
+
+    return t->data;
+}
+
 int
 list_equal(struct listnode *a, struct listnode *b)
 {
@@ -101,20 +115,4 @@ list_equal(struct listnode *a, struct listnode *b)
     }
 
     return 1;
-}
-
-struct listnode *
-list_findkey(struct listnode *head, char *key)
-{
-    struct listnode *current = head;
-
-    while (current != NULL)
-    {
-        if (strcmp(key, ((struct pair *)current->data)->key) == 0)
-        {
-            return current;
-        }
-        current = current->next;
-    }
-    return current;
 }

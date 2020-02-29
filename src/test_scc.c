@@ -632,6 +632,21 @@ START_TEST(test_list_append)
 }
 END_TEST
 
+START_TEST(test_list_item)
+{
+    struct listnode *a_list;
+    char *e1 = "123";
+    char *e2 = "456";
+
+    list_init(&a_list);
+    list_append(&a_list, e1);
+    list_append(&a_list, e2);
+
+    ck_assert_str_eq("123", (char *)list_item(&a_list, 0));
+    ck_assert_str_eq("456", (char *)list_item(&a_list, 1));
+}
+END_TEST
+
 START_TEST(test_scanner_can_parse_integer_token)
 {
     char *content = "1234";
@@ -857,6 +872,7 @@ main(void)
     tcase_add_test(testcase, test_parser_can_parse_conditional_statements);
     tcase_add_test(testcase, test_parser_can_parse_assigment_operations);
     tcase_add_test(testcase, test_list_append);
+    tcase_add_test(testcase, test_list_item);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token_with_integers);
