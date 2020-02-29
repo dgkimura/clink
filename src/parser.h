@@ -163,7 +163,7 @@ enum astnode_t
 struct rule
 {
     enum astnode_t type;
-    struct astnode *(*create)(struct listnode *list);
+    struct astnode *(*create)(struct listnode *list, struct rule *rule);
     int length_of_nodes;
     enum astnode_t nodes[MAX_ASTNODES];
 };
@@ -364,9 +364,9 @@ struct astnode *
 parse(struct listnode *tokens);
 
 struct astnode *
-create_(struct listnode *list);
+create_(struct listnode *list, struct rule *rule);
 
 struct astnode *
-create_binary_op(struct listnode *list);
+create_binary_op(struct listnode *list, struct rule *rule);
 
 #endif

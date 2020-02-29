@@ -1023,8 +1023,7 @@ parse(struct listnode *tokens)
         }
         else if (cell->reduce)
         {
-            root = cell->rule->create(stack);
-            root->type = cell->rule->type;
+            root = cell->rule->create(stack, cell->rule);
 
             /*
              * Reduce involves removing the astnodes that compose the rule from
@@ -1070,16 +1069,18 @@ parse(struct listnode *tokens)
 }
 
 struct astnode *
-create_(struct listnode *list)
+create_(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;
     node = malloc(sizeof(struct astnode));
     memset(node, 0, sizeof(struct astnode));
+
+    node->type = rule->type;
     return node;
 }
 
 struct astnode *
-create_binary_op(struct listnode *list)
+create_binary_op(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;
     node = malloc(sizeof(struct astnode));
@@ -1092,6 +1093,8 @@ create_binary_op(struct listnode *list)
      * next->next->next = next token
      */
     node->right = list->next->next->next->next->data;
+
+    node->type = rule->type;
     return node;
 }
 
