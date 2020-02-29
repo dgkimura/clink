@@ -183,6 +183,17 @@ struct astnode
 
         struct
         {
+            unsigned int translation_unit_items_size;
+
+            /*
+             * Variable length array of astnode with size specified by
+             * translation_unit_items.
+             */
+            struct astnode *translation_unit_items[0];
+        };
+
+        struct
+        {
             enum astnode_t op;
             struct astnode *left;
             struct astnode *right;
@@ -362,6 +373,9 @@ token_to_astnode(struct token * token);
 
 struct astnode *
 parse(struct listnode *tokens);
+
+struct astnode *
+create_translation_unit_node(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_(struct listnode *list, struct rule *rule);

@@ -12,13 +12,13 @@ struct rule grammar[NUM_RULES] =
     /* translation-unit: */
     {
         AST_TRANSLATION_UNIT,
-        create_,
+        create_translation_unit_node,
         1,
         { AST_EXTERNAL_DECLARATION }
     },
     {
         AST_TRANSLATION_UNIT,
-        create_,
+        create_translation_unit_node,
         2,
         { AST_TRANSLATION_UNIT, AST_EXTERNAL_DECLARATION }
     },

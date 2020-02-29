@@ -1069,6 +1069,45 @@ parse(struct listnode *tokens)
 }
 
 struct astnode *
+create_translation_unit_node(struct listnode *list, struct rule *rule)
+{
+    unsigned int i, node_size;
+    struct astnode *node;
+    struct astnode *child;
+
+
+    if (rule->length_of_nodes == 1)
+    {
+        node_size = sizeof(struct astnode) + (sizeof(struct astnode *));
+        node = malloc(node_size);
+        memset(node, 0, node_size);
+
+        node->translation_unit_items[0] = list_item(&list, 0);
+        node->translation_unit_items_size = 1;
+        node->type = rule->type;
+    }
+    else if (rule->length_of_nodes == 2)
+    {
+        /* index 3 is AST_TRANSLATION_UNIT astnode */
+        /* index 2 is AST_TRANSLATION_UNIT astnode */
+        child = list_item(&list, 3);
+
+        node_size = sizeof(struct astnode) +
+            (sizeof(struct astnode *) * child->translation_unit_items_size);
+        node = realloc(child, node_size);
+
+        /* index 1 is AST_EXTERNAL_DECLARATION astnode */
+        /* index 0 is AST_EXTERNAL_DECLARATION state */
+        child = list_item(&list, 1);
+
+        node->translation_unit_items_size += 1;
+        node->translation_unit_items[node->translation_unit_items_size] = child;
+    }
+
+    return node;
+}
+
+struct astnode *
 create_(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;
