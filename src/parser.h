@@ -378,6 +378,9 @@ struct astnode *
 create_translation_unit_node(struct listnode *list, struct rule *rule);
 
 struct astnode *
+create_elided_node(struct listnode *list, struct rule *rule);
+
+struct astnode *
 create_(struct listnode *list, struct rule *rule);
 
 struct astnode *

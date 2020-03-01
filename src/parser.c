@@ -1108,6 +1108,17 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_elided_node(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node;
+
+    node = list_item(&list, 1);
+    node->type = rule->type;
+
+    return node;
+}
+
+struct astnode *
 create_(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;

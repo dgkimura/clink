@@ -25,13 +25,13 @@ struct rule grammar[NUM_RULES] =
     /* external-declaration: */
     {
         AST_EXTERNAL_DECLARATION,
-        create_,
+        create_elided_node,
         1,
         { AST_FUNCTION_DEFINITION }
     },
     {
         AST_EXTERNAL_DECLARATION,
-        create_,
+        create_elided_node,
         1,
         { AST_DECLARATION }
     },
