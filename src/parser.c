@@ -1089,7 +1089,7 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
     else if (rule->length_of_nodes == 2)
     {
         /* index 3 is AST_TRANSLATION_UNIT astnode */
-        /* index 2 is AST_TRANSLATION_UNIT astnode */
+        /* index 2 is AST_TRANSLATION_UNIT state */
         child = list_item(&list, 3);
 
         node_size = sizeof(struct astnode) +
@@ -1115,6 +1115,56 @@ create_elided_node(struct listnode *list, struct rule *rule)
     node = list_item(&list, 1);
     node->type = rule->type;
 
+    return node;
+}
+
+struct astnode *
+create_declaration_specifiers(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+
+    if (rule->length_of_nodes == 1)
+    {
+        node = malloc(sizeof(struct astnode));
+        memset(node, 0, sizeof(struct astnode));
+        child = list_item(&list, 1);
+    }
+    else if (rule->length_of_nodes == 2)
+    {
+        /* index 1 is AST_DECLARATION_SPECIFIERS astnode */
+        /* index 0 is AST_DECLARATION_SPECIFIERS state */
+        node = list_item(&list, 1);
+
+        child = list_item(&list, 3);
+    }
+
+    switch (child->type)
+    {
+        case AST_STORAGE_CLASS_SPECIFIER:
+        {
+            node->storage_class_specifiers[node->storage_class_specifiers_size++] = child->type;
+            break;
+        }
+        case AST_TYPE_SPECIFIER:
+        {
+            /* FIXME: How to handle struct, union, or enum specifier? */
+            node->type_specifiers[node->type_specifiers_size++] = child->type;
+            break;
+        }
+        case AST_TYPE_QUALIFIER:
+        {
+            node->type_qualifier[node->type_qualifier_size++] = child->type;
+            break;
+        }
+        default:
+        {
+            assert(0);
+            break;
+        }
+
+    }
+
+    node->type = rule->type;
     return node;
 }
 

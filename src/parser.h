@@ -208,18 +208,21 @@ struct astnode
              * Storage specifiers - there are 5 specifiers:
              *     auto, register, static, extern, typedef
              */
+            int storage_class_specifiers_size;
             enum astnode_t storage_class_specifiers[5];
 
             /*
              * Type specifiers - there are 12 specifiers:
              *      void, char, short, long, ... typedef name
              */
+            int type_specifiers_size;
             enum astnode_t type_specifiers[12];
 
             /*
              * Type qualifier - there are 2 specifiers:
              *      const, volatile
              */
+            int type_qualifier_size;
             enum astnode_t type_qualifier[2];
 
             /*
@@ -379,6 +382,9 @@ create_translation_unit_node(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_elided_node(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_declaration_specifiers(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_(struct listnode *list, struct rule *rule);

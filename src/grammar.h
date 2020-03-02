@@ -89,37 +89,37 @@ struct rule grammar[NUM_RULES] =
     /* declaration-specifiers: */
     {
         AST_DECLARATION_SPECIFIERS,
-        create_,
+        create_declaration_specifiers,
         1,
         { AST_STORAGE_CLASS_SPECIFIER }
     },
     {
         AST_DECLARATION_SPECIFIERS,
-        create_,
+        create_declaration_specifiers,
         2,
         { AST_STORAGE_CLASS_SPECIFIER, AST_DECLARATION_SPECIFIERS }
     },
     {
         AST_DECLARATION_SPECIFIERS,
-        create_,
+        create_declaration_specifiers,
         1,
         { AST_TYPE_SPECIFIER }
     },
     {
         AST_DECLARATION_SPECIFIERS,
-        create_,
+        create_declaration_specifiers,
         2,
         { AST_TYPE_SPECIFIER, AST_DECLARATION_SPECIFIERS }
     },
     {
         AST_DECLARATION_SPECIFIERS,
-        create_,
+        create_declaration_specifiers,
         1,
         { AST_TYPE_QUALIFIER }
     },
     {
         AST_DECLARATION_SPECIFIERS,
-        create_,
+        create_declaration_specifiers,
         2,
         { AST_TYPE_QUALIFIER, AST_DECLARATION_SPECIFIERS }
     },
