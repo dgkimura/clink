@@ -63,13 +63,13 @@ struct rule grammar[NUM_RULES] =
     /* declaration: */
     {
         AST_DECLARATION,
-        create_,
+        create_elided_node,
         2,
         { AST_DECLARATION_SPECIFIERS, AST_SEMICOLON }
     },
     {
         AST_DECLARATION,
-        create_,
+        create_declaration,
         3,
         { AST_DECLARATION_SPECIFIERS, AST_INIT_DECLARATOR_LIST, AST_SEMICOLON }
     },

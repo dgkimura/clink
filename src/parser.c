@@ -1119,6 +1119,27 @@ create_elided_node(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_declaration(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+
+    assert(rule->length_of_nodes == 3);
+
+    /* index 5 is AST_DECLARATION_SPECIFIERS astnode */
+    /* index 3 is AST_INIT_DECLARATOR_LIST state */
+    /* index 1 is AST_SEMICOLON state */
+    node = list_item(&list, 5);
+    child = list_item(&list, 3);
+
+    node->declaration_name = child->declaration_name;
+    node->declaration_size = child->declaration_size;
+    memcpy(node->args, child->args, sizeof(struct astnode *) * child->declaration_size);
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
 create_declaration_specifiers(struct listnode *list, struct rule *rule)
 {
     struct astnode *node, *child;
