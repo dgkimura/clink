@@ -442,13 +442,13 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_,
+        create_declarator,
         3,
         { AST_LPAREN, AST_DECLARATOR, AST_RPAREN }
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_,
+        create_declarator,
         3,
         { AST_DIRECT_DECLARATOR, AST_LBRACKET, AST_RBRACKET }
     },
@@ -460,7 +460,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_,
+        create_declarator,
         3,
         { AST_DIRECT_DECLARATOR, AST_LPAREN, AST_RPAREN }
     },

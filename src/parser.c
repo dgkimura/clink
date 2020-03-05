@@ -1203,6 +1203,19 @@ create_declarator(struct listnode *list, struct rule *rule)
 
         node->declarator_identifier = child->token->value;
     }
+    else if (rule->length_of_nodes == 3)
+    {
+        child = list_item(&list, 5);
+        if (child->type == AST_DIRECT_DECLARATOR)
+        {
+            node = child;
+        }
+        else
+        {
+            /* index 3 is AST_DECLARATOR astnode */
+            node = list_item(&list, 3);
+        }
+    }
 
     node->type = rule->type;
     return node;
