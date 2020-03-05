@@ -1131,9 +1131,9 @@ create_declaration(struct listnode *list, struct rule *rule)
     node = list_item(&list, 5);
     child = list_item(&list, 3);
 
-    node->declaration_name = child->declaration_name;
-    node->declaration_size = child->declaration_size;
-    memcpy(node->args, child->args, sizeof(struct astnode *) * child->declaration_size);
+    node->declarator_identifier = child->declarator_identifier;
+    node->declarators_size = child->declarators_size;
+    memcpy(node->declarators, child->declarators, sizeof(struct astnode *) * child->declarators_size);
 
     node->type = rule->type;
     return node;
@@ -1183,6 +1183,25 @@ create_declaration_specifiers(struct listnode *list, struct rule *rule)
             break;
         }
 
+    }
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_declarator(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    if (rule->length_of_nodes == 1)
+    {
+        /* index 1 is AST_IDENTIFIER astnode */
+        child = list_item(&list, 1);
+
+        node->declarator_identifier = child->token->value;
     }
 
     node->type = rule->type;

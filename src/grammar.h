@@ -436,7 +436,7 @@ struct rule grammar[NUM_RULES] =
     /* direct-declarator: */
     {
         AST_DIRECT_DECLARATOR,
-        create_,
+        create_declarator,
         1,
         { AST_IDENTIFIER }
     },

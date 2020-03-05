@@ -200,7 +200,8 @@ struct astnode
         };
 
         /*
-         * Declarator
+         * Declaration that consists of declaration specifiers and list of
+         * declarators.
          */
         struct
         {
@@ -226,21 +227,29 @@ struct astnode
             enum astnode_t type_qualifier[2];
 
             /*
+             * Declarators
+             */
+            int declarators_size;
+            struct astnode *declarators;
+        };
+
+        /*
+         * Declarator
+         */
+        struct
+        {
+            int is_pointer;
+
+            /*
              * Name of the declaration
              */
-            char *declaration_name;
+            char *declarator_identifier;
 
-            /*
-             * If array, size of array
-             * If function declarator, number of args
-             */
-            unsigned int declaration_size;
+            unsigned int declarator_parameter_type_list_size;
+            struct astnode *declarator_parameter_type_list;
 
-            /*
-             * Function arguments. Array of declarators where size is defined by
-             * declaration_size.
-             */
-            struct astnode *args;
+            unsigned int declarator_identifier_list_size;
+            struct astnode *declarator_identifier_list;
         };
 
         /*
@@ -388,6 +397,9 @@ create_declaration(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_declaration_specifiers(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_declarator(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_(struct listnode *list, struct rule *rule);
