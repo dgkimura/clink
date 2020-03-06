@@ -1140,6 +1140,35 @@ create_declaration(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_parameter_declaration(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+
+    if (rule->length_of_nodes == 1)
+    {
+        /* index 1 is AST_DECLARATION_SPECIFIERS astnode */
+        node = list_item(&list, 1);
+        node->type = rule->type;
+        return node;
+    }
+
+    assert(rule->length_of_nodes == 2);
+
+    /* index 3 is AST_DECLARATION_SPECIFIERS astnode */
+    node = list_item(&list, 3);
+
+    /* index 1 is [ AST_DECLARATOR | AST_ABSTRACT_DECLARATOR ] astnode */
+    child = list_item(&list, 1);
+
+    node->declarator_identifier = child->declarator_identifier;
+    node->declarators = child;
+    node->declarators_size = 1;
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
 create_declaration_specifiers(struct listnode *list, struct rule *rule)
 {
     struct astnode *node, *child;

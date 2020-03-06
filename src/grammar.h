@@ -301,7 +301,7 @@ struct rule grammar[NUM_RULES] =
     /* init-declarator: */
     {
         AST_INIT_DECLARATOR,
-        create_,
+        create_elided_node,
         1,
         { AST_DECLARATOR }
     },
@@ -423,7 +423,7 @@ struct rule grammar[NUM_RULES] =
     /* declarator: */
     {
         AST_DECLARATOR,
-        create_,
+        create_elided_node,
         1,
         { AST_DIRECT_DECLARATOR }
     },
@@ -543,19 +543,19 @@ struct rule grammar[NUM_RULES] =
     /* parameter-declaration: */
     {
         AST_PARAMETER_DECLARATION,
-        create_,
+        create_parameter_declaration,
         2,
         { AST_DECLARATION_SPECIFIERS, AST_DECLARATOR }
     },
     {
         AST_PARAMETER_DECLARATION,
-        create_,
+        create_parameter_declaration,
         2,
         { AST_DECLARATION_SPECIFIERS, AST_ABSTRACT_DECLARATOR }
     },
     {
         AST_PARAMETER_DECLARATION,
-        create_,
+        create_parameter_declaration,
         1,
         { AST_DECLARATION_SPECIFIERS }
     },
