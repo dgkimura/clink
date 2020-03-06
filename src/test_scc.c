@@ -2,6 +2,7 @@
 
 #include <check.h>
 
+#include "ast.h"
 #include "utilities.h"
 #include "scanner.h"
 #include "parser.h"

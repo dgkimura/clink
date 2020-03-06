@@ -1,7 +1,9 @@
 #ifndef __GRAMMAR_H__
 #define __GRAMMAR_H__
 
+#include "ast.h"
 #include "parser.h"
+
 /*
  * List of rules that defines the grammar for the parser. It is a copy of the C
  * grammar as defined by K&R in "C Programming Language" 2nd edition reference

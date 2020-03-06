@@ -16,17 +16,18 @@ ifeq (,$(wildcard parsetable.h))
 	$(CC) -DGENPT=1 parser.c utilities.c -o genpt
 	./genpt
 endif
+	$(CC) -g -o ast.o -c ast.c
 	$(CC) -g -o main.o -c main.c
 	$(CC) -g -o parser.o -c parser.c
 	$(CC) -g -o scanner.o -c scanner.c
 	$(CC) -g -o generator.o -c generator.c
 	$(CC) -g -o utilities.o -c utilities.c
-	$(CC) main.o parser.o scanner.o generator.o utilities.o -o scc
+	$(CC) main.o ast.o parser.o scanner.o generator.o utilities.o -o scc
 
 test_scc: scc
 	$(CC) -g -o test_scc.o -c test_scc.c
-	$(CC) parser.o scanner.o generator.o utilities.o test_scc.o -o test_scc ${TEST_LIBS}
+	$(CC) ast.o parser.o scanner.o generator.o utilities.o test_scc.o -o test_scc ${TEST_LIBS}
 
 .PHONY: clean
 clean:
-	rm -f *.o scc parsetable.h test_scc genpt
+	rm -f *.o scc test_scc
