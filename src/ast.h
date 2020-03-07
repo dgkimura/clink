@@ -25,7 +25,7 @@ struct astnode *
 create_declaration_specifiers(struct listnode *list, struct rule *rule);
 
 struct astnode *
-create_declarator(struct listnode *list, struct rule *rule);
+create_direct_declarator(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_(struct listnode *list, struct rule *rule);

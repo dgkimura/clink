@@ -151,8 +151,9 @@ create_declaration_specifiers(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
-create_declarator(struct listnode *list, struct rule *rule)
+create_direct_declarator(struct listnode *list, struct rule *rule)
 {
+    int i;
     struct astnode *node, *child;
     node = malloc(sizeof(struct astnode));
     memset(node, 0, sizeof(struct astnode));
@@ -169,19 +170,55 @@ create_declarator(struct listnode *list, struct rule *rule)
         child = list_item(&list, 5);
         if (child->type == AST_DIRECT_DECLARATOR)
         {
+            /* { AST_DIRECT_DECLARATOR, AST_LBRACKET, AST_RBRACKET } */
+            /* { AST_DIRECT_DECLARATOR,  AST_LPAREN,  AST_RPAREN } */
+
+            /* index 3 is AST_DECLARATOR astnode */
             node = child;
         }
         else
         {
+            /* { AST_LPAREN, AST_DECLARATOR, AST_RPAREN } */
+
             /* index 3 is AST_DECLARATOR astnode */
             node = list_item(&list, 3);
         }
     }
     else if (rule->length_of_nodes == 4)
     {
+        node = list_item(&list, 7);
         child = list_item(&list, 3);
-        if (child->type == AST_PARAMETER_TYPE_LIST)
+        switch (child->type)
         {
+            case AST_CONSTANT_EXPRESSION:
+            {
+                /*TODO:*/
+                break;
+            }
+            case AST_PARAMETER_TYPE_LIST:
+            {
+                for (i=0; i<child->declarator_parameter_type_list_size; i++)
+                {
+                    node->declarator_parameter_type_list[i] =
+                        child->declarator_parameter_type_list[i];
+                }
+                break;
+            }
+            case AST_IDENTIFIER_LIST:
+            {
+                for (i=0; i<child->declarator_identifier_list_size; i++)
+                {
+                    node->declarator_identifier_list[i] =
+                        child->declarator_identifier_list[i];
+                }
+                break;
+            }
+            default:
+            {
+                assert(0);
+                break;
+            }
+
         }
     }
 

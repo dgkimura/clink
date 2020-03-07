@@ -438,43 +438,43 @@ struct rule grammar[NUM_RULES] =
     /* direct-declarator: */
     {
         AST_DIRECT_DECLARATOR,
-        create_declarator,
+        create_direct_declarator,
         1,
         { AST_IDENTIFIER }
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_declarator,
+        create_direct_declarator,
         3,
         { AST_LPAREN, AST_DECLARATOR, AST_RPAREN }
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_declarator,
+        create_direct_declarator,
         3,
         { AST_DIRECT_DECLARATOR, AST_LBRACKET, AST_RBRACKET }
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_,
+        create_direct_declarator,
         4,
         { AST_DIRECT_DECLARATOR, AST_LBRACKET, AST_CONSTANT_EXPRESSION, AST_RBRACKET }
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_declarator,
+        create_direct_declarator,
         3,
         { AST_DIRECT_DECLARATOR, AST_LPAREN, AST_RPAREN }
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_,
+        create_direct_declarator,
         4,
         { AST_DIRECT_DECLARATOR, AST_LPAREN, AST_PARAMETER_TYPE_LIST, AST_RPAREN }
     },
     {
         AST_DIRECT_DECLARATOR,
-        create_,
+        create_direct_declarator,
         4,
         { AST_DIRECT_DECLARATOR, AST_LPAREN, AST_IDENTIFIER_LIST, AST_RPAREN }
     },
