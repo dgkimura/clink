@@ -13,7 +13,7 @@ all: scc test_scc
 .ONESHELL:
 scc:
 ifeq (,$(wildcard parsetable.h))
-	$(CC) -DGENPT=1 parser.c utilities.c -o genpt
+	$(CC) -DGENPT=1 parser.c utilities.c ast.c -o genpt
 	./genpt
 endif
 	$(CC) -g -o ast.o -c ast.c
@@ -30,4 +30,4 @@ test_scc: scc
 
 .PHONY: clean
 clean:
-	rm -f *.o scc test_scc
+	rm -f *.o scc parsetable.h test_scc genpt
