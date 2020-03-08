@@ -93,7 +93,7 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
     child = list_item(&list, 1);
 
     node->declarator_identifier = child->declarator_identifier;
-    node->declarators = child;
+    node->declarators[0] = child;
     node->declarators_size = 1;
 
     node->type = rule->type;
@@ -124,18 +124,18 @@ create_declaration_specifiers(struct listnode *list, struct rule *rule)
     {
         case AST_STORAGE_CLASS_SPECIFIER:
         {
-            node->storage_class_specifiers[node->storage_class_specifiers_size++] = child->type;
+            node->storage_class_specifiers |= child->storage_class_specifiers;
             break;
         }
         case AST_TYPE_SPECIFIER:
         {
             /* FIXME: How to handle struct, union, or enum specifier? */
-            node->type_specifiers[node->type_specifiers_size++] = child->type;
+            node->type_specifiers |= child->type_specifiers;
             break;
         }
         case AST_TYPE_QUALIFIER:
         {
-            node->type_qualifier[node->type_qualifier_size++] = child->type;
+            node->type_qualifier |= child->type_qualifier;
             break;
         }
         default:
@@ -219,6 +219,170 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
                 break;
             }
 
+        }
+    }
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_storage_class_specifier(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    assert(rule->length_of_nodes == 1);
+
+    child = list_item(&list, 1);
+    switch (child->type)
+    {
+        case AST_AUTO:
+        {
+            child->storage_class_specifiers = AUTO;
+            break;
+        }
+        case AST_REGISTER:
+        {
+            child->storage_class_specifiers = REGISTER;
+            break;
+        }
+        case AST_STATIC:
+        {
+            child->storage_class_specifiers = STATIC;
+            break;
+        }
+        case AST_EXTERN:
+        {
+            child->storage_class_specifiers = EXTERN;
+            break;
+        }
+        case AST_TYPEDEF:
+        {
+            child->storage_class_specifiers = TYPEDEF;
+            break;
+        }
+        default:
+        {
+            assert(0);
+            break;
+        }
+    }
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_type_specifier(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    assert(rule->length_of_nodes == 1);
+
+    child = list_item(&list, 1);
+    switch (child->type)
+    {
+        case AST_VOID:
+        {
+            child->type_specifiers = VOID;
+            break;
+        }
+        case AST_CHAR:
+        {
+            child->type_specifiers = CHAR;
+            break;
+        }
+        case AST_SHORT:
+        {
+            child->type_specifiers = SHORT;
+            break;
+        }
+        case AST_INT:
+        {
+            child->type_specifiers = INT;
+            break;
+        }
+        case AST_LONG:
+        {
+            child->type_specifiers = LONG;
+            break;
+        }
+        case AST_FLOAT:
+        {
+            child->type_specifiers = FLOAT;
+            break;
+        }
+        case AST_DOUBLE:
+        {
+            child->type_specifiers = DOUBLE;
+            break;
+        }
+        case AST_SIGNED:
+        {
+            child->type_specifiers = SIGNED;
+            break;
+        }
+        case AST_UNSIGNED:
+        {
+            child->type_specifiers = UNSIGNED;
+            break;
+        }
+        case AST_STRUCT_OR_UNION_SPECIFIER:
+        {
+            child->type_specifiers = STRUCT_OR_UNION_SPECIFIER;
+            break;
+        }
+        case AST_ENUM_SPECIFIER:
+        {
+            child->type_specifiers = ENUM_SPECIFIER;
+            break;
+        }
+        case AST_TYPEDEF_NAME:
+        {
+            child->type_specifiers = TYPEDEF_NAME;
+            break;
+        }
+        default:
+        {
+            assert(0);
+            break;
+        }
+    }
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_type_qualifier(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    assert(rule->length_of_nodes == 1);
+
+    child = list_item(&list, 1);
+    switch (child->type)
+    {
+        case AST_CONST:
+        {
+            child->type_qualifier = VOID;
+            break;
+        }
+        case AST_VOLATILE:
+        {
+            child->type_qualifier = VOLATILE;
+            break;
+        }
+        default:
+        {
+            assert(0);
+            break;
         }
     }
 

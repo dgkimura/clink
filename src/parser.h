@@ -206,31 +206,28 @@ struct astnode
         struct
         {
             /*
-             * Storage specifiers - there are 5 specifiers:
-             *     auto, register, static, extern, typedef
+             * Storage specifiers - there are 5 specifiers in ast.h:
+             *     AUTO, REGISTER, STATIC, EXTERN, TYPEDEF
              */
-            int storage_class_specifiers_size;
-            enum astnode_t storage_class_specifiers[5];
+            int storage_class_specifiers;
 
             /*
-             * Type specifiers - there are 12 specifiers:
+             * Type specifiers - there are 12 specifiers in ast.h:
              *      void, char, short, long, ... typedef name
              */
-            int type_specifiers_size;
-            enum astnode_t type_specifiers[12];
+            int type_specifiers;
 
             /*
              * Type qualifier - there are 2 specifiers:
              *      const, volatile
              */
-            int type_qualifier_size;
-            enum astnode_t type_qualifier[2];
+            int type_qualifier;
 
             /*
              * Declarators
              */
             int declarators_size;
-            struct astnode *declarators;
+            struct astnode *declarators[0];
         };
 
         /*

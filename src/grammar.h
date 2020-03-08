@@ -128,117 +128,117 @@ struct rule grammar[NUM_RULES] =
     /* storage-class-specifier: */
     {
         AST_STORAGE_CLASS_SPECIFIER,
-        create_,
+        create_storage_class_specifier,
         1,
         { AST_AUTO }
     },
     {
         AST_STORAGE_CLASS_SPECIFIER,
-        create_,
+        create_storage_class_specifier,
         1,
         { AST_REGISTER }
     },
     {
         AST_STORAGE_CLASS_SPECIFIER,
-        create_,
+        create_storage_class_specifier,
         1,
         { AST_STATIC }
     },
     {
         AST_STORAGE_CLASS_SPECIFIER,
-        create_,
+        create_storage_class_specifier,
         1,
         { AST_EXTERN }
     },
     {
         AST_STORAGE_CLASS_SPECIFIER,
-        create_,
+        create_storage_class_specifier,
         1,
         { AST_TYPEDEF }
     },
     /* type-specifier: */
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_VOID }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_CHAR }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_SHORT }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_INT }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_LONG }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_FLOAT }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_DOUBLE }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_SIGNED }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_UNSIGNED }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_STRUCT_OR_UNION_SPECIFIER }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_ENUM_SPECIFIER }
     },
     {
         AST_TYPE_SPECIFIER,
-        create_,
+        create_type_specifier,
         1,
         { AST_TYPEDEF_NAME }
     },
     /* type-qualifier: */
     {
         AST_TYPE_QUALIFIER,
-        create_,
+        create_type_qualifier,
         1,
         { AST_CONST }
     },
     {
         AST_TYPE_QUALIFIER,
-        create_,
+        create_type_qualifier,
         1,
         { AST_VOLATILE }
     },
