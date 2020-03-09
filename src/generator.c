@@ -206,39 +206,20 @@ visit_init_declarator_list(struct astnode *ast, enum scope scope)
 static void
 visit_declaration(struct astnode *ast, enum scope scope)
 {
-    struct listnode *list;
+    int i;
     struct astnode *next;
 
     assert(ast->type == AST_DECLARATION);
 
-    for (list=ast->children; list!=NULL; list=list->next)
+    for (i=0; i<ast->declarators_size; i++)
     {
-        next = (struct astnode *)list->data;
-        switch (next->type)
+        next = ast->declarators[i];
+        /* TODO: Write the location of the declaration */
+
+        if (next->type_specifiers & INT)
         {
-            case AST_DECLARATION_SPECIFIERS:
-            {
-                visit_declaration_specifiers(next, scope);
-                break;
-            }
-            case AST_INIT_DECLARATOR_LIST:
-            {
-                /*
-                 * If this is a named declaration then it will parse an
-                 * identifer inside the init declarator list
-                 */
-                visit_init_declarator_list(next, scope);
-                break;
-            }
-            case AST_SEMICOLON:
-            {
-                break;
-            }
-            default:
-            {
-                assert(0);
-                break;
-            }
+            write_assembly("_%s", next->declarator_identifier);
+            write_assembly(".long %d", next->declarator_value);
         }
     }
 }
@@ -1657,24 +1638,24 @@ visit_external_declaration(struct astnode *ast)
 static void
 visit_translation_unit(struct astnode *ast)
 {
-    struct listnode *list;
+    int i;
     struct astnode *next;
 
     assert(ast->type == AST_TRANSLATION_UNIT);
 
-    for (list=ast->children; list!=NULL; list=list->next)
+    for (i=0; i<ast->translation_unit_items_size; i++)
     {
-        next = (struct astnode *)list->data;
-        switch (((struct astnode *)list->data)->type)
+        next = ast->translation_unit_items[i];
+        switch (next->type)
         {
-            case AST_TRANSLATION_UNIT:
+            case AST_FUNCTION_DEFINITION:
             {
-                visit_translation_unit(next);
+                visit_function_definition(next);
                 break;
             }
-            case AST_EXTERNAL_DECLARATION:
+            case AST_DECLARATION:
             {
-                visit_external_declaration(next);
+                visit_declaration(next, GLOBAL);
                 break;
             }
             default:
