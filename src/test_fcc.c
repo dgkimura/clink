@@ -844,8 +844,8 @@ END_TEST
 int
 main(void)
 {
-    Suite *suite = suite_create("scc");
-    TCase *testcase = tcase_create("scc");
+    Suite *suite = suite_create("fcc");
+    TCase *testcase = tcase_create("fcc");
     SRunner *runner = srunner_create(suite);
 
     suite_add_tcase(suite, testcase);

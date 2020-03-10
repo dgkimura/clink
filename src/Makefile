@@ -8,10 +8,10 @@ endif
 
 CFLAGS = -g
 
-all: scc test_scc
+all: fcc test_fcc
 
 .ONESHELL:
-scc:
+fcc:
 ifeq (,$(wildcard parsetable.h))
 	$(CC) -DGENPT=1 parser.c utilities.c ast.c -o genpt
 	./genpt
@@ -22,12 +22,12 @@ endif
 	$(CC) -g -o scanner.o -c scanner.c
 	$(CC) -g -o generator.o -c generator.c
 	$(CC) -g -o utilities.o -c utilities.c
-	$(CC) main.o ast.o parser.o scanner.o generator.o utilities.o -o scc
+	$(CC) main.o ast.o parser.o scanner.o generator.o utilities.o -o fcc
 
-test_scc: scc
-	$(CC) -g -o test_scc.o -c test_scc.c
-	$(CC) ast.o parser.o scanner.o generator.o utilities.o test_scc.o -o test_scc ${TEST_LIBS}
+test_fcc: fcc
+	$(CC) -g -o test_fcc.o -c test_fcc.c
+	$(CC) ast.o parser.o scanner.o generator.o utilities.o test_fcc.o -o test_fcc ${TEST_LIBS}
 
 .PHONY: clean
 clean:
-	rm -f *.o scc parsetable.h test_scc genpt
+	rm -f *.o fcc parsetable.h test_fcc genpt

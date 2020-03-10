@@ -1,4 +1,4 @@
-# scc
+# fcc
 
 [![Build Status](https://travis-ci.org/dgkimura/scc.svg?branch=master)](https://travis-ci.org/dgkimura/scc)
 
