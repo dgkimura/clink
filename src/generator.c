@@ -1553,85 +1553,18 @@ visit_function_definition(struct astnode *ast)
 {
     /* add to local symbol table */
 
+    int i;
     struct listnode *list;
     struct astnode *next;
 
     assert(ast->type == AST_FUNCTION_DEFINITION);
 
-    for (list=ast->children; list!=NULL; list=list->next)
+    for (i=0; i<ast->declarators[0]->declarator_parameter_type_list_size; i++)
     {
-        next = (struct astnode *)list->data;
-        switch (next->type)
-        {
-            case AST_DECLARATION_SPECIFIERS:
-            {
-                visit_declaration_specifiers(next, GLOBAL);
-                break;
-            }
-            case AST_DECLARATOR:
-            {
-                /*
-                 * If this is a named function then it will parse an identifer
-                 * inside the declarator
-                 */
-                visit_declarator(next, GLOBAL);
-                break;
-            }
-            case AST_DECLARATION_LIST:
-            {
-                /*
-                 * If there are identifiers in the declaration list then add
-                 * them to the local symbol table. Those symbols can then later
-                 * be referenced in the compound statements.
-                 */
-                visit_declaration_list(next);
-                break;
-            }
-            case AST_COMPOUND_STATEMENT:
-            {
-                visit_compound_statement(next);
-                break;
-            }
-            default:
-            {
-                assert(0);
-                break;
-            }
-        }
-    }
-}
-
-static void
-visit_external_declaration(struct astnode *ast)
-{
-    /* add to global symbol table */
-
-    struct listnode *list;
-    struct astnode *next;
-
-    assert(ast->type == AST_EXTERNAL_DECLARATION);
-
-    for (list=ast->children; list!=NULL; list=list->next)
-    {
-        next = (struct astnode *)list->data;
-        switch (next->type)
-        {
-            case AST_FUNCTION_DEFINITION:
-            {
-                visit_function_definition(next);
-                break;
-            }
-            case AST_DECLARATION:
-            {
-                visit_declaration(next, GLOBAL);
-                break;
-            }
-            default:
-            {
-                assert(0);
-                break;
-            }
-        }
+        next = ast->declarators[0]->declarator_parameter_type_list[i];
+        /*
+         * Add up the size of all parameters and push onto the stack
+         */
     }
 }
 
