@@ -1555,13 +1555,17 @@ visit_function_definition(struct astnode *ast)
 
     int i;
     struct listnode *list;
-    struct astnode *next;
+    struct astnode *declarator, *declaration, *parameter;
 
     assert(ast->type == AST_FUNCTION_DEFINITION);
 
-    for (i=0; i<ast->declarators[0]->declarator_parameter_type_list_size; i++)
+    declarator = ast->function_declarator;
+    declaration = ast->function_declarator->declarators[0];
+
+    for (i=0; i<declaration->declarator_parameter_type_list_size; i++)
     {
-        next = ast->declarators[0]->declarator_parameter_type_list[i];
+        parameter = declarator->declarators[0]->declarator_parameter_type_list[i];
+
         /*
          * Add up the size of all parameters and push onto the stack
          */
