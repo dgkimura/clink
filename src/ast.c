@@ -14,7 +14,9 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
         node = malloc(node_size);
         memset(node, 0, node_size);
 
-        node->translation_unit_items[0] = list_item(&list, 0);
+        /* index 1 is AST_EXTERNAL_DECLARATION astnode */
+        /* index 0 is AST_EXTERNAL_DECLARATION state */
+        node->translation_unit_items[0] = list_item(&list, 1);
         node->translation_unit_items_size = 1;
         node->type = rule->type;
     }
