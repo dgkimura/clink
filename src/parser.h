@@ -173,6 +173,12 @@ struct rule
 struct astnode
 {
     enum astnode_t type;
+
+    /*
+     * An elided type is removes extra types that aren't necessary during
+     * generation.
+     */
+    enum astnode_t elided_type;
     struct token *token;
 
     struct listnode *children;

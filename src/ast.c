@@ -18,7 +18,7 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
         /* index 0 is AST_EXTERNAL_DECLARATION state */
         node->translation_unit_items[0] = list_item(&list, 1);
         node->translation_unit_items_size = 1;
-        node->type = rule->type;
+        node->elided_type = rule->type;
     }
     else if (rule->length_of_nodes == 2)
     {
@@ -48,6 +48,7 @@ create_elided_node(struct listnode *list, struct rule *rule)
 
     node = list_item(&list, 1);
     node->type = rule->type;
+    node->elided_type = rule->nodes[0];
 
     return node;
 }

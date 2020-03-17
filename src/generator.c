@@ -209,7 +209,7 @@ visit_declaration(struct astnode *ast, enum scope scope)
     int i;
     struct astnode *next;
 
-    assert(ast->type == AST_DECLARATION);
+    assert(ast->elided_type == AST_DECLARATION);
 
     for (i=0; i<ast->declarators_size; i++)
     {
@@ -1578,12 +1578,12 @@ visit_translation_unit(struct astnode *ast)
     int i;
     struct astnode *next;
 
-    assert(ast->type == AST_TRANSLATION_UNIT);
+    assert(ast->elided_type == AST_TRANSLATION_UNIT);
 
     for (i=0; i<ast->translation_unit_items_size; i++)
     {
         next = ast->translation_unit_items[i];
-        switch (next->type)
+        switch (next->elided_type)
         {
             case AST_FUNCTION_DEFINITION:
             {
