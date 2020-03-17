@@ -10,4 +10,4 @@ install:
   - sudo apt-get install check subunit
 
 script:
-  - pushd src && make && CK_DEFAULT_TIMEOUT=600 ./test_scc
+  - pushd src && make && CK_DEFAULT_TIMEOUT=600 ./test_fcc
