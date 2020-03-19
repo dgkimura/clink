@@ -291,62 +291,62 @@ create_type_specifier(struct listnode *list, struct rule *rule)
     {
         case AST_VOID:
         {
-            child->type_specifiers = VOID;
+            node->type_specifiers = VOID;
             break;
         }
         case AST_CHAR:
         {
-            child->type_specifiers = CHAR;
+            node->type_specifiers = CHAR;
             break;
         }
         case AST_SHORT:
         {
-            child->type_specifiers = SHORT;
+            node->type_specifiers = SHORT;
             break;
         }
         case AST_INT:
         {
-            child->type_specifiers = INT;
+            node->type_specifiers = INT;
             break;
         }
         case AST_LONG:
         {
-            child->type_specifiers = LONG;
+            node->type_specifiers = LONG;
             break;
         }
         case AST_FLOAT:
         {
-            child->type_specifiers = FLOAT;
+            node->type_specifiers = FLOAT;
             break;
         }
         case AST_DOUBLE:
         {
-            child->type_specifiers = DOUBLE;
+            node->type_specifiers = DOUBLE;
             break;
         }
         case AST_SIGNED:
         {
-            child->type_specifiers = SIGNED;
+            node->type_specifiers = SIGNED;
             break;
         }
         case AST_UNSIGNED:
         {
-            child->type_specifiers = UNSIGNED;
+            node->type_specifiers = UNSIGNED;
             break;
         }
         case AST_STRUCT_OR_UNION_SPECIFIER:
         {
-            child->type_specifiers = STRUCT_OR_UNION_SPECIFIER;
+            node->type_specifiers = STRUCT_OR_UNION_SPECIFIER;
             break;
         }
         case AST_ENUM_SPECIFIER:
         {
-            child->type_specifiers = ENUM_SPECIFIER;
+            node->type_specifiers = ENUM_SPECIFIER;
             break;
         }
         case AST_TYPEDEF_NAME:
         {
-            child->type_specifiers = TYPEDEF_NAME;
+            node->type_specifiers = TYPEDEF_NAME;
             break;
         }
         default:
