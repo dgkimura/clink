@@ -290,13 +290,13 @@ struct rule grammar[NUM_RULES] =
     /* init-declarator-list: */
     {
         AST_INIT_DECLARATOR_LIST,
-        create_,
+        create_init_declarator_list,
         1,
         { AST_INIT_DECLARATOR }
     },
     {
         AST_INIT_DECLARATOR_LIST,
-        create_,
+        create_init_declarator_list,
         3,
         { AST_INIT_DECLARATOR_LIST, AST_COMMA, AST_INIT_DECLARATOR }
     },
@@ -309,7 +309,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_INIT_DECLARATOR,
-        create_,
+        create_init_declarator,
         3,
         { AST_DECLARATOR, AST_EQUAL, AST_INITIALIZER }
     },

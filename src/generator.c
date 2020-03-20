@@ -60,6 +60,7 @@ write_assembly(char *format, ...)
     va_start(args, format);
     vfprintf(assembly_filename, format, args);
     va_end(args);
+    fprintf(assembly_filename, "\n");
 }
 
 static void
@@ -216,9 +217,9 @@ visit_declaration(struct astnode *ast, enum scope scope)
         next = ast->declarators[i];
         /* TODO: Write the location of the declaration */
 
-        if (next->type_specifiers & INT)
+        if (ast->type_specifiers & INT)
         {
-            write_assembly("_%s", next->declarator_identifier);
+            write_assembly("_%s:", next->declarator_identifier);
             write_assembly(".long %d", next->declarator_value);
         }
     }

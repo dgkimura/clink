@@ -154,10 +154,68 @@ create_declaration_specifiers(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_init_declarator_list(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *init_declarator, *init_declarator_list;
+    size_t node_size;
+
+    assert(rule->length_of_nodes == 1 || rule->length_of_nodes == 3);
+
+    if (rule->length_of_nodes == 1)
+    {
+        /* index 1 is AST_INIT_DECLARATOR astnode */
+        init_declarator = list_item(&list, 1);
+
+        node = malloc(sizeof(struct astnode) + sizeof(struct astnode *));
+        memset(node, 0, sizeof(struct astnode));
+
+        node->declarators_size = 1;
+        node->declarators[0] = init_declarator;
+    }
+    else if (rule->length_of_nodes == 3)
+    {
+        /* index 5 is AST_INIT_DECLARATOR_LIST astnode */
+        /* index 3 is AST_COMMA astnode */
+        /* index 1 is AST_INIT_DECLARATOR astnode */
+        init_declarator_list = list_item(&list, 5);
+        init_declarator = list_item(&list, 1);
+
+        node_size = sizeof(struct astnode) + sizeof(struct astnode *) *
+            init_declarator_list->declarators_size;
+
+        node = malloc(node_size);
+        memset(node, 0, node_size);
+
+        node->declarators_size = init_declarator_list->declarators_size + 1;
+        memcpy(node->declarators, init_declarator_list->declarators,
+            sizeof(struct astnode *) * init_declarator_list->declarators_size);
+        node->declarators[node->declarators_size - 1] = init_declarator;
+    }
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_init_declarator(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node;
+    assert(rule->length_of_nodes == 3);
+
+    /* index 5 is AST_DECLARATOR astnode */
+    /* index 3 is AST_EQUAL astnode */
+    /* index 1 is AST_INITIALIZER astnode */
+
+    node = list_item(&list, 5);
+    return node;
+}
+
+struct astnode *
 create_direct_declarator(struct listnode *list, struct rule *rule)
 {
     int i;
     struct astnode *node, *child;
+
     node = malloc(sizeof(struct astnode));
     memset(node, 0, sizeof(struct astnode));
 
