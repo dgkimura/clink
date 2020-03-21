@@ -1579,7 +1579,7 @@ visit_translation_unit(struct astnode *ast)
     int i;
     struct astnode *next;
 
-    assert(ast->elided_type == AST_TRANSLATION_UNIT);
+    assert(ast->type == AST_TRANSLATION_UNIT);
 
     for (i=0; i<ast->translation_unit_items_size; i++)
     {
