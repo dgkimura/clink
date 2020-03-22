@@ -222,6 +222,11 @@ visit_declaration(struct astnode *ast, enum scope scope)
             write_assembly("_%s:", next->declarator_identifier);
             write_assembly(".long %d", next->declarator_value);
         }
+        else if (ast->type_specifiers & CHAR)
+        {
+            write_assembly("_%s:", next->declarator_identifier);
+            write_assembly(".byte %d", next->declarator_value);
+        }
     }
 }
 
