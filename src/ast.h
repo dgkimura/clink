@@ -47,6 +47,9 @@ struct astnode *
 create_elided_node(struct listnode *list, struct rule *rule);
 
 struct astnode *
+create_function_definition(struct listnode *list, struct rule *rule);
+
+struct astnode *
 create_declaration(struct listnode *list, struct rule *rule);
 
 struct astnode *

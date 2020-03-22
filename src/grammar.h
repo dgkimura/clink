@@ -40,25 +40,25 @@ struct rule grammar[NUM_RULES] =
     /* function-definition: */
     {
         AST_FUNCTION_DEFINITION,
-        create_,
+        create_function_definition,
         2,
         { AST_DECLARATOR, AST_COMPOUND_STATEMENT }
     },
     {
         AST_FUNCTION_DEFINITION,
-        create_,
+        create_function_definition,
         3,
         { AST_DECLARATION_SPECIFIERS, AST_DECLARATOR, AST_COMPOUND_STATEMENT }
     },
     {
         AST_FUNCTION_DEFINITION,
-        create_,
+        create_function_definition,
         3,
         { AST_DECLARATOR, AST_DECLARATION_LIST, AST_COMPOUND_STATEMENT }
     },
     {
         AST_FUNCTION_DEFINITION,
-        create_,
+        create_function_definition,
         4,
         { AST_DECLARATION_SPECIFIERS, AST_DECLARATOR, AST_DECLARATION_LIST, AST_COMPOUND_STATEMENT }
     },

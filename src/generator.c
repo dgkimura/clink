@@ -1563,7 +1563,7 @@ visit_function_definition(struct astnode *ast)
     struct listnode *list;
     struct astnode *declarator, *declaration, *parameter;
 
-    assert(ast->type == AST_FUNCTION_DEFINITION);
+    assert(ast->elided_type == AST_FUNCTION_DEFINITION);
 
     declarator = ast->function_declarator;
     declaration = ast->function_declarator->declarators[0];
