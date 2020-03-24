@@ -109,23 +109,6 @@ find_symbol(const char *name)
     return symbol;
 }
 
-static struct astnode *
-get_node(struct listnode *children, enum astnode_t type)
-{
-    struct listnode *next;
-
-    next = children;
-    for (next=children; next!=NULL; next=next->next)
-    {
-        if (((struct astnode *)(next->data))->type == type)
-        {
-            return (struct astnode *)(next->data);
-        }
-    }
-
-    return NULL;
-}
-
 static void
 visit_initializer(struct astnode *ast, enum scope scope)
 {
