@@ -250,11 +250,18 @@ struct astnode
 
             int declarator_value;
 
-            unsigned int declarator_parameter_type_list_size;
-            struct astnode *declarator_parameter_type_list[0];
+            struct astnode *declarator_parameter_type_list;
 
-            unsigned int declarator_identifier_list_size;
-            struct astnode *declarator_identifier_list[0];
+            struct astnode *declarator_identifier_list;
+        };
+
+        struct
+        {
+            unsigned int parameter_type_list_size;
+            struct astnode *parameter_type_list[0];
+
+            unsigned int identifier_list_size;
+            struct astnode *identifier_list[0];
         };
 
         /*

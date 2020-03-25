@@ -1551,9 +1551,9 @@ visit_function_definition(struct astnode *ast)
     declarator = ast->function_declarator;
     declaration = ast->function_declarator->declarators[0];
 
-    for (i=0; i<declaration->declarator_parameter_type_list_size; i++)
+    for (i=0; i<declaration->parameter_type_list_size; i++)
     {
-        parameter = declarator->declarators[0]->declarator_parameter_type_list[i];
+        parameter = declarator->declarators[0]->parameter_type_list[i];
 
         /*
          * Add up the size of all parameters and push onto the stack

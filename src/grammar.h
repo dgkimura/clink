@@ -532,13 +532,13 @@ struct rule grammar[NUM_RULES] =
     /* parameter-list: */
     {
         AST_PARAMETER_LIST,
-        create_,
+        create_parameter_list,
         1,
         { AST_PARAMETER_DECLARATION }
     },
     {
         AST_PARAMETER_LIST,
-        create_,
+        create_parameter_list,
         3,
         { AST_PARAMETER_LIST, AST_COMMA, AST_PARAMETER_DECLARATION }
     },

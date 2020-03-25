@@ -96,6 +96,42 @@ create_declaration(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_parameter_list(struct listnode *list, struct rule *rule)
+{
+    unsigned int node_size;
+    struct astnode *node, *child;
+
+    if (rule->length_of_nodes == 3)
+    {
+        /* index 5 is AST_PARAMETER_LIST astnode */
+        /* index 1 is AST_PARAMETER_DECLARATION astnode */
+        child = list_item(&list, 5);
+
+        node_size = sizeof(struct astnode) + sizeof(struct astnode *) *
+            (child->parameter_type_list_size + 1);
+        node = realloc(child, node_size);
+        child = list_item(&list, 1);
+
+        node->parameter_type_list[node->parameter_type_list_size] = child;
+        node->parameter_type_list_size += 1;
+    }
+    else if (rule->length_of_nodes == 1)
+    {
+        /* index 1 is AST_PARAMETER_DECLARATION astnode */
+        child = list_item(&list, 1);
+
+        node_size = sizeof(struct astnode) + sizeof(struct astnode *);
+        node = malloc(node_size);
+
+        node->parameter_type_list[0] = child;
+        node->parameter_type_list_size = 1;
+    }
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
 create_parameter_declaration(struct listnode *list, struct rule *rule)
 {
     struct astnode *node, *child;
@@ -279,20 +315,12 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
             }
             case AST_PARAMETER_TYPE_LIST:
             {
-                for (i=0; i<child->declarator_parameter_type_list_size; i++)
-                {
-                    node->declarator_parameter_type_list[i] =
-                        child->declarator_parameter_type_list[i];
-                }
+                node->declarator_parameter_type_list = child;
                 break;
             }
             case AST_IDENTIFIER_LIST:
             {
-                for (i=0; i<child->declarator_identifier_list_size; i++)
-                {
-                    node->declarator_identifier_list[i] =
-                        child->declarator_identifier_list[i];
-                }
+                node->declarator_identifier_list = child;
                 break;
             }
             default:
