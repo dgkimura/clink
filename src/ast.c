@@ -309,8 +309,6 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
         node = list_item(&list, 7);
         child = list_item(&list, 3);
 
-        node = malloc(sizeof(struct astnode));
-        memset(node, 0, sizeof(struct astnode));
         switch (child->type)
         {
             case AST_CONSTANT_EXPRESSION:

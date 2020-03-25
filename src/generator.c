@@ -1551,6 +1551,7 @@ visit_function_definition(struct astnode *ast)
     declarator = ast->function_declarator;
     declaration = ast->function_declarator->declarator_parameter_type_list;
 
+    write_assembly(".global _%s:", declarator->declarator_identifier);
     for (i=0; i<declaration->parameter_type_list_size; i++)
     {
         parameter = declaration->parameter_type_list[i];
