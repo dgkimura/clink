@@ -1549,11 +1549,11 @@ visit_function_definition(struct astnode *ast)
     assert(ast->elided_type == AST_FUNCTION_DEFINITION);
 
     declarator = ast->function_declarator;
-    declaration = ast->function_declarator->declarators[0];
+    declaration = ast->function_declarator->declarator_parameter_type_list;
 
     for (i=0; i<declaration->parameter_type_list_size; i++)
     {
-        parameter = declarator->declarators[0]->parameter_type_list[i];
+        parameter = declaration->parameter_type_list[i];
 
         /*
          * Add up the size of all parameters and push onto the stack

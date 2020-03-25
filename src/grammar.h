@@ -519,7 +519,7 @@ struct rule grammar[NUM_RULES] =
     /* parameter-type-list: */
     {
         AST_PARAMETER_TYPE_LIST,
-        create_,
+        create_elided_node,
         1,
         { AST_PARAMETER_LIST }
     },

@@ -273,13 +273,13 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
     int i;
     struct astnode *node, *child;
 
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
-
     if (rule->length_of_nodes == 1)
     {
         /* index 1 is AST_IDENTIFIER astnode */
         child = list_item(&list, 1);
+
+        node = malloc(sizeof(struct astnode));
+        memset(node, 0, sizeof(struct astnode));
 
         node->declarator_identifier = child->token->value;
     }
@@ -304,8 +304,13 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
     }
     else if (rule->length_of_nodes == 4)
     {
+        /* index 7 is AST_DIRECT_DECLARATOR astnode */
+        /* index 3 is AST_PARAMETER_TYPE_LIST | AST_IDENTIFIER_LIST astnode */
         node = list_item(&list, 7);
         child = list_item(&list, 3);
+
+        node = malloc(sizeof(struct astnode));
+        memset(node, 0, sizeof(struct astnode));
         switch (child->type)
         {
             case AST_CONSTANT_EXPRESSION:
