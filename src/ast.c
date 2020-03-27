@@ -521,13 +521,12 @@ create_binary_op(struct listnode *list, struct rule *rule)
     node = malloc(sizeof(struct astnode));
     memset(node, 0, sizeof(struct astnode));
 
-    node->left = list->data;
-    /*
-     * next = token
-     * next->next = next state
-     * next->next->next = next token
-     */
-    node->right = list->next->next->next->next->data;
+    /* index 1 is right astnode */
+    /* index 3 is operator astnode */
+    /* index 5 is right astnode */
+    node->left = list_item(&list, 5);
+    node->op = ((struct astnode *)list_item(&list, 3))->type;
+    node->right = list_item(&list, 1);
 
     node->type = rule->type;
     return node;
