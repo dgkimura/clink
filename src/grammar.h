@@ -928,50 +928,50 @@ struct rule grammar[NUM_RULES] =
     /* TODO: other assignemnt operators*/
     {
         AST_ASSIGNMENT_EXPRESSION,
-        create_,
+        create_assignment_expression,
         3,
         { AST_UNARY_EXPRESSION, AST_EQUAL, AST_ASSIGNMENT_EXPRESSION }
     },
     {
         AST_ASSIGNMENT_EXPRESSION,
-        create_,
+        create_assignment_expression,
         3,
         { AST_UNARY_EXPRESSION, AST_ASTERISK_EQUAL, AST_ASSIGNMENT_EXPRESSION }
     },
     {
         AST_ASSIGNMENT_EXPRESSION,
-        create_,
+        create_assignment_expression,
         3,
         { AST_UNARY_EXPRESSION, AST_BACKSLASH_EQUAL, AST_ASSIGNMENT_EXPRESSION }
     },
     {
         AST_ASSIGNMENT_EXPRESSION,
-        create_,
+        create_assignment_expression,
         3,
         { AST_UNARY_EXPRESSION, AST_MOD_EQUAL, AST_ASSIGNMENT_EXPRESSION }
     },
     {
         AST_ASSIGNMENT_EXPRESSION,
-        create_,
+        create_assignment_expression,
         3,
         { AST_UNARY_EXPRESSION, AST_PLUS_EQUAL, AST_ASSIGNMENT_EXPRESSION }
     },
     {
         AST_ASSIGNMENT_EXPRESSION,
-        create_,
+        create_assignment_expression,
         3,
         { AST_UNARY_EXPRESSION, AST_MINUS_EQUAL, AST_ASSIGNMENT_EXPRESSION }
     },
     {
         AST_ASSIGNMENT_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_CONDITIONAL_EXPRESSION }
     },
     /* constant-expression: */
     {
         AST_CONSTANT_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_CONDITIONAL_EXPRESSION }
     },
@@ -984,7 +984,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_CONDITIONAL_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_LOGICAL_OR_EXPRESSION }
     },
@@ -997,7 +997,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_LOGICAL_OR_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_LOGICAL_AND_EXPRESSION }
     },
@@ -1010,7 +1010,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_LOGICAL_AND_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_INCLUSIVE_OR_EXPRESSION }
     },
@@ -1023,7 +1023,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_INCLUSIVE_OR_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_EXCLUSIVE_OR_EXPRESSION }
     },
@@ -1036,7 +1036,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_EXCLUSIVE_OR_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_AND_EXPRESSION }
     },
@@ -1049,7 +1049,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_AND_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_EQUALITY_EXPRESSION }
     },
@@ -1068,7 +1068,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_EQUALITY_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_RELATIONAL_EXPRESSION }
     },
@@ -1099,7 +1099,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_RELATIONAL_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_SHIFT_EXPRESSION }
     },
@@ -1118,7 +1118,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_SHIFT_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_ADDITIVE_EXPRESSION }
     },
@@ -1137,7 +1137,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_ADDITIVE_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_MULTIPLICATIVE_EXPRESSION }
     },

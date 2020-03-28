@@ -59,6 +59,9 @@ struct astnode *
 create_parameter_declaration(struct listnode *list, struct rule *rule);
 
 struct astnode *
+create_assignment_expression(struct listnode *list, struct rule *rule);
+
+struct astnode *
 create_declaration_specifiers(struct listnode *list, struct rule *rule);
 
 struct astnode *
