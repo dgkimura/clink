@@ -58,16 +58,19 @@ create_function_definition(struct listnode *list, struct rule *rule)
 {
     struct astnode *node, *child;
 
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
-
     if (rule->length_of_nodes == 3 &&
         ((struct astnode*)list_item(&list, 5))->type == AST_DECLARATION_SPECIFIERS)
     {
         /* index 5 is AST_DECLARATION_SPECIFIERS astnode */
         /* index 3 is AST_DECLARATOR state */
         /* index 1 is AST_COMPOUND_STATEMENT state */
+        node = list_item(&list, 1);
         node->function_declarator = list_item(&list, 3);
+    }
+    else
+    {
+        node = malloc(sizeof(struct astnode));
+        memset(node, 0, sizeof(struct astnode));
     }
 
     node->type = rule->type;
@@ -155,6 +158,20 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
     node->declarator_identifier = child->declarator_identifier;
     node->declarators[0] = child;
     node->declarators_size = 1;
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_compound_statement(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node;
+
+    if (rule->length_of_nodes == 3)
+    {
+        node = list_item(&list, 3);
+    }
 
     node->type = rule->type;
     return node;

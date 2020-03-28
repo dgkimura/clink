@@ -59,6 +59,9 @@ struct astnode *
 create_parameter_declaration(struct listnode *list, struct rule *rule);
 
 struct astnode *
+create_compound_statement(struct listnode *list, struct rule *rule);
+
+struct astnode *
 create_statement_list(struct listnode *list, struct rule *rule);
 
 struct astnode *

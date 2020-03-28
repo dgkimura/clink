@@ -1544,7 +1544,7 @@ visit_function_definition(struct astnode *ast)
 
     int i;
     struct listnode *list;
-    struct astnode *declarator, *declaration, *parameter;
+    struct astnode *declarator, *declaration, *statement, *parameter;
 
     assert(ast->elided_type == AST_FUNCTION_DEFINITION);
 
@@ -1565,6 +1565,11 @@ visit_function_definition(struct astnode *ast)
         /*
          * Add up the size of all parameters and push onto the stack
          */
+    }
+
+    for (i=0; i<ast->statement_list_size; i++)
+    {
+        statement = ast->statement_list[i];
     }
 
     write_assembly("  retq");
