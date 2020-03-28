@@ -1551,8 +1551,14 @@ visit_function_definition(struct astnode *ast)
     declarator = ast->function_declarator;
     declaration = ast->function_declarator->declarator_parameter_type_list;
 
+    /*
+     * Function prologue
+     */
+    write_assembly(".text");
     write_assembly(".global _%s:", declarator->declarator_identifier);
-    for (i=0; i<declaration->parameter_type_list_size; i++)
+    write_assembly("  movq %%esp %%ebp");
+
+    for (i=0; declaration && i<declaration->parameter_type_list_size; i++)
     {
         parameter = declaration->parameter_type_list[i];
 
@@ -1560,6 +1566,8 @@ visit_function_definition(struct astnode *ast)
          * Add up the size of all parameters and push onto the stack
          */
     }
+
+    write_assembly("  retq");
 }
 
 static void
