@@ -282,7 +282,8 @@ struct astnode
             /*
              * List of function statements
              */
-            struct astnode *statement_list;
+            unsigned int statement_list_size;
+            struct astnode *statement_list[0];
         };
     };
 };

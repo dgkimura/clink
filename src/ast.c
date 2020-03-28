@@ -161,6 +161,44 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_statement_list(struct listnode *list, struct rule *rule)
+{
+    unsigned int i, node_size;
+    struct astnode *node;
+    struct astnode *child;
+
+
+    if (rule->length_of_nodes == 1)
+    {
+        node_size = sizeof(struct astnode) + (sizeof(struct astnode *));
+        node = malloc(node_size);
+        memset(node, 0, node_size);
+
+        /* index 1 is AST_STATEMENT astnode */
+        node->statement_list[0] = list_item(&list, 1);
+        node->statement_list_size = 1;
+    }
+    else if (rule->length_of_nodes == 2)
+    {
+        /* index 3 is AST_STATEMENT_LIST astnode */
+        /* index 1 is AST_STATEMENT astnode */
+        child = list_item(&list, 3);
+
+        node_size = sizeof(struct astnode) +
+            (sizeof(struct astnode *) * child->statement_list_size);
+        node = realloc(child, node_size);
+
+        child = list_item(&list, 1);
+
+        node->statement_list[node->statement_list_size] = child;
+        node->statement_list_size += 1;
+    }
+    node->type = rule->type;
+
+    return node;
+}
+
+struct astnode *
 create_assignment_expression(struct listnode *list, struct rule *rule)
 {
     /*

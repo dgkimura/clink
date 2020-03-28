@@ -702,7 +702,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_STATEMENT,
-        create_,
+        create_elided_node,
         1,
         { AST_EXPRESSION_STATEMENT }
     },
@@ -758,7 +758,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_EXPRESSION_STATEMENT,
-        create_,
+        create_elided_node,
         2,
         { AST_EXPRESSION, AST_SEMICOLON }
     },
@@ -790,13 +790,13 @@ struct rule grammar[NUM_RULES] =
     /* statement-list: */
     {
         AST_STATEMENT_LIST,
-        create_,
+        create_statement_list,
         2,
         { AST_STATEMENT_LIST, AST_STATEMENT }
     },
     {
         AST_STATEMENT_LIST,
-        create_,
+        create_statement_list,
         1,
         { AST_STATEMENT }
     },
@@ -920,7 +920,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_ASSIGNMENT_EXPRESSION }
     },
