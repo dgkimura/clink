@@ -59,6 +59,9 @@ struct astnode *
 create_parameter_declaration(struct listnode *list, struct rule *rule);
 
 struct astnode *
+create_expression_statement(struct listnode *list, struct rule *rule);
+
+struct astnode *
 create_compound_statement(struct listnode *list, struct rule *rule);
 
 struct astnode *
@@ -93,5 +96,8 @@ create_(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_binary_op(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_primary_expression(struct listnode *list, struct rule *rule);
 
 #endif

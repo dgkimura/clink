@@ -186,6 +186,7 @@ struct astnode
     union
     {
         int int_value;
+        char *identifier;
 
         struct
         {

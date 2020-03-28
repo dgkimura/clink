@@ -46,6 +46,8 @@ create_elided_node(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;
 
+    assert(rule->length_of_nodes == 1);
+
     node = list_item(&list, 1);
     node->type = rule->type;
     node->elided_type = rule->nodes[0];
@@ -160,6 +162,17 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
     node->declarators_size = 1;
 
     node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_expression_statement(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node;
+
+    node = list_item(&list, 3);
+    node->type = rule->type;
+
     return node;
 }
 
@@ -605,6 +618,23 @@ create_binary_op(struct listnode *list, struct rule *rule)
     node->left = list_item(&list, 5);
     node->op = ((struct astnode *)list_item(&list, 3))->type;
     node->right = list_item(&list, 1);
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_primary_expression(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    child = list_item(&list, 1);
+    if (child->type == AST_IDENTIFIER)
+    {
+        node->identifier = child->token->value;
+    }
 
     node->type = rule->type;
     return node;

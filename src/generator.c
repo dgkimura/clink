@@ -1570,6 +1570,10 @@ visit_function_definition(struct astnode *ast)
     for (i=0; i<ast->statement_list_size; i++)
     {
         statement = ast->statement_list[i];
+
+        /*
+         * Iterate over the statements
+         */
     }
 
     write_assembly("  retq");

@@ -758,7 +758,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_EXPRESSION_STATEMENT,
-        create_elided_node,
+        create_expression_statement,
         2,
         { AST_EXPRESSION, AST_SEMICOLON }
     },
@@ -1144,32 +1144,32 @@ struct rule grammar[NUM_RULES] =
     /* multplicative-expression: */
     {
         AST_MULTIPLICATIVE_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_MULTIPLICATIVE_EXPRESSION, AST_ASTERISK, AST_CAST_EXPRESSION }
     },
     {
         AST_MULTIPLICATIVE_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_MULTIPLICATIVE_EXPRESSION, AST_BACKSLASH, AST_CAST_EXPRESSION }
     },
     {
         AST_MULTIPLICATIVE_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_MULTIPLICATIVE_EXPRESSION, AST_MOD, AST_CAST_EXPRESSION }
     },
     {
         AST_MULTIPLICATIVE_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_CAST_EXPRESSION }
     },
     /* cast-expression: */
     {
         AST_CAST_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_UNARY_EXPRESSION }
     },
@@ -1212,7 +1212,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_UNARY_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_POSTFIX_EXPRESSION }
     },
@@ -1237,14 +1237,14 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_POSTFIX_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_PRIMARY_EXPRESSION }
     },
     /* primary-expression: */
     {
         AST_PRIMARY_EXPRESSION,
-        create_,
+        create_primary_expression,
         1,
         { AST_IDENTIFIER }
     },
