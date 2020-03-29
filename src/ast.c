@@ -84,17 +84,24 @@ create_declaration(struct listnode *list, struct rule *rule)
 {
     struct astnode *node, *child;
 
-    assert(rule->length_of_nodes == 3);
+    if (rule->length_of_nodes == 2)
+    {
+        /* index 3 is AST_DECLARATION_SPECIFIERS astnode */
+        /* index 1 is AST_SEMICOLON state */
+        node = list_item(&list, 3);
+    }
+    else if (rule->length_of_nodes == 3)
+    {
+        /* index 5 is AST_DECLARATION_SPECIFIERS astnode */
+        /* index 3 is AST_INIT_DECLARATOR_LIST state */
+        /* index 1 is AST_SEMICOLON state */
+        node = list_item(&list, 5);
+        child = list_item(&list, 3);
 
-    /* index 5 is AST_DECLARATION_SPECIFIERS astnode */
-    /* index 3 is AST_INIT_DECLARATOR_LIST state */
-    /* index 1 is AST_SEMICOLON state */
-    node = list_item(&list, 5);
-    child = list_item(&list, 3);
-
-    node->declarator_identifier = child->declarator_identifier;
-    node->declarators_size = child->declarators_size;
-    memcpy(node->declarators, child->declarators, sizeof(struct astnode *) * child->declarators_size);
+        node->declarator_identifier = child->declarator_identifier;
+        node->declarators_size = child->declarators_size;
+        memcpy(node->declarators, child->declarators, sizeof(struct astnode *) * child->declarators_size);
+    }
 
     node->type = rule->type;
     return node;

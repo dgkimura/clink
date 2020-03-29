@@ -65,7 +65,7 @@ struct rule grammar[NUM_RULES] =
     /* declaration: */
     {
         AST_DECLARATION,
-        create_elided_node,
+        create_declaration,
         2,
         { AST_DECLARATION_SPECIFIERS, AST_SEMICOLON }
     },
