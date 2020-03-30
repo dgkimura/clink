@@ -198,6 +198,15 @@ visit_additive_expression(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_expression(struct astnode *ast)
+{
+    if (ast->type == AST_ADDITIVE_EXPRESSION)
+    {
+        visit_additive_expression(ast, LOCAL);
+    }
+}
+
+static void
 visit_function_definition(struct astnode *ast)
 {
     /* add to local symbol table */
@@ -234,6 +243,7 @@ visit_function_definition(struct astnode *ast)
         /*
          * Iterate over the statements
          */
+        visit_expression(statement);
     }
 
     write_assembly("  retq");

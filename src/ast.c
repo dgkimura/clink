@@ -50,7 +50,15 @@ create_elided_node(struct listnode *list, struct rule *rule)
 
     node = list_item(&list, 1);
     node->type = rule->type;
-    node->elided_type = rule->nodes[0];
+
+    /*
+     * Only set elided type if it has not already been set. We do not want to
+     * override a lower node in the tree.
+     */
+    if (!node->elided_type)
+    {
+        node->elided_type = rule->nodes[0];
+    }
 
     return node;
 }
@@ -254,6 +262,7 @@ create_assignment_expression(struct listnode *list, struct rule *rule)
     node->op = ((struct astnode *)list_item(&list, 3))->type;
     node->right = list_item(&list, 1);
 
+    node->elided_type = rule->type;
     node->type = rule->type;
     return node;
 }
