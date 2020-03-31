@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "ast.h"
 
 struct astnode *
@@ -652,6 +654,20 @@ create_primary_expression(struct listnode *list, struct rule *rule)
         node->identifier = child->token->value;
     }
 
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
+create_constant(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node, *child;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    child = list_item(&list, 1);
+
+    node->int_value = atoi(child->token->value);
     node->type = rule->type;
     return node;
 }

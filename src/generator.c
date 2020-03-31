@@ -46,6 +46,8 @@ struct symbol local_symbol_table[8192];
 
 static FILE *assembly_filename;
 
+static void visit_expression(struct astnode *ast, enum scope scope);
+
 static void
 write_assembly(char *format, ...)
 {
@@ -167,42 +169,54 @@ visit_additive_expression(struct astnode *ast, enum scope scope)
     struct listnode *list;
     struct astnode *next;
 
-    assert(ast->type == AST_ADDITIVE_EXPRESSION);
+    assert(ast->elided_type == AST_ADDITIVE_EXPRESSION);
 
     switch (ast->op)
     {
         case AST_MINUS:
         case AST_PLUS:
         {
-            visit_additive_expression(ast->left, scope);
-            write_assembly("push %rax");
-            visit_multiplicative_expression(ast->right, scope);
-            write_assembly("mov %rax %rcx");
-            write_assembly("pop %rax");
+            visit_expression(ast->left, scope);
+            write_assembly("  push %%rax");
+            visit_expression(ast->right, scope);
+            write_assembly("  mov %%rax %%rcx");
+            write_assembly("  pop %%rax");
             if (ast->op == AST_PLUS)
             {
-                write_assembly("add %rcx %rax");
+                write_assembly("  add %%rcx %%rax");
             }
             else if (ast->op == AST_MINUS)
             {
-                write_assembly("sub %rcx %rax");
+                write_assembly("  sub %%rcx %%rax");
             }
             break;
         }
         default:
         {
-            visit_multiplicative_expression(next, scope);
             break;
         }
     }
 }
 
 static void
-visit_expression(struct astnode *ast)
+visit_expression(struct astnode *ast, enum scope scope)
 {
-    if (ast->type == AST_ADDITIVE_EXPRESSION)
+    switch (ast->elided_type)
     {
-        visit_additive_expression(ast, LOCAL);
+        case AST_ADDITIVE_EXPRESSION:
+        {
+            visit_additive_expression(ast, LOCAL);
+            break;
+        }
+        case AST_CONSTANT:
+        {
+            break;
+        }
+        default:
+        {
+            assert(0);
+            break;
+        }
     }
 }
 
@@ -243,7 +257,7 @@ visit_function_definition(struct astnode *ast)
         /*
          * Iterate over the statements
          */
-        visit_expression(statement);
+        visit_expression(statement, LOCAL);
     }
 
     write_assembly("  retq");

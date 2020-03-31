@@ -100,4 +100,7 @@ create_binary_op(struct listnode *list, struct rule *rule);
 struct astnode *
 create_primary_expression(struct listnode *list, struct rule *rule);
 
+struct astnode *
+create_constant(struct listnode *list, struct rule *rule);
+
 #endif

@@ -1250,14 +1250,14 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_PRIMARY_EXPRESSION,
-        create_,
+        create_elided_node,
         1,
         { AST_CONSTANT }
     },
     /* constant: */
     {
         AST_CONSTANT,
-        create_,
+        create_constant,
         1,
         { AST_INTEGER_CONSTANT }
     },
