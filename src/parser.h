@@ -168,7 +168,7 @@ struct rule
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
-#define NUM_RULES 199
+#define NUM_RULES 200
 
 struct astnode
 {

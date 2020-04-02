@@ -246,6 +246,17 @@ create_statement_list(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_jump_statement(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node;
+
+    node = list_item(&list, 3);
+
+    node->type = rule->type;
+    return node;
+}
+
+struct astnode *
 create_assignment_expression(struct listnode *list, struct rule *rule)
 {
     /*
@@ -646,13 +657,21 @@ struct astnode *
 create_primary_expression(struct listnode *list, struct rule *rule)
 {
     struct astnode *node, *child;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
 
-    child = list_item(&list, 1);
-    if (child->type == AST_IDENTIFIER)
+    if (rule->length_of_nodes == 1)
     {
-        node->identifier = child->token->value;
+        node = malloc(sizeof(struct astnode));
+        memset(node, 0, sizeof(struct astnode));
+
+        child = list_item(&list, 1);
+        if (child->type == AST_IDENTIFIER)
+        {
+            node->identifier = child->token->value;
+        }
+    }
+    else
+    {
+        node = list_item(&list, 3);
     }
 
     node->type = rule->type;

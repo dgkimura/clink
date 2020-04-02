@@ -371,6 +371,27 @@ START_TEST(test_parser_can_parse_multiple_simple_declarations)
 }
 END_TEST
 
+START_TEST(test_parser_can_parse_primary_expressions)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    char *content;
+    list_init(&tokens);
+
+    /*
+     * parse primary expression with parens
+     */
+    content = "int function()"
+              "{"
+              "    return (1 + 2) * 3;"
+              "}";
+    scan(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
 START_TEST(test_parser_can_parse_function)
 {
     struct astnode *ast;
@@ -591,7 +612,6 @@ START_TEST(test_parser_can_parse_conditional_statements)
     ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
 }
 END_TEST
-
 
 START_TEST(test_parser_can_parse_assigment_operations)
 {
@@ -866,6 +886,7 @@ main(void)
     tcase_add_test(testcase, test_generate_transitions_increments_cursor_position);
     tcase_add_test(testcase, test_parser_can_parse_simple_declaration);
     tcase_add_test(testcase, test_parser_can_parse_multiple_simple_declarations);
+    tcase_add_test(testcase, test_parser_can_parse_primary_expressions);
     tcase_add_test(testcase, test_parser_can_parse_function);
     tcase_add_test(testcase, test_parser_can_parse_function_prototype);
     tcase_add_test(testcase, test_parser_can_parse_struct);

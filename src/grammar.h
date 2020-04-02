@@ -726,7 +726,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_STATEMENT,
-        create_,
+        create_elided_node,
         1,
         { AST_JUMP_STATEMENT }
     },
@@ -907,7 +907,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_JUMP_STATEMENT,
-        create_,
+        create_jump_statement,
         3,
         { AST_RETURN, AST_EXPRESSION, AST_SEMICOLON }
     },
@@ -1253,6 +1253,12 @@ struct rule grammar[NUM_RULES] =
         create_elided_node,
         1,
         { AST_CONSTANT }
+    },
+    {
+        AST_PRIMARY_EXPRESSION,
+        create_primary_expression,
+        3,
+        { AST_LPAREN, AST_EXPRESSION, AST_RPAREN }
     },
     /* constant: */
     {
