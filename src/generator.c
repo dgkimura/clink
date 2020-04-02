@@ -136,13 +136,11 @@ visit_constant(struct astnode *ast, enum scope scope)
     struct listnode *list;
     struct astnode *next;
 
-    assert(ast->type == AST_CONSTANT);
-
-    switch (((struct astnode *)ast->children->data)->type)
+    switch (ast->elided_type)
     {
             case AST_INTEGER_CONSTANT:
             {
-                write_assembly("mov $%d %rax", ast->int_value);
+                write_assembly("  mov $%d, %%rax", ast->int_value);
                 break;
             }
             case AST_CHARACTER_CONSTANT:
@@ -159,11 +157,6 @@ visit_constant(struct astnode *ast, enum scope scope)
 }
 
 static void
-visit_multiplicative_expression(struct astnode *ast, enum scope scope)
-{
-}
-
-static void
 visit_arithmetic_expression(struct astnode *ast, enum scope scope)
 {
     struct listnode *list;
@@ -175,24 +168,24 @@ visit_arithmetic_expression(struct astnode *ast, enum scope scope)
     visit_expression(ast->left, scope);
     write_assembly("  push %%rax");
     visit_expression(ast->right, scope);
-    write_assembly("  mov %%rax %%rcx");
+    write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
     switch (ast->op)
     {
         case AST_MINUS:
         {
-            write_assembly("  sub %%rcx %%rax");
+            write_assembly("  sub %%rcx, %%rax");
             break;
         }
         case AST_PLUS:
         {
-            write_assembly("  add %%rcx %%rax");
+            write_assembly("  add %%rcx, %%rax");
             break;
         }
         case AST_ASTERISK:
         {
-            write_assembly("  imul %%rcx %%rax");
+            write_assembly("  imul %%rcx, %%rax");
             break;
         }
         default:
@@ -213,8 +206,9 @@ visit_expression(struct astnode *ast, enum scope scope)
             visit_arithmetic_expression(ast, LOCAL);
             break;
         }
-        case AST_CONSTANT:
+        case AST_INTEGER_CONSTANT:
         {
+            visit_constant(ast, LOCAL);
             break;
         }
         default:
@@ -243,8 +237,9 @@ visit_function_definition(struct astnode *ast)
      * Function prologue
      */
     write_assembly(".text");
-    write_assembly(".global _%s:", declarator->declarator_identifier);
-    write_assembly("  movq %%esp %%ebp");
+    write_assembly("  .global _%s", declarator->declarator_identifier);
+    write_assembly("_%s:", declarator->declarator_identifier);
+    write_assembly("  movq %%rsp, %%rbp");
 
     for (i=0; declaration && i<declaration->parameter_type_list_size; i++)
     {

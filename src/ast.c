@@ -670,5 +670,6 @@ create_constant(struct listnode *list, struct rule *rule)
 
     node->int_value = atoi(child->token->value);
     node->type = rule->type;
+    node->elided_type = rule->nodes[0];
     return node;
 }
