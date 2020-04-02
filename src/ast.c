@@ -637,6 +637,7 @@ create_binary_op(struct listnode *list, struct rule *rule)
     node->op = ((struct astnode *)list_item(&list, 3))->type;
     node->right = list_item(&list, 1);
 
+    node->elided_type = rule->type;
     node->type = rule->type;
     return node;
 }

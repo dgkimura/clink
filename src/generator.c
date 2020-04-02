@@ -164,31 +164,35 @@ visit_multiplicative_expression(struct astnode *ast, enum scope scope)
 }
 
 static void
-visit_additive_expression(struct astnode *ast, enum scope scope)
+visit_arithmetic_expression(struct astnode *ast, enum scope scope)
 {
     struct listnode *list;
     struct astnode *next;
 
-    assert(ast->elided_type == AST_ADDITIVE_EXPRESSION);
+    assert(ast->elided_type == AST_ADDITIVE_EXPRESSION ||
+           ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION );
+
+    visit_expression(ast->left, scope);
+    write_assembly("  push %%rax");
+    visit_expression(ast->right, scope);
+    write_assembly("  mov %%rax %%rcx");
+    write_assembly("  pop %%rax");
 
     switch (ast->op)
     {
         case AST_MINUS:
+        {
+            write_assembly("  sub %%rcx %%rax");
+            break;
+        }
         case AST_PLUS:
         {
-            visit_expression(ast->left, scope);
-            write_assembly("  push %%rax");
-            visit_expression(ast->right, scope);
-            write_assembly("  mov %%rax %%rcx");
-            write_assembly("  pop %%rax");
-            if (ast->op == AST_PLUS)
-            {
-                write_assembly("  add %%rcx %%rax");
-            }
-            else if (ast->op == AST_MINUS)
-            {
-                write_assembly("  sub %%rcx %%rax");
-            }
+            write_assembly("  add %%rcx %%rax");
+            break;
+        }
+        case AST_ASTERISK:
+        {
+            write_assembly("  imul %%rcx %%rax");
             break;
         }
         default:
@@ -204,8 +208,9 @@ visit_expression(struct astnode *ast, enum scope scope)
     switch (ast->elided_type)
     {
         case AST_ADDITIVE_EXPRESSION:
+        case AST_MULTIPLICATIVE_EXPRESSION:
         {
-            visit_additive_expression(ast, LOCAL);
+            visit_arithmetic_expression(ast, LOCAL);
             break;
         }
         case AST_CONSTANT:
