@@ -258,11 +258,11 @@ struct astnode
 
         struct
         {
+            /*
+             * List of parameter declarations referenced from the declarator.
+             */
             unsigned int parameter_type_list_size;
             struct astnode *parameter_type_list[0];
-
-            unsigned int identifier_list_size;
-            struct astnode *identifier_list[0];
         };
 
         /*
