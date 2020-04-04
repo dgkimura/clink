@@ -8,41 +8,11 @@
 #include "generator.h"
 #include "utilities.h"
 
-#define MAX_SYMBOL_ATTRIBUTES 10
-
-struct symbol
-{
-    /* String identifier of the symbol.. */
-    char *identifier;
-
-    /* Attributes of the symbol. */
-    enum token_t attributes[MAX_SYMBOL_ATTRIBUTES];
-
-    /*
-     * Offset of the symbol. For parameters and local variables this will be an
-     * offset from ebp.
-     */
-    int offset;
-};
-
-/*
- * Temporarily holds the attributes of a symbol during AST iteration when name
- * of symbol(s) is not yet known.
- */
-int index_current_symbol_attributes;
-enum token_t current_symbol_attributes[MAX_SYMBOL_ATTRIBUTES];
-
 enum scope
 {
     LOCAL,
     GLOBAL
 };
-
-int global_symbol_table_index = 0;
-struct symbol global_symbol_table[8192];
-
-int local_symbol_table_index = 0;
-struct symbol local_symbol_table[8192];
 
 static FILE *assembly_filename;
 
@@ -56,52 +26,6 @@ write_assembly(char *format, ...)
     vfprintf(assembly_filename, format, args);
     va_end(args);
     fprintf(assembly_filename, "\n");
-}
-
-static void
-insert_symbol(char *name, enum scope scope)
-{
-    struct symbol *s = malloc(sizeof(struct symbol));
-    memset(s, 0, sizeof(struct symbol));
-
-    s->identifier = name;
-    memcpy(s->attributes, current_symbol_attributes, MAX_SYMBOL_ATTRIBUTES);
-
-    if (scope == LOCAL)
-    {
-        local_symbol_table[local_symbol_table_index++] = *s;
-    }
-    else if (scope == GLOBAL)
-    {
-        global_symbol_table[global_symbol_table_index++] = *s;
-    }
-}
-
-static struct symbol *
-find_symbol(const char *name)
-{
-    int i;
-    struct symbol *symbol = NULL;
-
-    for (i=0; i<global_symbol_table_index; i++)
-    {
-        if (strcmp(global_symbol_table[i].identifier, name) == 0)
-        {
-            symbol = &global_symbol_table[i];
-            break;
-        }
-    }
-
-    for (i=0; i<local_symbol_table_index; i++)
-    {
-        if (strcmp(local_symbol_table[i].identifier, name) == 0)
-        {
-            symbol = &local_symbol_table[i];
-            break;
-        }
-    }
-
-    return symbol;
 }
 
 static void
