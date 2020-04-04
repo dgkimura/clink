@@ -170,6 +170,33 @@ struct rule
 
 #define NUM_RULES 200
 
+struct ast_compound_statement
+{
+    enum astnode_t type;
+    enum astnode_t elided_type;
+
+    struct ast_declaration_list *declarations;
+    struct ast_statement_list *statements;
+};
+
+struct ast_statement_list
+{
+    enum astnode_t type;
+    enum astnode_t elided_type;
+
+    unsigned int size;
+    struct astnode *items[0];
+};
+
+struct ast_declaration_list
+{
+    enum astnode_t type;
+    enum astnode_t elided_type;
+
+    unsigned int size;
+    struct astnode *items[0];
+};
+
 struct astnode
 {
     enum astnode_t type;
@@ -180,8 +207,6 @@ struct astnode
      */
     enum astnode_t elided_type;
     struct token *token;
-
-    struct listnode *children;
 
     union
     {
@@ -283,8 +308,7 @@ struct astnode
             /*
              * List of function statements
              */
-            unsigned int statement_list_size;
-            struct astnode *statement_list[0];
+            struct ast_compound_statement *statements;
         };
     };
 };

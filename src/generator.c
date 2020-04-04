@@ -151,11 +151,13 @@ visit_function_definition(struct astnode *ast)
     int i;
     struct listnode *list;
     struct astnode *declarator, *declaration, *statement, *parameter;
+    struct ast_compound_statement *compound;
 
     assert(ast->elided_type == AST_FUNCTION_DEFINITION);
 
     declarator = ast->function_declarator;
     declaration = ast->function_declarator->declarator_parameter_type_list;
+    compound = ast->statements;
 
     /*
      * Function prologue
@@ -174,9 +176,15 @@ visit_function_definition(struct astnode *ast)
          */
     }
 
-    for (i=0; i<ast->statement_list_size; i++)
+    /*
+     * TODO: Reserve stack space for local variables in this function so that
+     * if this function calls another function it will not clobber this
+     * functions local variables on the stack.
+     */
+
+    for (i=0; compound->statements && i<compound->statements->size; i++)
     {
-        statement = ast->statement_list[i];
+        statement = compound->statements->items[i];
 
         /*
          * Iterate over the statements

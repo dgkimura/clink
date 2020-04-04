@@ -1032,8 +1032,6 @@ parse(struct listnode *tokens)
              */
             for (i=0; i<cell->rule->length_of_nodes; i++)
             {
-                list_append(&root->children, stack->data);
-
                 /*
                  * Remove astnode and cell state from the stack.
                  */
