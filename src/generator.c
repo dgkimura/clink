@@ -29,10 +29,10 @@ write_assembly(char *format, ...)
 }
 
 static void
-visit_declaration(struct astnode *ast, enum scope scope)
+visit_declaration(struct ast_declaration *ast, enum scope scope)
 {
     int i;
-    struct astnode *next;
+    struct ast_declarator *next;
 
     assert(ast->elided_type == AST_DECLARATION);
 
@@ -144,19 +144,22 @@ visit_expression(struct astnode *ast, enum scope scope)
 }
 
 static void
-visit_function_definition(struct astnode *ast)
+visit_function_definition(struct ast_function *ast)
 {
     /* add to local symbol table */
 
     int i;
     struct listnode *list;
-    struct astnode *declarator, *declaration, *statement, *parameter;
+    struct astnode *statement;
+    struct ast_declarator *declarator;
+    struct ast_declaration *parameter;
     struct ast_compound_statement *compound;
+    struct ast_parameter_type_list *parameters;
 
     assert(ast->elided_type == AST_FUNCTION_DEFINITION);
 
     declarator = ast->function_declarator;
-    declaration = ast->function_declarator->declarator_parameter_type_list;
+    parameters = ast->function_declarator->declarator_parameter_type_list;
     compound = ast->statements;
 
     /*
@@ -167,9 +170,9 @@ visit_function_definition(struct astnode *ast)
     write_assembly("_%s:", declarator->declarator_identifier);
     write_assembly("  movq %%rsp, %%rbp");
 
-    for (i=0; declaration && i<declaration->parameter_type_list_size; i++)
+    for (i=0; parameters && i<parameters->size; i++)
     {
-        parameter = declaration->parameter_type_list[i];
+        parameter = parameters->items[i];
 
         /*
          * Add up the size of all parameters and push onto the stack
@@ -196,7 +199,7 @@ visit_function_definition(struct astnode *ast)
 }
 
 static void
-visit_translation_unit(struct astnode *ast)
+visit_translation_unit(struct ast_translation_unit *ast)
 {
     int i;
     struct astnode *next;
@@ -210,12 +213,12 @@ visit_translation_unit(struct astnode *ast)
         {
             case AST_FUNCTION_DEFINITION:
             {
-                visit_function_definition(next);
+                visit_function_definition((struct ast_function *)next);
                 break;
             }
             case AST_DECLARATION:
             {
-                visit_declaration(next, GLOBAL);
+                visit_declaration((struct ast_declaration *)next, GLOBAL);
                 break;
             }
             default:
@@ -234,5 +237,5 @@ void
 generate(struct astnode *ast, char *outfile)
 {
     assembly_filename = fopen(outfile, "w");
-    visit_translation_unit(ast);
+    visit_translation_unit((struct ast_translation_unit *)ast);
 }

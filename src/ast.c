@@ -6,9 +6,8 @@ struct astnode *
 create_translation_unit_node(struct listnode *list, struct rule *rule)
 {
     unsigned int i, node_size;
-    struct astnode *node;
+    struct ast_translation_unit *node;
     struct astnode *child;
-
 
     if (rule->length_of_nodes == 1)
     {
@@ -25,11 +24,11 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
     {
         /* index 3 is AST_TRANSLATION_UNIT astnode */
         /* index 2 is AST_TRANSLATION_UNIT state */
-        child = list_item(&list, 3);
+        node = list_item(&list, 3);
 
         node_size = sizeof(struct astnode) +
-            (sizeof(struct astnode *) * child->translation_unit_items_size);
-        node = realloc(child, node_size);
+            (sizeof(struct astnode *) * node->translation_unit_items_size);
+        node = realloc(node, node_size);
 
         /* index 1 is AST_EXTERNAL_DECLARATION astnode */
         /* index 0 is AST_EXTERNAL_DECLARATION state */
@@ -40,7 +39,7 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
     }
     node->type = rule->type;
 
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
@@ -68,10 +67,10 @@ create_elided_node(struct listnode *list, struct rule *rule)
 struct astnode *
 create_function_definition(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
+    struct ast_function *node;
 
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    node = malloc(sizeof(struct ast_function));
+    memset(node, 0, sizeof(struct ast_function));
 
     if (rule->length_of_nodes == 3 &&
         ((struct astnode*)list_item(&list, 5))->type == AST_DECLARATION_SPECIFIERS)
@@ -84,13 +83,13 @@ create_function_definition(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_declaration(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
+    struct ast_declaration *node, *child;
 
     if (rule->length_of_nodes == 2)
     {
@@ -106,34 +105,34 @@ create_declaration(struct listnode *list, struct rule *rule)
         node = list_item(&list, 5);
         child = list_item(&list, 3);
 
-        node->declarator_identifier = child->declarator_identifier;
         node->declarators_size = child->declarators_size;
         memcpy(node->declarators, child->declarators, sizeof(struct astnode *) * child->declarators_size);
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_parameter_list(struct listnode *list, struct rule *rule)
 {
     unsigned int node_size;
-    struct astnode *node, *child;
+    struct ast_parameter_type_list *node;
+    struct ast_declaration *child;
 
     if (rule->length_of_nodes == 3)
     {
         /* index 5 is AST_PARAMETER_LIST astnode */
         /* index 1 is AST_PARAMETER_DECLARATION astnode */
-        child = list_item(&list, 5);
+        node = list_item(&list, 5);
 
         node_size = sizeof(struct astnode) + sizeof(struct astnode *) *
-            (child->parameter_type_list_size + 1);
-        node = realloc(child, node_size);
+            (node->size + 1);
+        node = realloc(node, node_size);
         child = list_item(&list, 1);
 
-        node->parameter_type_list[node->parameter_type_list_size] = child;
-        node->parameter_type_list_size += 1;
+        node->items[node->size] = child;
+        node->size += 1;
     }
     else if (rule->length_of_nodes == 1)
     {
@@ -143,25 +142,26 @@ create_parameter_list(struct listnode *list, struct rule *rule)
         node_size = sizeof(struct astnode) + sizeof(struct astnode *);
         node = malloc(node_size);
 
-        node->parameter_type_list[0] = child;
-        node->parameter_type_list_size = 1;
+        node->items[0] = child;
+        node->size = 1;
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_parameter_declaration(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
+    struct ast_declaration *node;
+    struct ast_declarator *child;
 
     if (rule->length_of_nodes == 1)
     {
         /* index 1 is AST_DECLARATION_SPECIFIERS astnode */
         node = list_item(&list, 1);
         node->type = rule->type;
-        return node;
+        return (struct astnode *)node;
     }
 
     assert(rule->length_of_nodes == 2);
@@ -172,12 +172,11 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
     /* index 1 is [ AST_DECLARATOR | AST_ABSTRACT_DECLARATOR ] astnode */
     child = list_item(&list, 1);
 
-    node->declarator_identifier = child->declarator_identifier;
     node->declarators[0] = child;
     node->declarators_size = 1;
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
@@ -281,7 +280,7 @@ create_assignment_expression(struct listnode *list, struct rule *rule)
 struct astnode *
 create_declaration_specifiers(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
+    struct ast_declaration *node, *child;
 
     if (rule->length_of_nodes == 1)
     {
@@ -325,13 +324,14 @@ create_declaration_specifiers(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_init_declarator_list(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *init_declarator, *init_declarator_list;
+    struct ast_declaration *node, *init_declarator_list;
+    struct ast_declarator *init_declarator;
     size_t node_size;
 
     assert(rule->length_of_nodes == 1 || rule->length_of_nodes == 3);
@@ -341,8 +341,10 @@ create_init_declarator_list(struct listnode *list, struct rule *rule)
         /* index 1 is AST_INIT_DECLARATOR astnode */
         init_declarator = list_item(&list, 1);
 
-        node = malloc(sizeof(struct astnode) + sizeof(struct astnode *));
-        memset(node, 0, sizeof(struct astnode));
+        node_size = sizeof(struct ast_declaration);
+
+        node = malloc(node_size);
+        memset(node, 0, node_size);
 
         node->declarators_size = 1;
         node->declarators[0] = init_declarator;
@@ -355,8 +357,9 @@ create_init_declarator_list(struct listnode *list, struct rule *rule)
         init_declarator_list = list_item(&list, 5);
         init_declarator = list_item(&list, 1);
 
-        node_size = sizeof(struct astnode) + sizeof(struct astnode *) *
-            init_declarator_list->declarators_size;
+        node_size = sizeof(struct ast_declaration) +
+                    sizeof(struct ast_declarator *) *
+                    (init_declarator_list->declarators_size + 1);
 
         node = malloc(node_size);
         memset(node, 0, node_size);
@@ -368,7 +371,7 @@ create_init_declarator_list(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
@@ -389,34 +392,30 @@ struct astnode *
 create_direct_declarator(struct listnode *list, struct rule *rule)
 {
     int i;
-    struct astnode *node, *child;
+    struct ast_declarator *node;
+    struct ast_declaration *child;
 
     if (rule->length_of_nodes == 1)
     {
         /* index 1 is AST_IDENTIFIER astnode */
         child = list_item(&list, 1);
 
-        node = malloc(sizeof(struct astnode));
-        memset(node, 0, sizeof(struct astnode));
+        node = malloc(sizeof(struct ast_declarator));
+        memset(node, 0, sizeof(struct ast_declarator));
 
         node->declarator_identifier = child->token->value;
     }
     else if (rule->length_of_nodes == 3)
     {
-        child = list_item(&list, 5);
-        if (child->type == AST_DIRECT_DECLARATOR)
+        node = list_item(&list, 5);
+        if (node->type == AST_DIRECT_DECLARATOR)
         {
             /* { AST_DIRECT_DECLARATOR, AST_LBRACKET, AST_RBRACKET } */
             /* { AST_DIRECT_DECLARATOR,  AST_LPAREN,  AST_RPAREN } */
-
-            /* index 3 is AST_DECLARATOR astnode */
-            node = child;
         }
         else
         {
             /* { AST_LPAREN, AST_DECLARATOR, AST_RPAREN } */
-
-            /* index 3 is AST_DECLARATOR astnode */
             node = list_item(&list, 3);
         }
     }
@@ -436,12 +435,12 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
             }
             case AST_PARAMETER_TYPE_LIST:
             {
-                node->declarator_parameter_type_list = child;
+                node->declarator_parameter_type_list = (struct ast_parameter_type_list *)child;
                 break;
             }
             case AST_IDENTIFIER_LIST:
             {
-                node->declarator_identifier_list = child;
+                node->declarator_identifier_list = (struct astnode *)child;
                 break;
             }
             default:
@@ -454,15 +453,16 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_storage_class_specifier(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    struct ast_declaration *node;
+    struct astnode *child;
+    node = malloc(sizeof(struct ast_declaration));
+    memset(node, 0, sizeof(struct ast_declaration));
 
     assert(rule->length_of_nodes == 1);
 
@@ -471,27 +471,27 @@ create_storage_class_specifier(struct listnode *list, struct rule *rule)
     {
         case AST_AUTO:
         {
-            child->storage_class_specifiers = AUTO;
+            node->storage_class_specifiers = AUTO;
             break;
         }
         case AST_REGISTER:
         {
-            child->storage_class_specifiers = REGISTER;
+            node->storage_class_specifiers = REGISTER;
             break;
         }
         case AST_STATIC:
         {
-            child->storage_class_specifiers = STATIC;
+            node->storage_class_specifiers = STATIC;
             break;
         }
         case AST_EXTERN:
         {
-            child->storage_class_specifiers = EXTERN;
+            node->storage_class_specifiers = EXTERN;
             break;
         }
         case AST_TYPEDEF:
         {
-            child->storage_class_specifiers = TYPEDEF;
+            node->storage_class_specifiers = TYPEDEF;
             break;
         }
         default:
@@ -502,15 +502,16 @@ create_storage_class_specifier(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_type_specifier(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    struct ast_declaration *node;
+    struct astnode *child;
+    node = malloc(sizeof(struct ast_declaration));
+    memset(node, 0, sizeof(struct ast_declaration));
 
     assert(rule->length_of_nodes == 1);
 
@@ -585,15 +586,16 @@ create_type_specifier(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_type_qualifier(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    struct ast_declaration *node;
+    struct astnode *child;
+    node = malloc(sizeof(struct ast_declaration));
+    memset(node, 0, sizeof(struct ast_declaration));
 
     assert(rule->length_of_nodes == 1);
 
@@ -602,12 +604,12 @@ create_type_qualifier(struct listnode *list, struct rule *rule)
     {
         case AST_CONST:
         {
-            child->type_qualifier = VOID;
+            node->type_qualifier = VOID;
             break;
         }
         case AST_VOLATILE:
         {
-            child->type_qualifier = VOLATILE;
+            node->type_qualifier = VOLATILE;
             break;
         }
         default:
@@ -618,7 +620,7 @@ create_type_qualifier(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
