@@ -153,6 +153,7 @@ visit_function_definition(struct ast_function *ast)
     struct astnode *statement;
     struct ast_declarator *declarator;
     struct ast_declaration *parameter;
+    struct ast_declaration *declaration;
     struct ast_compound_statement *compound;
     struct ast_parameter_type_list *parameters;
 
@@ -184,6 +185,10 @@ visit_function_definition(struct ast_function *ast)
      * if this function calls another function it will not clobber this
      * functions local variables on the stack.
      */
+    for (i=0; compound->declarations && i<compound->declarations->size; i++)
+    {
+        declaration = compound->declarations->items[i];
+    }
 
     for (i=0; compound->statements && i<compound->statements->size; i++)
     {

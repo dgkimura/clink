@@ -198,7 +198,7 @@ struct ast_declaration_list
     enum astnode_t elided_type;
 
     unsigned int size;
-    struct astnode *items[0];
+    struct ast_declaration *items[0];
 };
 
 struct ast_declarator

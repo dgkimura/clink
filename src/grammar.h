@@ -78,13 +78,13 @@ struct rule grammar[NUM_RULES] =
     /* declaration-list: */
     {
         AST_DECLARATION_LIST,
-        create_,
+        create_declaration_list,
         1,
         { AST_DECLARATION }
     },
     {
         AST_DECLARATION_LIST,
-        create_,
+        create_declaration_list,
         2,
         { AST_DECLARATION_LIST, AST_DECLARATION }
     },
@@ -783,7 +783,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_COMPOUND_STATEMENT,
-        create_,
+        create_compound_statement,
         4,
         { AST_LBRACE, AST_DECLARATION_LIST, AST_STATEMENT_LIST, AST_RBRACE }
     },

@@ -114,6 +114,41 @@ create_declaration(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_declaration_list(struct listnode *list, struct rule *rule)
+{
+    unsigned int node_size;
+    struct ast_declaration_list *node;
+    struct ast_declaration *child;
+
+    if (rule->length_of_nodes == 2)
+    {
+        /* index 3 is AST_DECLARATION_LIST astnode */
+        /* index 1 is AST_DECLARATION astnode */
+        node = list_item(&list, 3);
+
+        node_size = sizeof(struct ast_declaration_list) +
+                    sizeof(struct ast_declaration *) * (node->size + 1);
+        node = realloc(node, node_size);
+        child = list_item(&list, 1);
+
+        node->items[node->size] = child;
+        node->size += 1;
+    }
+    else if (rule->length_of_nodes == 1)
+    {
+        /* index 1 is AST_DECLARATION astnode */
+        node_size = sizeof(struct astnode) + sizeof(struct astnode *);
+        node = malloc(node_size);
+
+        node->items[0] = list_item(&list, 1);
+        node->size = 1;
+    }
+
+    node->type = rule->type;
+    return (struct astnode *)node;
+}
+
+struct astnode *
 create_parameter_list(struct listnode *list, struct rule *rule)
 {
     unsigned int node_size;
@@ -201,6 +236,11 @@ create_compound_statement(struct listnode *list, struct rule *rule)
     if (rule->length_of_nodes == 3)
     {
         node->statements = list_item(&list, 3);
+    }
+    else if (rule->length_of_nodes == 4)
+    {
+        node->statements = list_item(&list, 3);
+        node->declarations = list_item(&list, 5);
     }
 
     node->type = rule->type;
