@@ -6,6 +6,7 @@
 
 #include "ast.h"
 #include "generator.h"
+#include "parser.h"
 #include "utilities.h"
 
 enum scope
@@ -17,6 +18,29 @@ enum scope
 static FILE *assembly_filename;
 
 static void visit_expression(struct astnode *ast, enum scope scope);
+
+static int
+size_of_type(int type_specifiers)
+{
+    int size = 0;
+    if (type_specifiers | AST_INT)
+    {
+        size = 4;
+    }
+    else if (type_specifiers | AST_SHORT)
+    {
+        size = 2;
+    }
+    else if (type_specifiers | AST_CHAR)
+    {
+        size = 1;
+    }
+    else
+    {
+        assert(0);
+    }
+    return size;
+}
 
 static void
 write_assembly(char *format, ...)
@@ -148,7 +172,7 @@ visit_function_definition(struct ast_function *ast)
 {
     /* add to local symbol table */
 
-    int i;
+    int i, local_size;
     struct listnode *list;
     struct astnode *statement;
     struct ast_declarator *declarator;
@@ -181,14 +205,18 @@ visit_function_definition(struct ast_function *ast)
     }
 
     /*
-     * TODO: Reserve stack space for local variables in this function so that
-     * if this function calls another function it will not clobber this
-     * functions local variables on the stack.
+     * Reserve stack space for local variables in this function so that if this
+     * function calls another function it will not clobber this functions local
+     * variables on the stack.
      */
+    local_size = 0;
     for (i=0; compound->declarations && i<compound->declarations->size; i++)
     {
         declaration = compound->declarations->items[i];
+        local_size += (declaration->declarators_size *
+                      size_of_type(declaration->type_specifiers));
     }
+    write_assembly("  sub $%d, %%rsp", local_size);
 
     for (i=0; compound->statements && i<compound->statements->size; i++)
     {
@@ -200,6 +228,10 @@ visit_function_definition(struct ast_function *ast)
         visit_expression(statement, LOCAL);
     }
 
+    /*
+     * Return registers and stack to state before called.
+     */
+    write_assembly("  add $%d, %%rsp", local_size);
     write_assembly("  retq");
 }
 
