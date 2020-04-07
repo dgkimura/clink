@@ -19,6 +19,15 @@ static FILE *assembly_filename;
 
 static void visit_expression(struct astnode *ast, enum scope scope);
 
+static char *
+function_register(int argnum)
+{
+    char *registers[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
+    assert(argnum < 6);
+
+    return registers[argnum];
+}
+
 static int
 size_of_type(int type_specifiers)
 {
@@ -193,8 +202,11 @@ visit_function_definition(struct ast_function *ast)
     write_assembly(".text");
     write_assembly("  .global _%s", declarator->declarator_identifier);
     write_assembly("_%s:", declarator->declarator_identifier);
+    write_assembly("  push %%rbp");
     write_assembly("  movq %%rsp, %%rbp");
 
+    /* Begin at 4 as old ebp push is on the stack. */
+    local_size = 4;
     for (i=0; parameters && i<parameters->size; i++)
     {
         parameter = parameters->items[i];
@@ -202,6 +214,10 @@ visit_function_definition(struct ast_function *ast)
         /*
          * Add up the size of all parameters and push onto the stack
          */
+        write_assembly("  movl %%%s, -%d(%%rbp)",
+                function_register(i),
+                local_size);
+        local_size += size_of_type(parameter->type_specifiers);
     }
 
     /*
@@ -232,6 +248,7 @@ visit_function_definition(struct ast_function *ast)
      * Return registers and stack to state before called.
      */
     write_assembly("  add $%d, %%rsp", local_size);
+    write_assembly("  popq %%rbp");
     write_assembly("  retq");
 }
 
