@@ -1221,6 +1221,24 @@ struct rule grammar[NUM_RULES] =
         AST_POSTFIX_EXPRESSION,
         create_,
         3,
+        { AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_RPAREN }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        create_,
+        4,
+        { AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_ARGUMENT_EXPRESSION_LIST, AST_RPAREN }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        create_,
+        3,
+        { AST_POSTFIX_EXPRESSION, AST_DOT, AST_IDENTIFIER }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        create_,
+        3,
         { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER }
     },
     {
@@ -1259,6 +1277,19 @@ struct rule grammar[NUM_RULES] =
         create_primary_expression,
         3,
         { AST_LPAREN, AST_EXPRESSION, AST_RPAREN }
+    },
+    /* argument-expression-list: */
+    {
+        AST_ARGUMENT_EXPRESSION_LIST,
+        create_,
+        1,
+        { AST_ASSIGNMENT_EXPRESSION }
+    },
+    {
+        AST_ARGUMENT_EXPRESSION_LIST,
+        create_,
+        3,
+        { AST_ARGUMENT_EXPRESSION_LIST, AST_COMMA, AST_ASSIGNMENT_EXPRESSION }
     },
     /* constant: */
     {

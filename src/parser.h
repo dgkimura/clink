@@ -94,6 +94,7 @@ enum astnode_t
      * following variable values in grammar
      */
     AST_CONSTANT,
+    AST_ARGUMENT_EXPRESSION_LIST,
     AST_PRIMARY_EXPRESSION,
     AST_POSTFIX_EXPRESSION,
     AST_UNARY_EXPRESSION,
@@ -168,7 +169,7 @@ struct rule
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
-#define NUM_RULES 200
+#define NUM_RULES 205
 
 /*
  * item is a rule with a cursor position to indicate how many symbols have been

@@ -270,13 +270,13 @@ START_TEST(test_generate_items_on_postfix_expression)
     generate_items(AST_POSTFIX_EXPRESSION, NULL, &items);
 
     assert_rules_equal(
-        (struct rule) { AST_POSTFIX_EXPRESSION, create_, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
+        (struct rule) { AST_POSTFIX_EXPRESSION, create_, 3, { AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_RPAREN } },
         *((struct item *)items->data)->rewrite_rule);
 
     assert_rules_equal(
-        (struct rule) { AST_POSTFIX_EXPRESSION, create_, 3, { AST_POSTFIX_EXPRESSION, AST_ARROW, AST_IDENTIFIER } },
+        (struct rule) { AST_POSTFIX_EXPRESSION, create_, 3, { AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_RPAREN } },
         *((struct item *)items->next->data)->rewrite_rule);
-    ck_assert_int_eq(AST_ARROW, (int)((struct item *)items->next->data)->lookahead->data);
+    ck_assert_int_eq(AST_LPAREN, (int)((struct item *)items->next->data)->lookahead->data);
 }
 END_TEST
 
@@ -465,6 +465,53 @@ START_TEST(test_parser_can_parse_function)
               "{"
               "label1:"
               "    goto label1;"
+              "}";
+    scan(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
+START_TEST(test_parser_can_parse_function_calls)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    char *content;
+    list_init(&tokens);
+
+    /*
+     * function with no parameters
+     */
+    content = "char function()"
+              "{"
+              "    afunction();"
+              "}";
+    scan(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    /*
+     * function with literal arguments
+     */
+    list_init(&tokens);
+    content = "char function()"
+              "{"
+              "    bfunction(1, 2);"
+              "}";
+    scan(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    /*
+     * function with argument variables
+     */
+    list_init(&tokens);
+    content = "char function()"
+              "{"
+              "    cfunction(myargument);"
               "}";
     scan(content, strlen(content), &tokens);
 
@@ -888,6 +935,7 @@ main(void)
     tcase_add_test(testcase, test_parser_can_parse_multiple_simple_declarations);
     tcase_add_test(testcase, test_parser_can_parse_primary_expressions);
     tcase_add_test(testcase, test_parser_can_parse_function);
+    tcase_add_test(testcase, test_parser_can_parse_function_calls);
     tcase_add_test(testcase, test_parser_can_parse_function_prototype);
     tcase_add_test(testcase, test_parser_can_parse_struct);
     tcase_add_test(testcase, test_parser_can_parse_arithmatic_statements);

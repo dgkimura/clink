@@ -168,6 +168,11 @@ visit_expression(struct astnode *ast, enum scope scope)
             visit_constant(ast, LOCAL);
             break;
         }
+        case AST_POSTFIX_EXPRESSION:
+        {
+            /* TODO function call. */
+            break;
+        }
         default:
         {
             assert(0);
