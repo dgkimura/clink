@@ -44,6 +44,18 @@
  * Following structs are nodes in the abstract syntax tree.
  */
 
+struct ast_expression
+{
+    enum astnode_t type;
+    enum astnode_t elided_type;
+
+    int int_value;
+    char *identifier;
+
+    unsigned int arguments_size;
+    struct ast_expression *arguments[0];
+};
+
 struct ast_compound_statement
 {
     enum astnode_t type;
@@ -176,9 +188,6 @@ struct astnode
 
     union
     {
-        int int_value;
-        char *identifier;
-
         struct
         {
             enum astnode_t op;
@@ -252,7 +261,13 @@ struct astnode *
 create_binary_op(struct listnode *list, struct rule *rule);
 
 struct astnode *
+create_postfix_expression(struct listnode *list, struct rule *rule);
+
+struct astnode *
 create_primary_expression(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_argument_expression_list(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_constant(struct listnode *list, struct rule *rule);

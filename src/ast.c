@@ -5,7 +5,7 @@
 struct astnode *
 create_translation_unit_node(struct listnode *list, struct rule *rule)
 {
-    unsigned int i, node_size;
+    unsigned int node_size;
     struct ast_translation_unit *node;
     struct astnode *child;
 
@@ -27,7 +27,7 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
         node = list_item(&list, 3);
 
         node_size = sizeof(struct astnode) +
-            (sizeof(struct astnode *) * node->translation_unit_items_size);
+            sizeof(struct astnode *) * (node->translation_unit_items_size + 1);
         node = realloc(node, node_size);
 
         /* index 1 is AST_EXTERNAL_DECLARATION astnode */
@@ -250,7 +250,7 @@ create_compound_statement(struct listnode *list, struct rule *rule)
 struct astnode *
 create_statement_list(struct listnode *list, struct rule *rule)
 {
-    unsigned int i, node_size;
+    unsigned int node_size;
     struct ast_statement_list *node, *child;
 
 
@@ -431,7 +431,6 @@ create_init_declarator(struct listnode *list, struct rule *rule)
 struct astnode *
 create_direct_declarator(struct listnode *list, struct rule *rule)
 {
-    int i;
     struct ast_declarator *node;
     struct ast_declaration *child;
 
@@ -694,9 +693,33 @@ create_binary_op(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_postfix_expression(struct listnode *list, struct rule *rule)
+{
+    struct ast_expression *node, *child;
+
+    if (rule->length_of_nodes == 3)
+    {
+        node = list_item(&list, 5);
+    }
+    else if (rule->length_of_nodes == 4)
+    {
+        /* index 7 is AST_POSTFIX_EXPRESSION astnode */
+        /* index 3 is AST_ARGUMENT_EXPRESSION_LIST astnode */
+        child = list_item(&list, 7);
+        node = list_item(&list, 3);
+
+        node->identifier = child->identifier;
+    }
+
+    node->type = rule->type;
+    return (struct astnode *)node;
+}
+
+struct astnode *
 create_primary_expression(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
+    struct ast_expression *node;
+    struct astnode *child;
 
     if (rule->length_of_nodes == 1)
     {
@@ -715,20 +738,52 @@ create_primary_expression(struct listnode *list, struct rule *rule)
     }
 
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
+}
+
+struct astnode *
+create_argument_expression_list(struct listnode *list, struct rule *rule)
+{
+    unsigned int node_size;
+    struct ast_expression *node;
+
+    if (rule->length_of_nodes == 1)
+    {
+        node_size = sizeof(struct ast_expression) + (sizeof(struct ast_expression *));
+        node = malloc(node_size);
+        memset(node, 0, node_size);
+
+        node->arguments[0] = list_item(&list, 1);
+        node->arguments_size = 1;
+    }
+    else
+    {
+        node = list_item(&list, 5);
+
+        node_size = sizeof(struct ast_expression) +
+            (sizeof(struct ast_expression *) * node->arguments_size + 1);
+        node = realloc(node, node_size);
+
+        node->arguments[node->arguments_size] = list_item(&list, 1);
+        node->arguments_size += 1;
+    }
+
+    node->type = rule->type;
+    return (struct astnode *)node;
 }
 
 struct astnode *
 create_constant(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node, *child;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    struct ast_expression *node;
+    struct astnode *child;
+    node = malloc(sizeof(struct ast_expression));
+    memset(node, 0, sizeof(struct ast_expression));
 
     child = list_item(&list, 1);
 
     node->int_value = atoi(child->token->value);
     node->type = rule->type;
     node->elided_type = rule->nodes[0];
-    return node;
+    return (struct astnode *)node;
 }

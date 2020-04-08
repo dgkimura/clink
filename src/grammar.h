@@ -1219,13 +1219,13 @@ struct rule grammar[NUM_RULES] =
     /* postfix-expression: */
     {
         AST_POSTFIX_EXPRESSION,
-        create_,
+        create_postfix_expression,
         3,
         { AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_RPAREN }
     },
     {
         AST_POSTFIX_EXPRESSION,
-        create_,
+        create_postfix_expression,
         4,
         { AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_ARGUMENT_EXPRESSION_LIST, AST_RPAREN }
     },
@@ -1281,13 +1281,13 @@ struct rule grammar[NUM_RULES] =
     /* argument-expression-list: */
     {
         AST_ARGUMENT_EXPRESSION_LIST,
-        create_,
+        create_argument_expression_list,
         1,
         { AST_ASSIGNMENT_EXPRESSION }
     },
     {
         AST_ARGUMENT_EXPRESSION_LIST,
-        create_,
+        create_argument_expression_list,
         3,
         { AST_ARGUMENT_EXPRESSION_LIST, AST_COMMA, AST_ASSIGNMENT_EXPRESSION }
     },

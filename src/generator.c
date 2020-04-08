@@ -88,7 +88,7 @@ visit_declaration(struct ast_declaration *ast, enum scope scope)
 }
 
 static void
-visit_constant(struct astnode *ast, enum scope scope)
+visit_constant(struct ast_expression *ast, enum scope scope)
 {
     struct listnode *list;
     struct astnode *next;
@@ -153,6 +153,19 @@ visit_arithmetic_expression(struct astnode *ast, enum scope scope)
 }
 
 static void
+visit_postfix_expression(struct ast_expression *ast, enum scope scope)
+{
+    int i;
+    struct ast_expression argument;
+
+    for (i=0; i<ast->arguments_size; i++)
+    {
+        write_assembly("  mov $%d, %%%s", ast->arguments[i]->int_value,
+            function_register(i));
+    }
+}
+
+static void
 visit_expression(struct astnode *ast, enum scope scope)
 {
     switch (ast->elided_type)
@@ -165,12 +178,13 @@ visit_expression(struct astnode *ast, enum scope scope)
         }
         case AST_INTEGER_CONSTANT:
         {
-            visit_constant(ast, LOCAL);
+            visit_constant((struct ast_expression *)ast, LOCAL);
             break;
         }
+        case AST_PRIMARY_EXPRESSION:
         case AST_POSTFIX_EXPRESSION:
         {
-            /* TODO function call. */
+            visit_postfix_expression((struct ast_expression *)ast, LOCAL);
             break;
         }
         default:
