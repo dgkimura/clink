@@ -873,6 +873,20 @@ START_TEST(test_scanner_ignores_comment_contents_around_strings)
 }
 END_TEST
 
+START_TEST(test_scanner_ignores_comment_contents_that_contant_asterisks)
+{
+    char *content = "abc/*d*e*f*/ghi";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    scan(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_IDENTIFIER, ((struct token *)tokens->data)->type);
+    ck_assert_str_eq("abc", ((struct token *)tokens->data)->value);
+    ck_assert_str_eq("ghi", ((struct token *)tokens->next->data)->value);
+}
+END_TEST
+
 START_TEST(test_scanner_can_parse_reserved_words)
 {
     char *content = "int char goto  continue break  return if else switch case default enum struct union const volatile void short long float double signed unsigned";
@@ -953,6 +967,7 @@ main(void)
     tcase_add_test(testcase, test_scanner_can_parse_combination_tokens);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents);
     tcase_add_test(testcase, test_scanner_ignores_comment_contents_around_strings);
+    tcase_add_test(testcase, test_scanner_ignores_comment_contents_that_contant_asterisks);
     tcase_add_test(testcase, test_scanner_can_parse_reserved_words);
 
     srunner_run_all(runner, CK_ENV);

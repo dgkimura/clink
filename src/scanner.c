@@ -347,7 +347,7 @@ scan(char *content, size_t content_len, struct listnode **tokens)
 
                 /* skip over comment contents */
                 while (i + 1 < content_len &&
-                       content[i] != '*' && content[i+1] != '/')
+                       !(content[i] == '*' && content[i+1] == '/'))
                 {
                     i += 1;
                 }
