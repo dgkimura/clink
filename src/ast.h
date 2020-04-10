@@ -51,6 +51,7 @@ struct ast_expression
 
     int int_value;
     char *identifier;
+    int is_function;
 
     unsigned int arguments_size;
     struct ast_expression *arguments[0];

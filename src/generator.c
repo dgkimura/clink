@@ -17,7 +17,7 @@ enum scope
 
 static FILE *assembly_filename;
 
-static void visit_expression(struct astnode *ast, enum scope scope);
+static void visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters);
 
 static char *
 function_register(int argnum)
@@ -114,7 +114,7 @@ visit_constant(struct ast_expression *ast, enum scope scope)
 }
 
 static void
-visit_arithmetic_expression(struct astnode *ast, enum scope scope)
+visit_arithmetic_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
 {
     struct listnode *list;
     struct astnode *next;
@@ -122,9 +122,9 @@ visit_arithmetic_expression(struct astnode *ast, enum scope scope)
     assert(ast->elided_type == AST_ADDITIVE_EXPRESSION ||
            ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION );
 
-    visit_expression(ast->left, scope);
+    visit_expression(ast->left, parameters);
     write_assembly("  push %%rax");
-    visit_expression(ast->right, scope);
+    visit_expression(ast->right, parameters);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
@@ -153,7 +153,7 @@ visit_arithmetic_expression(struct astnode *ast, enum scope scope)
 }
 
 static void
-visit_postfix_expression(struct ast_expression *ast, enum scope scope)
+visit_function_call(struct ast_expression *ast, enum scope scope)
 {
     int i;
     struct ast_expression argument;
@@ -163,17 +163,38 @@ visit_postfix_expression(struct ast_expression *ast, enum scope scope)
         write_assembly("  mov $%d, %%%s", ast->arguments[i]->int_value,
             function_register(i));
     }
+    write_assembly("  call _%s", ast->identifier);
 }
 
 static void
-visit_expression(struct astnode *ast, enum scope scope)
+visit_identifier(struct ast_expression *ast, struct ast_parameter_type_list *parameters)
+{
+    int i, offset;
+    struct ast_declaration *parameter;
+
+    offset = 0;
+    for (i=0; i<parameters->size; i++)
+    {
+        parameter = parameters->items[i];
+        offset += size_of_type(parameters->items[i]->type_specifiers);
+
+        if (strcmp(ast->identifier, parameter->declarators[0]->declarator_identifier) == 0)
+        {
+            write_assembly("  mov -%d(%%rbp), %%rax", offset);
+            break;
+        }
+    }
+}
+
+static void
+visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
 {
     switch (ast->elided_type)
     {
         case AST_ADDITIVE_EXPRESSION:
         case AST_MULTIPLICATIVE_EXPRESSION:
         {
-            visit_arithmetic_expression(ast, LOCAL);
+            visit_arithmetic_expression(ast, parameters);
             break;
         }
         case AST_INTEGER_CONSTANT:
@@ -184,7 +205,14 @@ visit_expression(struct astnode *ast, enum scope scope)
         case AST_PRIMARY_EXPRESSION:
         case AST_POSTFIX_EXPRESSION:
         {
-            visit_postfix_expression((struct ast_expression *)ast, LOCAL);
+            if (((struct ast_expression *)ast)->is_function)
+            {
+                visit_function_call((struct ast_expression *)ast, LOCAL);
+            }
+            else
+            {
+                visit_identifier((struct ast_expression *)ast, parameters);
+            }
             break;
         }
         default:
@@ -244,7 +272,7 @@ visit_function_definition(struct ast_function *ast)
      * function calls another function it will not clobber this functions local
      * variables on the stack.
      */
-    local_size = 0;
+    local_size -= 4;
     for (i=0; compound->declarations && i<compound->declarations->size; i++)
     {
         declaration = compound->declarations->items[i];
@@ -260,7 +288,7 @@ visit_function_definition(struct ast_function *ast)
         /*
          * Iterate over the statements
          */
-        visit_expression(statement, LOCAL);
+        visit_expression(statement, parameters);
     }
 
     /*

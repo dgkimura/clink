@@ -700,6 +700,7 @@ create_postfix_expression(struct listnode *list, struct rule *rule)
     if (rule->length_of_nodes == 3)
     {
         node = list_item(&list, 5);
+        node->is_function = 1;
     }
     else if (rule->length_of_nodes == 4)
     {
@@ -709,6 +710,7 @@ create_postfix_expression(struct listnode *list, struct rule *rule)
         node = list_item(&list, 3);
 
         node->identifier = child->identifier;
+        node->is_function = 1;
     }
 
     node->type = rule->type;
