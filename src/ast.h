@@ -51,7 +51,14 @@ struct ast_expression
 
     int int_value;
     char *identifier;
-    int is_function;
+
+    enum kind
+    {
+        INT_VALUE,
+        IDENTIFIER_VALUE,
+        FUNCTION_VALUE,
+        STRING_VALUE
+    } kind;
 
     unsigned int arguments_size;
     struct ast_expression *arguments[0];

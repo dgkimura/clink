@@ -10,6 +10,7 @@ enum astnode_t
      */
     AST_CHARACTER_CONSTANT,
     AST_INTEGER_CONSTANT,
+    AST_STRING_CONSTANT,
     AST_IDENTIFIER,
     AST_ARROW,
     AST_PLUS,
@@ -169,7 +170,7 @@ struct rule
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
-#define NUM_RULES 205
+#define NUM_RULES 206
 
 /*
  * item is a rule with a cursor position to indicate how many symbols have been

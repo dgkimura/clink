@@ -1275,6 +1275,12 @@ struct rule grammar[NUM_RULES] =
     {
         AST_PRIMARY_EXPRESSION,
         create_primary_expression,
+        1,
+        { AST_STRING_CONSTANT }
+    },
+    {
+        AST_PRIMARY_EXPRESSION,
+        create_primary_expression,
         3,
         { AST_LPAREN, AST_EXPRESSION, AST_RPAREN }
     },

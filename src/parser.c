@@ -561,6 +561,12 @@ token_to_astnode(struct token *token)
         node->type = AST_INTEGER_CONSTANT;
         node->token = token;
     }
+    if (token->type == TOK_STRING)
+    {
+        node = malloc(sizeof(struct astnode));
+        node->type = AST_STRING_CONSTANT;
+        node->token = token;
+    }
     else if (token->type == TOK_IDENTIFIER)
     {
         node = malloc(sizeof(struct astnode));

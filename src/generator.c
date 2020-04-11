@@ -20,9 +20,18 @@ static FILE *assembly_filename;
 static void visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters);
 
 static char *
-function_register(int argnum)
+get_32bit_register(int argnum)
 {
     char *registers[] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
+    assert(argnum < 6);
+
+    return registers[argnum];
+}
+
+static char *
+get_64bit_register(int argnum)
+{
+    char *registers[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
     assert(argnum < 6);
 
     return registers[argnum];
@@ -49,6 +58,24 @@ size_of_type(int type_specifiers)
         assert(0);
     }
     return size;
+}
+
+static int cursor = 0;
+static char string_literal_buffer[512];
+
+static char *
+create_string_literal(char *string)
+{
+    static int i = 0;
+    char *label;
+
+    label = malloc(sizeof(char) * 16);
+    snprintf(label, 16, "L.str.%d", i);
+    cursor += snprintf(string_literal_buffer, 512 - cursor, "%s:\n", label);
+    cursor += snprintf(string_literal_buffer + cursor, 512 - cursor, "  .asciz \"%s\"", string);
+
+    i += 1;
+    return label;
 }
 
 static void
@@ -160,8 +187,17 @@ visit_function_call(struct ast_expression *ast, enum scope scope)
 
     for (i=0; i<ast->arguments_size; i++)
     {
-        write_assembly("  mov $%d, %%%s", ast->arguments[i]->int_value,
-            function_register(i));
+        if (ast->arguments[i]->kind == INT_VALUE)
+        {
+            write_assembly("  mov $%d, %%%s", ast->arguments[i]->int_value,
+                get_32bit_register(i));
+        }
+        else if (ast->arguments[i]->kind == STRING_VALUE)
+        {
+            write_assembly("  leaq %s(%%rip), %%%s",
+                create_string_literal(ast->arguments[i]->identifier),
+                get_64bit_register(i));
+        }
     }
     write_assembly("  call _%s", ast->identifier);
 }
@@ -205,7 +241,7 @@ visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters
         case AST_PRIMARY_EXPRESSION:
         case AST_POSTFIX_EXPRESSION:
         {
-            if (((struct ast_expression *)ast)->is_function)
+            if (((struct ast_expression *)ast)->kind == FUNCTION_VALUE)
             {
                 visit_function_call((struct ast_expression *)ast, LOCAL);
             }
@@ -262,7 +298,7 @@ visit_function_definition(struct ast_function *ast)
          * Add up the size of all parameters and push onto the stack
          */
         write_assembly("  movl %%%s, -%d(%%rbp)",
-                function_register(i),
+                get_32bit_register(i),
                 local_size);
         local_size += size_of_type(parameter->type_specifiers);
     }
@@ -339,4 +375,6 @@ generate(struct astnode *ast, char *outfile)
 {
     assembly_filename = fopen(outfile, "w");
     visit_translation_unit((struct ast_translation_unit *)ast);
+
+    write_assembly(string_literal_buffer);
 }

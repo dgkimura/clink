@@ -731,7 +731,7 @@ create_postfix_expression(struct listnode *list, struct rule *rule)
     if (rule->length_of_nodes == 3)
     {
         node = list_item(&list, 5);
-        node->is_function = 1;
+        node->kind = FUNCTION_VALUE;
     }
     else if (rule->length_of_nodes == 4)
     {
@@ -741,7 +741,7 @@ create_postfix_expression(struct listnode *list, struct rule *rule)
         node = list_item(&list, 3);
 
         node->identifier = child->identifier;
-        node->is_function = 1;
+        node->kind = FUNCTION_VALUE;
     }
 
     node->type = rule->type;
@@ -754,18 +754,25 @@ create_primary_expression(struct listnode *list, struct rule *rule)
     struct ast_expression *node;
     struct astnode *child;
 
-    if (rule->length_of_nodes == 1)
+    if (is_rule(rule, AST_IDENTIFIER))
     {
         node = malloc(sizeof(struct astnode));
         memset(node, 0, sizeof(struct astnode));
 
         child = list_item(&list, 1);
-        if (child->type == AST_IDENTIFIER)
-        {
-            node->identifier = child->token->value;
-        }
+        node->identifier = child->token->value;
+        node->kind = IDENTIFIER_VALUE;
     }
-    else
+    else if (is_rule(rule, AST_STRING_CONSTANT))
+    {
+        node = malloc(sizeof(struct astnode));
+        memset(node, 0, sizeof(struct astnode));
+
+        child = list_item(&list, 1);
+        node->identifier = child->token->value;
+        node->kind = STRING_VALUE;
+    }
+    else if (is_rule(rule, AST_LPAREN, AST_EXPRESSION, AST_RPAREN))
     {
         node = list_item(&list, 3);
     }
