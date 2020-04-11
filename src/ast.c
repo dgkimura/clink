@@ -1,6 +1,26 @@
+#include <stdarg.h>
 #include <stdlib.h>
 
 #include "ast.h"
+
+static int
+is_rule(struct rule *rule, ...)
+{
+    int i, is_rule = 1;
+    va_list list;
+    va_start(list, rule);
+
+    for (i=0; i<rule->length_of_nodes; i++)
+    {
+        enum astnode_t node = va_arg(list, enum astnode_t);
+        if (rule->nodes[i] != node)
+        {
+            is_rule = 0;
+            break;
+        }
+    }
+    return is_rule;
+}
 
 struct astnode *
 create_translation_unit_node(struct listnode *list, struct rule *rule)
@@ -9,7 +29,7 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
     struct ast_translation_unit *node;
     struct astnode *child;
 
-    if (rule->length_of_nodes == 1)
+    if (is_rule(rule, AST_EXTERNAL_DECLARATION))
     {
         node_size = sizeof(struct astnode) + (sizeof(struct astnode *));
         node = malloc(node_size);
@@ -20,7 +40,7 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
         node->translation_unit_items[0] = list_item(&list, 1);
         node->translation_unit_items_size = 1;
     }
-    else if (rule->length_of_nodes == 2)
+    if (is_rule(rule, AST_TRANSLATION_UNIT, AST_EXTERNAL_DECLARATION))
     {
         /* index 3 is AST_TRANSLATION_UNIT astnode */
         /* index 2 is AST_TRANSLATION_UNIT state */
@@ -72,8 +92,8 @@ create_function_definition(struct listnode *list, struct rule *rule)
     node = malloc(sizeof(struct ast_function));
     memset(node, 0, sizeof(struct ast_function));
 
-    if (rule->length_of_nodes == 3 &&
-        ((struct astnode*)list_item(&list, 5))->type == AST_DECLARATION_SPECIFIERS)
+    if (is_rule(rule,
+        AST_DECLARATION_SPECIFIERS, AST_DECLARATOR, AST_COMPOUND_STATEMENT))
     {
         /* index 5 is AST_DECLARATION_SPECIFIERS astnode */
         /* index 3 is AST_DECLARATOR state */
@@ -91,13 +111,14 @@ create_declaration(struct listnode *list, struct rule *rule)
 {
     struct ast_declaration *node, *child;
 
-    if (rule->length_of_nodes == 2)
+    if (is_rule(rule, AST_DECLARATION_SPECIFIERS, AST_SEMICOLON))
     {
         /* index 3 is AST_DECLARATION_SPECIFIERS astnode */
         /* index 1 is AST_SEMICOLON state */
         node = list_item(&list, 3);
     }
-    else if (rule->length_of_nodes == 3)
+    else if (is_rule(rule,
+             AST_DECLARATION_SPECIFIERS, AST_INIT_DECLARATOR_LIST, AST_SEMICOLON))
     {
         /* index 5 is AST_DECLARATION_SPECIFIERS astnode */
         /* index 3 is AST_INIT_DECLARATOR_LIST state */
@@ -120,7 +141,7 @@ create_declaration_list(struct listnode *list, struct rule *rule)
     struct ast_declaration_list *node;
     struct ast_declaration *child;
 
-    if (rule->length_of_nodes == 2)
+    if (is_rule(rule, AST_DECLARATION_LIST, AST_DECLARATION))
     {
         /* index 3 is AST_DECLARATION_LIST astnode */
         /* index 1 is AST_DECLARATION astnode */
@@ -134,7 +155,7 @@ create_declaration_list(struct listnode *list, struct rule *rule)
         node->items[node->size] = child;
         node->size += 1;
     }
-    else if (rule->length_of_nodes == 1)
+    else if (is_rule(rule, AST_DECLARATION))
     {
         /* index 1 is AST_DECLARATION astnode */
         node_size = sizeof(struct astnode) + sizeof(struct astnode *);
@@ -155,7 +176,7 @@ create_parameter_list(struct listnode *list, struct rule *rule)
     struct ast_parameter_type_list *node;
     struct ast_declaration *child;
 
-    if (rule->length_of_nodes == 3)
+    if (is_rule(rule, AST_PARAMETER_LIST, AST_COMMA, AST_PARAMETER_DECLARATION))
     {
         /* index 5 is AST_PARAMETER_LIST astnode */
         /* index 1 is AST_PARAMETER_DECLARATION astnode */
@@ -169,7 +190,7 @@ create_parameter_list(struct listnode *list, struct rule *rule)
         node->items[node->size] = child;
         node->size += 1;
     }
-    else if (rule->length_of_nodes == 1)
+    else if (is_rule(rule, AST_PARAMETER_DECLARATION))
     {
         /* index 1 is AST_PARAMETER_DECLARATION astnode */
         child = list_item(&list, 1);
@@ -191,7 +212,7 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
     struct ast_declaration *node;
     struct ast_declarator *child;
 
-    if (rule->length_of_nodes == 1)
+    if (is_rule(rule, AST_DECLARATION_SPECIFIERS))
     {
         /* index 1 is AST_DECLARATION_SPECIFIERS astnode */
         node = list_item(&list, 1);
@@ -219,9 +240,12 @@ create_expression_statement(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;
 
-    node = list_item(&list, 3);
-    node->type = rule->type;
+    if (is_rule(rule, AST_EXPRESSION, AST_SEMICOLON))
+    {
+        node = list_item(&list, 3);
+    }
 
+    node->type = rule->type;
     return node;
 }
 
@@ -233,11 +257,12 @@ create_compound_statement(struct listnode *list, struct rule *rule)
     node = malloc(sizeof(struct ast_compound_statement));
     memset(node, 0, sizeof(struct ast_compound_statement));
 
-    if (rule->length_of_nodes == 3)
+    if (is_rule(rule, AST_LBRACE, AST_STATEMENT_LIST, AST_RBRACE))
     {
         node->statements = list_item(&list, 3);
     }
-    else if (rule->length_of_nodes == 4)
+    else if (is_rule(rule,
+             AST_LBRACE, AST_DECLARATION_LIST, AST_STATEMENT_LIST, AST_RBRACE))
     {
         node->statements = list_item(&list, 3);
         node->declarations = list_item(&list, 5);
@@ -254,7 +279,7 @@ create_statement_list(struct listnode *list, struct rule *rule)
     struct ast_statement_list *node, *child;
 
 
-    if (rule->length_of_nodes == 1)
+    if (is_rule(rule, AST_STATEMENT))
     {
         node_size = sizeof(struct ast_statement_list) + (sizeof(struct astnode *));
         node = malloc(node_size);
@@ -264,7 +289,7 @@ create_statement_list(struct listnode *list, struct rule *rule)
         node->items[0] = list_item(&list, 1);
         node->size = 1;
     }
-    else if (rule->length_of_nodes == 2)
+    else if (is_rule(rule, AST_STATEMENT_LIST, AST_STATEMENT))
     {
         /* index 3 is AST_STATEMENT_LIST astnode */
         /* index 1 is AST_STATEMENT astnode */
@@ -287,7 +312,10 @@ create_jump_statement(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;
 
-    node = list_item(&list, 3);
+    if (is_rule(rule, AST_RETURN, AST_EXPRESSION, AST_SEMICOLON))
+    {
+        node = list_item(&list, 3);
+    }
 
     node->type = rule->type;
     return node;
@@ -376,7 +404,7 @@ create_init_declarator_list(struct listnode *list, struct rule *rule)
 
     assert(rule->length_of_nodes == 1 || rule->length_of_nodes == 3);
 
-    if (rule->length_of_nodes == 1)
+    if (is_rule(rule, AST_INIT_DECLARATOR))
     {
         /* index 1 is AST_INIT_DECLARATOR astnode */
         init_declarator = list_item(&list, 1);
@@ -389,7 +417,7 @@ create_init_declarator_list(struct listnode *list, struct rule *rule)
         node->declarators_size = 1;
         node->declarators[0] = init_declarator;
     }
-    else if (rule->length_of_nodes == 3)
+    else if (is_rule(rule, AST_INIT_DECLARATOR_LIST, AST_COMMA, AST_INIT_DECLARATOR))
     {
         /* index 5 is AST_INIT_DECLARATOR_LIST astnode */
         /* index 3 is AST_COMMA astnode */
@@ -420,11 +448,14 @@ create_init_declarator(struct listnode *list, struct rule *rule)
     struct astnode *node;
     assert(rule->length_of_nodes == 3);
 
-    /* index 5 is AST_DECLARATOR astnode */
-    /* index 3 is AST_EQUAL astnode */
-    /* index 1 is AST_INITIALIZER astnode */
 
-    node = list_item(&list, 5);
+    if (is_rule(rule, AST_DECLARATOR, AST_EQUAL, AST_INITIALIZER))
+    {
+        /* index 5 is AST_DECLARATOR astnode */
+        /* index 3 is AST_EQUAL astnode */
+        /* index 1 is AST_INITIALIZER astnode */
+        node = list_item(&list, 5);
+    }
     return node;
 }
 
@@ -434,7 +465,7 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
     struct ast_declarator *node;
     struct ast_declaration *child;
 
-    if (rule->length_of_nodes == 1)
+    if (is_rule(rule, AST_IDENTIFIER))
     {
         /* index 1 is AST_IDENTIFIER astnode */
         child = list_item(&list, 1);
