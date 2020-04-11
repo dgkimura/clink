@@ -741,6 +741,19 @@ START_TEST(test_scanner_can_parse_string_token)
 }
 END_TEST
 
+START_TEST(test_scanner_can_parse_literal_string_token)
+{
+    char *content = "\"abcd\"";
+    struct listnode *tokens;
+    list_init(&tokens);
+
+    scan(content, strlen(content), &tokens);
+
+    ck_assert_int_eq(TOK_STRING, ((struct token *)tokens->data)->type);
+    ck_assert_str_eq("abcd", ((struct token *)tokens->data)->value);
+}
+END_TEST
+
 START_TEST(test_scanner_can_parse_string_token_with_integers)
 {
     char *content = "abc123";
@@ -795,7 +808,7 @@ END_TEST
 
 START_TEST(test_scanner_can_parse_special_characters)
 {
-    char *content = ";=+*&'\"/%<>^|?:.";
+    char *content = ";=+*&'/%<>^|?:.";
     struct listnode *tokens;
     list_init(&tokens);
 
@@ -807,16 +820,15 @@ START_TEST(test_scanner_can_parse_special_characters)
     ck_assert_int_eq(TOK_ASTERISK, ((struct token *)tokens->next->next->next->data)->type);
     ck_assert_int_eq(TOK_AMPERSAND, ((struct token *)tokens->next->next->next->next->data)->type);
     ck_assert_int_eq(TOK_SINGLEQUOTE, ((struct token *)tokens->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_DOUBLEQUOTE, ((struct token *)tokens->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_BACKSLASH, ((struct token *)tokens->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_MOD, ((struct token *)tokens->next->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_LESSTHAN, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_GREATERTHAN, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_CARET, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_VERTICALBAR, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_QUESTIONMARK, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_COLON, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
-    ck_assert_int_eq(TOK_DOT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_BACKSLASH, ((struct token *)tokens->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_MOD, ((struct token *)tokens->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_LESSTHAN, ((struct token *)tokens->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_GREATERTHAN, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_CARET, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_VERTICALBAR, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_QUESTIONMARK, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_COLON, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
+    ck_assert_int_eq(TOK_DOT, ((struct token *)tokens->next->next->next->next->next->next->next->next->next->next->next->next->next->next->data)->type);
 }
 END_TEST
 
@@ -959,6 +971,7 @@ main(void)
     tcase_add_test(testcase, test_list_item);
     tcase_add_test(testcase, test_scanner_can_parse_integer_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token);
+    tcase_add_test(testcase, test_scanner_can_parse_literal_string_token);
     tcase_add_test(testcase, test_scanner_can_parse_string_token_with_integers);
     tcase_add_test(testcase, test_scanner_can_parse_paren);
     tcase_add_test(testcase, test_scanner_can_parse_two_braces);

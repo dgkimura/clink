@@ -321,10 +321,27 @@ scan(char *content, size_t content_len, struct listnode **tokens)
         }
         else if (content[i] == '"')
         {
+            /* consume first " */
             i += 1;
+            tok_start = i;
 
             tok = (struct token *)malloc(sizeof(struct token));
-            tok->type = TOK_DOUBLEQUOTE;
+
+            /* consume characters */
+            while (i < content_len && content[i] != '"')
+            {
+                i += 1;
+            }
+            tok_end = i;
+
+            /* consume next " */
+            i += 1;
+
+            tok_size = tok_end - tok_start;
+            tok->value = malloc(sizeof(char) * tok_size);
+            strncpy(tok->value, &content[tok_start], tok_size);
+
+            tok->type = TOK_STRING;
 
             list_append(tokens, tok);
         }
