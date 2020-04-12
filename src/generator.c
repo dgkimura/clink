@@ -60,6 +60,12 @@ size_of_type(int type_specifiers)
     return size;
 }
 
+static int
+align16(int size)
+{
+    return size + ((size % 16 == 0) ?  0 : 16 - (size % 16));
+}
+
 static int cursor = 0;
 static char string_literal_buffer[512];
 
@@ -307,15 +313,17 @@ visit_function_definition(struct ast_function *ast)
      * Reserve stack space for local variables in this function so that if this
      * function calls another function it will not clobber this functions local
      * variables on the stack.
+     *
+     * NOTE: System-V AMD64 ABI mandates in section 3.2.2 that the stack frame
+     * must be 16 bytes aligned.
      */
-    local_size -= 4;
     for (i=0; compound->declarations && i<compound->declarations->size; i++)
     {
         declaration = compound->declarations->items[i];
         local_size += (declaration->declarators_size *
                       size_of_type(declaration->type_specifiers));
     }
-    write_assembly("  sub $%d, %%rsp", local_size);
+    write_assembly("  subq $%d, %%rsp", align16(local_size));
 
     for (i=0; compound->statements && i<compound->statements->size; i++)
     {
@@ -330,7 +338,7 @@ visit_function_definition(struct ast_function *ast)
     /*
      * Return registers and stack to state before called.
      */
-    write_assembly("  add $%d, %%rsp", local_size);
+    write_assembly("  addq $%d, %%rsp", align16(local_size));
     write_assembly("  popq %%rbp");
     write_assembly("  retq");
 }
