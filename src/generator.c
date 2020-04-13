@@ -73,12 +73,25 @@ static char *
 create_string_literal(char *string)
 {
     static int i = 0;
+    int j;
     char *label;
 
     label = malloc(sizeof(char) * 16);
     snprintf(label, 16, "L.str.%d", i);
     cursor += snprintf(string_literal_buffer, 512 - cursor, "%s:\n", label);
-    cursor += snprintf(string_literal_buffer + cursor, 512 - cursor, "  .asciz \"%s\"", string);
+    strcpy(string_literal_buffer + cursor, "  .asciz ");
+    cursor += strlen("  .asciz ");
+
+    string_literal_buffer[cursor++] = '"';
+    for (j=0; j<strlen(string); j++)
+    {
+        string_literal_buffer[cursor++] = string[j];
+        if (string[j] == '%')
+        {
+            string_literal_buffer[cursor++] = '%';
+        }
+    }
+    string_literal_buffer[cursor++] = '"';
 
     i += 1;
     return label;
