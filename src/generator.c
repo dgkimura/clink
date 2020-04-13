@@ -201,7 +201,7 @@ visit_arithmetic_expression(struct astnode *ast, struct ast_parameter_type_list 
 static void
 visit_function_call(struct ast_expression *ast, enum scope scope)
 {
-    int i;
+    int i, j;
     struct ast_expression argument;
 
     for (i=0; i<ast->arguments_size; i++)
@@ -216,6 +216,27 @@ visit_function_call(struct ast_expression *ast, enum scope scope)
             write_assembly("  leaq %s(%%rip), %%%s",
                 create_string_literal(ast->arguments[i]->identifier),
                 get_64bit_register(i));
+        }
+        else if (ast->arguments[i]->kind == FUNCTION_VALUE)
+        {
+            /*
+             * Save registers that have updated. Since we are about to perform
+             * another function call we may need the registers.
+             */
+            for (j=0; j<i; j++)
+            {
+                write_assembly("  push %%%s", get_64bit_register(j));
+            }
+            visit_function_call(ast->arguments[i], LOCAL);
+            write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
+
+            /*
+             * Re-apply registers.
+             */
+            for (j=0; j<i; j++)
+            {
+                write_assembly("  pop %%%s", get_64bit_register(j));
+            }
         }
     }
     write_assembly("  call _%s", ast->identifier);
