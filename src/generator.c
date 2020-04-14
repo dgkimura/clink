@@ -228,15 +228,17 @@ visit_function_call(struct ast_expression *ast, enum scope scope)
                 write_assembly("  push %%%s", get_64bit_register(j));
             }
             visit_function_call(ast->arguments[i], LOCAL);
-            write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
 
             /*
-             * Re-apply registers.
+             * Re-apply registers. Since registers are stored on the stack they
+             * need to be pop'd in the opposite order that they were push'd.
              */
-            for (j=0; j<i; j++)
+            for (j=i-1; j>=0; j--)
             {
                 write_assembly("  pop %%%s", get_64bit_register(j));
             }
+
+            write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
         }
     }
     write_assembly("  call _%s", ast->identifier);
