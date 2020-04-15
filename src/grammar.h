@@ -714,7 +714,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_STATEMENT,
-        create_,
+        create_elided_node,
         1,
         { AST_SELECTION_STATEMENT }
     },
@@ -803,13 +803,13 @@ struct rule grammar[NUM_RULES] =
     /* selection-statement: */
     {
         AST_SELECTION_STATEMENT,
-        create_,
+        create_selection_statement,
         5,
         { AST_IF, AST_LPAREN, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT }
     },
     {
         AST_SELECTION_STATEMENT,
-        create_,
+        create_selection_statement,
         7,
         { AST_IF, AST_LPAREN, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT, AST_ELSE, AST_STATEMENT }
     },
@@ -1056,13 +1056,13 @@ struct rule grammar[NUM_RULES] =
     /* equality-expression: */
     {
         AST_EQUALITY_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_EQUALITY_EXPRESSION, AST_EQ, AST_RELATIONAL_EXPRESSION }
     },
     {
         AST_EQUALITY_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_EQUALITY_EXPRESSION, AST_NEQ, AST_RELATIONAL_EXPRESSION }
     },
@@ -1075,25 +1075,25 @@ struct rule grammar[NUM_RULES] =
     /* relational-expression: */
     {
         AST_RELATIONAL_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_RELATIONAL_EXPRESSION, AST_LT, AST_SHIFT_EXPRESSION }
     },
     {
         AST_RELATIONAL_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_RELATIONAL_EXPRESSION, AST_GT, AST_SHIFT_EXPRESSION }
     },
     {
         AST_RELATIONAL_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_RELATIONAL_EXPRESSION, AST_LTEQ, AST_SHIFT_EXPRESSION }
     },
     {
         AST_RELATIONAL_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_RELATIONAL_EXPRESSION, AST_GTEQ, AST_SHIFT_EXPRESSION }
     },

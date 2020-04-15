@@ -265,6 +265,12 @@ visit_identifier(struct ast_expression *ast, struct ast_parameter_type_list *par
 }
 
 static void
+visit_selection_statement(struct ast_selection_statement *ast, enum scope scope)
+{
+    /* TODO: generate appropriate assembly */
+}
+
+static void
 visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
 {
     switch (ast->elided_type)
@@ -291,6 +297,11 @@ visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters
             {
                 visit_identifier((struct ast_expression *)ast, parameters);
             }
+            break;
+        }
+        case AST_SELECTION_STATEMENT:
+        {
+            visit_selection_statement((struct ast_selection_statement *)ast, LOCAL);
             break;
         }
         default:
