@@ -136,9 +136,6 @@ visit_declaration(struct ast_declaration *ast, enum scope scope)
 static void
 visit_constant(struct ast_expression *ast, enum scope scope)
 {
-    struct listnode *list;
-    struct astnode *next;
-
     switch (ast->elided_type)
     {
             case AST_INTEGER_CONSTANT:
@@ -162,9 +159,6 @@ visit_constant(struct ast_expression *ast, enum scope scope)
 static void
 visit_arithmetic_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
 {
-    struct listnode *list;
-    struct astnode *next;
-
     assert(ast->elided_type == AST_ADDITIVE_EXPRESSION ||
            ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION );
 
@@ -265,14 +259,63 @@ visit_identifier(struct ast_expression *ast, struct ast_parameter_type_list *par
 }
 
 static void
-visit_selection_statement(struct ast_selection_statement *ast, enum scope scope)
+visit_selection_statement(struct ast_selection_statement *ast,
+                          struct ast_parameter_type_list *parameters)
 {
-    /* TODO: generate appropriate assembly */
+    /*
+     * Use 'i' to generate and keep track of a unique label
+     */
+    static int i = 0;
+
+    visit_expression(ast->expression, parameters);
+
+    switch (ast->expression->op)
+    {
+        case AST_EQ:
+        {
+            write_assembly("  jne L_%d", i);
+            break;
+        }
+        default:
+        {
+            assert(0);
+            break;
+        }
+    }
+
+    visit_expression(ast->statement1, parameters);
+    write_assembly("L_%d:", i++);
+}
+
+static void
+visit_equality_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
+{
+    visit_expression(ast->left, parameters);
+    write_assembly("  push %%rax");
+    visit_expression(ast->right, parameters);
+    write_assembly("  mov %%rax, %%rcx");
+    write_assembly("  pop %%rax");
+
+    write_assembly("  cmpl %%ecx, %%eax");
+    switch (ast->op)
+    {
+        case AST_EQ:
+        {
+            write_assembly("  sub %%rcx, %%rax");
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
 }
 
 static void
 visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
 {
+    int i;
+
     switch (ast->elided_type)
     {
         case AST_ADDITIVE_EXPRESSION:
@@ -301,7 +344,23 @@ visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters
         }
         case AST_SELECTION_STATEMENT:
         {
-            visit_selection_statement((struct ast_selection_statement *)ast, LOCAL);
+            struct ast_selection_statement *statement = (struct ast_selection_statement *)ast;
+            visit_selection_statement(statement, parameters);
+            break;
+        }
+        case AST_EQUALITY_EXPRESSION:
+        {
+            visit_equality_expression(ast, parameters);
+            break;
+        }
+        case AST_COMPOUND_STATEMENT:
+        {
+            struct ast_compound_statement *compound = (struct ast_compound_statement *)ast;
+
+            for (i=0; i<compound->statements->size; i++)
+            {
+                visit_expression(compound->statements->items[i], parameters);
+            }
             break;
         }
         default:

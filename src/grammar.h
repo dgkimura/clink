@@ -708,7 +708,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_STATEMENT,
-        create_,
+        create_elided_node,
         1,
         { AST_COMPOUND_STATEMENT }
     },
