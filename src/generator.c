@@ -66,6 +66,10 @@ align16(int size)
     return size + ((size % 16 == 0) ?  0 : 16 - (size % 16));
 }
 
+/*
+ * cursor and string_literal_buffer are used as a buffer to store that will
+ * later be appended to the end of the assembly file.
+ */
 static int cursor = 0;
 static char string_literal_buffer[512];
 
@@ -78,7 +82,7 @@ create_string_literal(char *string)
 
     label = malloc(sizeof(char) * 16);
     snprintf(label, 16, "L.str.%d", i);
-    cursor += snprintf(string_literal_buffer, 512 - cursor, "%s:\n", label);
+    cursor += snprintf(string_literal_buffer + cursor, 512 - cursor, "%s:\n", label);
     strcpy(string_literal_buffer + cursor, "  .asciz ");
     cursor += strlen("  .asciz ");
 
@@ -92,6 +96,7 @@ create_string_literal(char *string)
         }
     }
     string_literal_buffer[cursor++] = '"';
+    string_literal_buffer[cursor++] = '\n';
 
     i += 1;
     return label;
