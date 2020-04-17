@@ -288,7 +288,22 @@ visit_selection_statement(struct ast_selection_statement *ast,
         }
     }
 
+    /*
+     * if block statements
+     */
     visit_expression(ast->statement1, parameters);
+    write_assembly("  jmp L_%d", i+1);
+
+    write_assembly("L_%d:", i++);
+
+    if (ast->statement2)
+    {
+        /*
+         * else block statements
+         */
+        visit_expression(ast->statement2, parameters);
+    }
+
     write_assembly("L_%d:", i++);
 }
 
