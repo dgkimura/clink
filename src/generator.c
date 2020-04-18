@@ -17,7 +17,9 @@ enum scope
 
 static FILE *assembly_filename;
 
-static void visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters);
+static void visit_expression(struct astnode *ast,
+                             struct ast_parameter_type_list *parameters,
+                             struct ast_declaration_list *declarations);
 
 static char *
 get_32bit_register(int argnum)
@@ -162,14 +164,16 @@ visit_constant(struct ast_expression *ast, enum scope scope)
 }
 
 static void
-visit_arithmetic_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
+visit_arithmetic_expression(struct astnode *ast,
+                            struct ast_parameter_type_list *parameters,
+                            struct ast_declaration_list *declarations)
 {
     assert(ast->elided_type == AST_ADDITIVE_EXPRESSION ||
            ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION );
 
-    visit_expression(ast->left, parameters);
+    visit_expression(ast->left, parameters, declarations);
     write_assembly("  push %%rax");
-    visit_expression(ast->right, parameters);
+    visit_expression(ast->right, parameters, declarations);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
@@ -244,35 +248,49 @@ visit_function_call(struct ast_expression *ast, enum scope scope)
 }
 
 static void
-visit_identifier(struct ast_expression *ast, struct ast_parameter_type_list *parameters)
+visit_identifier(struct ast_expression *ast,
+                 struct ast_parameter_type_list *parameters,
+                 struct ast_declaration_list *declarations)
 {
     int i, offset;
-    struct ast_declaration *parameter;
+    struct ast_declaration *parameter, *declaration;
 
-    offset = 0;
-    for (i=0; i<parameters->size; i++)
+    for (i=0; parameters && i<parameters->size; i++)
     {
         parameter = parameters->items[i];
-        offset += size_of_type(parameters->items[i]->type_specifiers);
 
         if (strcmp(ast->identifier, parameter->declarators[0]->declarator_identifier) == 0)
         {
+            write_assembly("  movl %%%s, %%eax", get_32bit_register(i));
+            return;
+        }
+    }
+
+    offset = 0;
+    for (i=0; i<declarations->size; i++)
+    {
+        declaration = declarations->items[i];
+        offset += size_of_type(declaration->type_specifiers);
+
+        if (strcmp(ast->identifier, declaration->declarators[0]->declarator_identifier) == 0)
+        {
             write_assembly("  mov -%d(%%rbp), %%rax", offset);
-            break;
+            return;
         }
     }
 }
 
 static void
 visit_selection_statement(struct ast_selection_statement *ast,
-                          struct ast_parameter_type_list *parameters)
+                            struct ast_parameter_type_list *parameters,
+                            struct ast_declaration_list *declarations)
 {
     /*
      * Use 'i' to generate and keep track of a unique label
      */
     static int i = 0;
 
-    visit_expression(ast->expression, parameters);
+    visit_expression(ast->expression, parameters, declarations);
 
     switch (ast->expression->op)
     {
@@ -291,7 +309,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
     /*
      * if block statements
      */
-    visit_expression(ast->statement1, parameters);
+    visit_expression(ast->statement1, parameters, declarations);
     write_assembly("  jmp L_%d", i+1);
 
     write_assembly("L_%d:", i++);
@@ -301,18 +319,20 @@ visit_selection_statement(struct ast_selection_statement *ast,
         /*
          * else block statements
          */
-        visit_expression(ast->statement2, parameters);
+        visit_expression(ast->statement2, parameters, declarations);
     }
 
     write_assembly("L_%d:", i++);
 }
 
 static void
-visit_equality_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
+visit_equality_expression(struct astnode *ast,
+                          struct ast_parameter_type_list *parameters,
+                          struct ast_declaration_list *declarations)
 {
-    visit_expression(ast->left, parameters);
+    visit_expression(ast->left, parameters, declarations);
     write_assembly("  push %%rax");
-    visit_expression(ast->right, parameters);
+    visit_expression(ast->right, parameters, declarations);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
@@ -332,7 +352,9 @@ visit_equality_expression(struct astnode *ast, struct ast_parameter_type_list *p
 }
 
 static void
-visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters)
+visit_expression(struct astnode *ast,
+                 struct ast_parameter_type_list *parameters,
+                 struct ast_declaration_list *declarations)
 {
     int i;
 
@@ -341,7 +363,7 @@ visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters
         case AST_ADDITIVE_EXPRESSION:
         case AST_MULTIPLICATIVE_EXPRESSION:
         {
-            visit_arithmetic_expression(ast, parameters);
+            visit_arithmetic_expression(ast, parameters, declarations);
             break;
         }
         case AST_INTEGER_CONSTANT:
@@ -358,19 +380,19 @@ visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters
             }
             else
             {
-                visit_identifier((struct ast_expression *)ast, parameters);
+                visit_identifier((struct ast_expression *)ast, parameters, declarations);
             }
             break;
         }
         case AST_SELECTION_STATEMENT:
         {
             struct ast_selection_statement *statement = (struct ast_selection_statement *)ast;
-            visit_selection_statement(statement, parameters);
+            visit_selection_statement(statement, parameters, declarations);
             break;
         }
         case AST_EQUALITY_EXPRESSION:
         {
-            visit_equality_expression(ast, parameters);
+            visit_equality_expression(ast, parameters, declarations);
             break;
         }
         case AST_COMPOUND_STATEMENT:
@@ -379,7 +401,7 @@ visit_expression(struct astnode *ast, struct ast_parameter_type_list *parameters
 
             for (i=0; i<compound->statements->size; i++)
             {
-                visit_expression(compound->statements->items[i], parameters);
+                visit_expression(compound->statements->items[i], parameters, declarations);
             }
             break;
         }
@@ -420,9 +442,15 @@ visit_function_definition(struct ast_function *ast)
     write_assembly("  push %%rbp");
     write_assembly("  movq %%rsp, %%rbp");
 
-    /* Begin at 4 as old ebp push is on the stack. */
+    /*
+     * Begin local_size 4 as old ebp push is on the stack.
+     *
+     * NOTE: System-V AMD64 ABI specifies in section 3.2.3 that the 6 function
+     * arguments are passed through registers. The remainder is pushed on the
+     * stack.
+     */
     local_size = 4;
-    for (i=0; parameters && i<parameters->size; i++)
+    for (i=6; parameters && i<parameters->size; i++)
     {
         parameter = parameters->items[i];
 
@@ -458,7 +486,7 @@ visit_function_definition(struct ast_function *ast)
         /*
          * Iterate over the statements
          */
-        visit_expression(statement, parameters);
+        visit_expression(statement, parameters, compound->declarations);
     }
 
     /*
