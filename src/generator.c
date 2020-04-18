@@ -63,6 +63,12 @@ size_of_type(int type_specifiers)
 }
 
 static int
+align8(int size)
+{
+    return size + ((size % 8 == 0) ?  0 : 8 - (size % 8));
+}
+
+static int
 align16(int size)
 {
     return size + ((size % 16 == 0) ?  0 : 16 - (size % 16));
@@ -147,7 +153,7 @@ visit_constant(struct ast_expression *ast, enum scope scope)
     {
             case AST_INTEGER_CONSTANT:
             {
-                write_assembly("  mov $%d, %%rax", ast->int_value);
+                write_assembly("  mov $%d, %%eax", ast->int_value);
                 break;
             }
             case AST_CHARACTER_CONSTANT:
@@ -169,7 +175,7 @@ visit_arithmetic_expression(struct astnode *ast,
                             struct ast_declaration_list *declarations)
 {
     assert(ast->elided_type == AST_ADDITIVE_EXPRESSION ||
-           ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION );
+           ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION);
 
     visit_expression(ast->left, parameters, declarations);
     write_assembly("  push %%rax");
@@ -271,10 +277,11 @@ visit_identifier(struct ast_expression *ast,
     {
         declaration = declarations->items[i];
         offset += size_of_type(declaration->type_specifiers);
+        offset = align8(offset);
 
         if (strcmp(ast->identifier, declaration->declarators[0]->declarator_identifier) == 0)
         {
-            write_assembly("  mov -%d(%%rbp), %%rax", offset);
+            write_assembly("  mov -%d(%%rbp), %%eax", offset);
             return;
         }
     }
@@ -352,6 +359,49 @@ visit_equality_expression(struct astnode *ast,
 }
 
 static void
+visit_assignment_expression(struct astnode *ast,
+                            struct ast_parameter_type_list *parameters,
+                            struct ast_declaration_list *declarations)
+{
+    int i, offset;
+    struct ast_declaration *declaration;
+
+    offset = 4;
+    for (i=0; i<declarations->size; i++)
+    {
+        declaration = declarations->items[i];
+        offset += size_of_type(declaration->type_specifiers);
+        offset = align8(offset);
+
+        /*
+         * FIXME: Need to evaluate ast->left to find location. Should not
+         *        assume it is a simple identifier node. It may be part of a
+         *        struct..
+         */
+        if (strcmp(((struct ast_expression *)ast->left)->identifier,
+                     declaration->declarators[0]->declarator_identifier) == 0)
+        {
+            break;
+        }
+    }
+
+    visit_expression(ast->right, parameters, declarations);
+
+    switch (ast->op)
+    {
+        case AST_EQUAL:
+        {
+            write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+}
+
+static void
 visit_expression(struct astnode *ast,
                  struct ast_parameter_type_list *parameters,
                  struct ast_declaration_list *declarations)
@@ -393,6 +443,11 @@ visit_expression(struct astnode *ast,
         case AST_EQUALITY_EXPRESSION:
         {
             visit_equality_expression(ast, parameters, declarations);
+            break;
+        }
+        case AST_ASSIGNMENT_EXPRESSION:
+        {
+            visit_assignment_expression(ast, parameters, declarations);
             break;
         }
         case AST_COMPOUND_STATEMENT:
