@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "scanner.h"
 #include "parser.h"
@@ -26,13 +27,21 @@ read_file(const char *filename, long *filelength)
     return buffer;
 }
 
+char *
+assembly_filename(char *filename)
+{
+    filename[strlen(filename) - 1] = 's';
+    return filename;
+}
+
 int
 main(int argc, char *argv[])
 {
     int total_tokens;
-    struct listnode *tokens;
+    struct listnode *tokens = NULL;
     struct astnode *ast;
 
+    char filename[25];
     char *buffer;
     long filelength;
 
@@ -41,12 +50,14 @@ main(int argc, char *argv[])
         printf("Not enough args. Must provide a file to compile.");
         return 1;
     }
+    strncpy(filename, argv[1], sizeof(filename));
 
-    buffer = read_file(argv[1], &filelength);
+    buffer = read_file(filename, &filelength);
     //preprocess("test.c", "_test.c");
     scan(buffer, filelength, &tokens);
     ast = parse(tokens);
-    generate(ast, "test.s");
+
+    generate(ast, assembly_filename(filename));
 
     return 0;
 }
