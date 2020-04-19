@@ -20,6 +20,10 @@ static FILE *assembly_filename;
 static void visit_expression(struct astnode *ast,
                              struct ast_parameter_type_list *parameters,
                              struct ast_declaration_list *declarations);
+static int
+identifier_offset(char *identifier,
+                  struct ast_parameter_type_list *parameters,
+                  struct ast_declaration_list *declarations);
 
 static char *
 get_32bit_register(int argnum)
@@ -208,13 +212,17 @@ visit_arithmetic_expression(struct astnode *ast,
 }
 
 static void
-visit_function_call(struct ast_expression *ast, enum scope scope)
+visit_function_call(struct ast_expression *ast,
+                    struct ast_parameter_type_list *parameters,
+                    struct ast_declaration_list *declarations)
 {
     int i, j;
-    struct ast_expression argument;
+    struct ast_expression *argument;
 
     for (i=0; i<ast->arguments_size; i++)
     {
+        argument = ast->arguments[i];
+
         if (ast->arguments[i]->kind == INT_VALUE)
         {
             write_assembly("  mov $%d, %%%s", ast->arguments[i]->int_value,
@@ -226,6 +234,17 @@ visit_function_call(struct ast_expression *ast, enum scope scope)
                 create_string_literal(ast->arguments[i]->identifier),
                 get_64bit_register(i));
         }
+        else if (ast->arguments[i]->kind == IDENTIFIER_VALUE)
+        {
+            /*
+             * FIXME: Identifier could be a function paramter passed through
+             * register, not on the stack. In that case we need to copy the old
+             * register in to the new callees register.
+             */
+            write_assembly("  mov -%d(%%rbp), %%%s",
+                identifier_offset(argument->identifier, parameters, declarations),
+                get_32bit_register(i));
+        }
         else if (ast->arguments[i]->kind == FUNCTION_VALUE)
         {
             /*
@@ -236,7 +255,7 @@ visit_function_call(struct ast_expression *ast, enum scope scope)
             {
                 write_assembly("  push %%%s", get_64bit_register(j));
             }
-            visit_function_call(ast->arguments[i], LOCAL);
+            visit_function_call(ast->arguments[i], parameters, declarations);
 
             /*
              * Re-apply registers. Since registers are stored on the stack they
@@ -358,32 +377,45 @@ visit_equality_expression(struct astnode *ast,
     }
 }
 
-static void
-visit_assignment_expression(struct astnode *ast,
-                            struct ast_parameter_type_list *parameters,
-                            struct ast_declaration_list *declarations)
+static int
+identifier_offset(char *identifier,
+                  struct ast_parameter_type_list *parameters,
+                  struct ast_declaration_list *declarations)
 {
-    int i, offset;
+    int i, offset = 0;
     struct ast_declaration *declaration;
 
-    offset = 4;
+    offset = 0;
     for (i=0; i<declarations->size; i++)
     {
         declaration = declarations->items[i];
         offset += size_of_type(declaration->type_specifiers);
         offset = align8(offset);
 
-        /*
-         * FIXME: Need to evaluate ast->left to find location. Should not
-         *        assume it is a simple identifier node. It may be part of a
-         *        struct..
-         */
-        if (strcmp(((struct ast_expression *)ast->left)->identifier,
-                     declaration->declarators[0]->declarator_identifier) == 0)
+        if (strcmp(identifier,
+                   declaration->declarators[0]->declarator_identifier) == 0)
         {
             break;
         }
     }
+
+    return offset;
+}
+
+static void
+visit_assignment_expression(struct astnode *ast,
+                            struct ast_parameter_type_list *parameters,
+                            struct ast_declaration_list *declarations)
+{
+    int i, offset;
+
+    /*
+     * FIXME: Need to evaluate ast->left to find location. Should not
+     *        assume it is a simple identifier node. It may be part of a
+     *        struct..
+     */
+    offset = identifier_offset(((struct ast_expression *)ast->left)->identifier,
+                               parameters, declarations);
 
     visit_expression(ast->right, parameters, declarations);
 
@@ -426,7 +458,7 @@ visit_expression(struct astnode *ast,
         {
             if (((struct ast_expression *)ast)->kind == FUNCTION_VALUE)
             {
-                visit_function_call((struct ast_expression *)ast, LOCAL);
+                visit_function_call((struct ast_expression *)ast, parameters, declarations);
             }
             else
             {
