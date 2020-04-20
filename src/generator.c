@@ -322,7 +322,15 @@ visit_selection_statement(struct ast_selection_statement *ast,
     {
         case AST_EQ:
         {
-            write_assembly("  jne L_%d", i);
+            write_assembly("  jne L_ELSE_%d", i);
+            break;
+        }
+        case AST_VERTICALBAR_VERTICALBAR:
+        {
+            visit_expression(ast->expression->left, parameters, declarations);
+            write_assembly("  je L_IF_%d", i);
+            visit_expression(ast->expression->right, parameters, declarations);
+            write_assembly("  jne L_ELSE_%d", i);
             break;
         }
         default:
@@ -335,10 +343,11 @@ visit_selection_statement(struct ast_selection_statement *ast,
     /*
      * if block statements
      */
+    write_assembly("L_IF_%d:", i);
     visit_expression(ast->statement1, parameters, declarations);
-    write_assembly("  jmp L_%d", i+1);
+    write_assembly("  jmp L_DONE_%d", i);
 
-    write_assembly("L_%d:", i++);
+    write_assembly("L_ELSE_%d:", i);
 
     if (ast->statement2)
     {
@@ -348,7 +357,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
         visit_expression(ast->statement2, parameters, declarations);
     }
 
-    write_assembly("L_%d:", i++);
+    write_assembly("L_DONE_%d:", i++);
 }
 
 static void
@@ -362,12 +371,11 @@ visit_equality_expression(struct astnode *ast,
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
-    write_assembly("  cmpl %%ecx, %%eax");
     switch (ast->op)
     {
         case AST_EQ:
         {
-            write_assembly("  sub %%rcx, %%rax");
+            write_assembly("  cmpl %%ecx, %%eax");
             break;
         }
         default:
@@ -472,6 +480,7 @@ visit_expression(struct astnode *ast,
             visit_selection_statement(statement, parameters, declarations);
             break;
         }
+        case AST_LOGICAL_OR_EXPRESSION:
         case AST_EQUALITY_EXPRESSION:
         {
             visit_equality_expression(ast, parameters, declarations);

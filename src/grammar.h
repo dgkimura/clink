@@ -991,7 +991,7 @@ struct rule grammar[NUM_RULES] =
     /* logical-or-expression: */
     {
         AST_LOGICAL_OR_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_LOGICAL_OR_EXPRESSION, AST_VERTICALBAR_VERTICALBAR, AST_LOGICAL_AND_EXPRESSION }
     },
