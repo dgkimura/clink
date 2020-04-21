@@ -1004,7 +1004,7 @@ struct rule grammar[NUM_RULES] =
     /* logical-and-expression: */
     {
         AST_LOGICAL_AND_EXPRESSION,
-        create_,
+        create_binary_op,
         3,
         { AST_LOGICAL_AND_EXPRESSION, AST_AMPERSAND_AMPERSAND, AST_INCLUSIVE_OR_EXPRESSION }
     },

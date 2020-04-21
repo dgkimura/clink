@@ -333,6 +333,14 @@ visit_selection_statement(struct ast_selection_statement *ast,
             write_assembly("  jne L_ELSE_%d", i);
             break;
         }
+        case AST_AMPERSAND_AMPERSAND:
+        {
+            visit_expression(ast->expression->left, parameters, declarations);
+            write_assembly("  jne L_ELSE_%d", i);
+            visit_expression(ast->expression->right, parameters, declarations);
+            write_assembly("  jne L_ELSE_%d", i);
+            break;
+        }
         default:
         {
             assert(0);
@@ -481,6 +489,7 @@ visit_expression(struct astnode *ast,
             break;
         }
         case AST_LOGICAL_OR_EXPRESSION:
+        case AST_LOGICAL_AND_EXPRESSION:
         case AST_EQUALITY_EXPRESSION:
         {
             visit_equality_expression(ast, parameters, declarations);
