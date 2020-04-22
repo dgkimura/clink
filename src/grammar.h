@@ -1176,13 +1176,13 @@ struct rule grammar[NUM_RULES] =
     /* unary-expression: */
     {
         AST_UNARY_EXPRESSION,
-        create_,
+        create_unary_expression,
         2,
         { AST_PLUS_PLUS, AST_UNARY_EXPRESSION }
     },
     {
         AST_UNARY_EXPRESSION,
-        create_,
+        create_unary_expression,
         2,
         { AST_MINUS_MINUS, AST_UNARY_EXPRESSION }
     },
@@ -1243,13 +1243,13 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_POSTFIX_EXPRESSION,
-        create_,
+        create_postfix_expression,
         2,
         { AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS }
     },
     {
         AST_POSTFIX_EXPRESSION,
-        create_,
+        create_postfix_expression,
         2,
         { AST_POSTFIX_EXPRESSION, AST_MINUS_MINUS }
     },

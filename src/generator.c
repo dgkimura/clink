@@ -236,14 +236,9 @@ visit_function_call(struct ast_expression *ast,
         }
         else if (ast->arguments[i]->kind == IDENTIFIER_VALUE)
         {
-            /*
-             * FIXME: Identifier could be a function paramter passed through
-             * register, not on the stack. In that case we need to copy the old
-             * register in to the new callees register.
-             */
-            write_assembly("  mov -%d(%%rbp), %%%s",
-                identifier_offset(argument->identifier, parameters, declarations),
-                get_32bit_register(i));
+            visit_expression((struct astnode *)ast->arguments[i], parameters,
+                             declarations);
+            write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
         }
         else if (ast->arguments[i]->kind == FUNCTION_VALUE)
         {
@@ -279,6 +274,9 @@ visit_identifier(struct ast_expression *ast,
 {
     int i, offset;
     struct ast_declaration *parameter, *declaration;
+    char location[25];
+
+    memset(location, 0, sizeof(location));
 
     for (i=0; parameters && i<parameters->size; i++)
     {
@@ -286,8 +284,9 @@ visit_identifier(struct ast_expression *ast,
 
         if (strcmp(ast->identifier, parameter->declarators[0]->declarator_identifier) == 0)
         {
+            snprintf(location, sizeof(location), "%%%s", get_32bit_register(i));
             write_assembly("  movl %%%s, %%eax", get_32bit_register(i));
-            return;
+            goto done;
         }
     }
 
@@ -300,8 +299,52 @@ visit_identifier(struct ast_expression *ast,
 
         if (strcmp(ast->identifier, declaration->declarators[0]->declarator_identifier) == 0)
         {
-            write_assembly("  mov -%d(%%rbp), %%eax", offset);
-            return;
+            snprintf(location, sizeof(location), "  -%d(%%rbp)", offset);
+            write_assembly("  mov %s, %%eax", location);
+            goto done;
+        }
+    }
+
+done:
+    switch (ast->inplace_op)
+    {
+        /*
+         * Post-increment/decrement saves the original value, then increments
+         * or decrements current value and saves the updated value into the
+         * local location on the stack (offset of 'rbp' frame pointer), and
+         * finally restores original value back into rax..
+         */
+        case POST_INCREMENT:
+        {
+            write_assembly("  push %%rax");
+            write_assembly("  add $1, %%eax", location);
+            write_assembly("  mov %%eax, %s", location);
+            write_assembly("  pop %%rax");
+            break;
+        }
+        case POST_DECREMENT:
+        {
+            write_assembly("  push %%rax");
+            write_assembly("  sub $1, %%eax", location);
+            write_assembly("  mov %%eax, %s", location);
+            write_assembly("  pop %%rax");
+            break;
+        }
+        case PRE_INCREMENT:
+        {
+            write_assembly("  add $1, %%eax", location);
+            write_assembly("  mov %%eax, %s", location);
+            break;
+        }
+        case PRE_DECREMENT:
+        {
+            write_assembly("  sub $1, %%eax", location);
+            write_assembly("  mov %%eax, %s", location);
+            break;
+        }
+        case NO_OP:
+        {
+            break;
         }
     }
 }

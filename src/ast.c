@@ -754,16 +754,37 @@ create_binary_op(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_unary_expression(struct listnode *list, struct rule *rule)
+{
+    struct ast_expression *node;
+
+    if (is_rule(rule, AST_PLUS_PLUS, AST_UNARY_EXPRESSION))
+    {
+        node = list_item(&list, 1);
+        node->inplace_op = PRE_INCREMENT;
+    }
+    else if (is_rule(rule, AST_MINUS_MINUS, AST_UNARY_EXPRESSION))
+    {
+        node = list_item(&list, 1);
+        node->inplace_op = PRE_DECREMENT;
+    }
+
+    node->type = rule->type;
+    return (struct astnode *)node;
+}
+
+struct astnode *
 create_postfix_expression(struct listnode *list, struct rule *rule)
 {
     struct ast_expression *node, *child;
 
-    if (rule->length_of_nodes == 3)
+    if (is_rule(rule, AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_RPAREN))
     {
         node = list_item(&list, 5);
         node->kind = FUNCTION_VALUE;
     }
-    else if (rule->length_of_nodes == 4)
+    else if (is_rule(rule,
+        AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_ARGUMENT_EXPRESSION_LIST, AST_RPAREN))
     {
         /* index 7 is AST_POSTFIX_EXPRESSION astnode */
         /* index 3 is AST_ARGUMENT_EXPRESSION_LIST astnode */
@@ -772,6 +793,16 @@ create_postfix_expression(struct listnode *list, struct rule *rule)
 
         node->identifier = child->identifier;
         node->kind = FUNCTION_VALUE;
+    }
+    else if (is_rule(rule, AST_POSTFIX_EXPRESSION, AST_PLUS_PLUS))
+    {
+        node = list_item(&list, 3);
+        node->inplace_op = POST_INCREMENT;
+    }
+    else if (is_rule(rule, AST_POSTFIX_EXPRESSION, AST_MINUS_MINUS))
+    {
+        node = list_item(&list, 3);
+        node->inplace_op = POST_DECREMENT;
     }
 
     node->type = rule->type;

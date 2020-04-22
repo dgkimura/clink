@@ -60,6 +60,15 @@ struct ast_expression
         STRING_VALUE
     } kind;
 
+    enum inplace_op
+    {
+        NO_OP,
+        PRE_INCREMENT,
+        POST_INCREMENT,
+        PRE_DECREMENT,
+        POST_DECREMENT
+    } inplace_op;
+
     unsigned int arguments_size;
     struct ast_expression *arguments[0];
 };
@@ -280,6 +289,9 @@ create_(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_binary_op(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_unary_expression(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_postfix_expression(struct listnode *list, struct rule *rule);
