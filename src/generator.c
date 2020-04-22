@@ -442,6 +442,30 @@ visit_assignment_expression(struct astnode *ast,
             write_assembly("  mov %%eax, -%d(%%rbp)", offset);
             break;
         }
+        case AST_PLUS_EQUAL:
+        {
+            write_assembly("  mov %%eax, %%ecx");
+            write_assembly("  mov -%d(%%rbp), %%eax", offset);
+            write_assembly("  add %%ecx, %%eax");
+            write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+            break;
+        }
+        case AST_MINUS_EQUAL:
+        {
+            write_assembly("  mov %%eax, %%ecx");
+            write_assembly("  mov -%d(%%rbp), %%eax", offset);
+            write_assembly("  sub %%ecx, %%eax");
+            write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+            break;
+        }
+        case AST_ASTERISK_EQUAL:
+        {
+            write_assembly("  mov %%eax, %%ecx");
+            write_assembly("  mov -%d(%%rbp), %%eax", offset);
+            write_assembly("  imul %%ecx, %%eax");
+            write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+            break;
+        }
         default:
         {
             break;
