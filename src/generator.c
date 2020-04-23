@@ -517,6 +517,30 @@ visit_assignment_expression(struct astnode *ast,
 }
 
 static void
+visit_iteration_statement(struct ast_iteration_statement *ast,
+                          struct ast_parameter_type_list *parameters,
+                          struct ast_declaration_list *declarations)
+{
+    /*
+     * Use 'i' to generate and keep track of a unique label
+     */
+    static int i = 0;
+
+    visit_expression(ast->expression1, parameters, declarations);
+    write_assembly("L_FOR_BEGIN_%d:", i);
+
+    visit_expression(ast->expression2, parameters, declarations);
+    write_assembly("  je L_FOR_END_%d", i);
+
+    visit_expression(ast->expression3, parameters, declarations);
+    visit_expression(ast->statement, parameters, declarations);
+
+    write_assembly("  jmp L_FOR_BEGIN_%d", i);
+
+    write_assembly("L_FOR_END_%d:", i);
+}
+
+static void
 visit_expression(struct astnode *ast,
                  struct ast_parameter_type_list *parameters,
                  struct ast_declaration_list *declarations)
@@ -565,6 +589,11 @@ visit_expression(struct astnode *ast,
         case AST_ASSIGNMENT_EXPRESSION:
         {
             visit_assignment_expression(ast, parameters, declarations);
+            break;
+        }
+        case AST_ITERATION_STATEMENT:
+        {
+            visit_iteration_statement((struct ast_iteration_statement *)ast, parameters, declarations);
             break;
         }
         case AST_COMPOUND_STATEMENT:

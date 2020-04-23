@@ -338,6 +338,32 @@ create_selection_statement(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_iteration_statement(struct listnode *list, struct rule *rule)
+{
+    struct astnode *expression1;
+    struct astnode *expression2;
+    struct astnode *expression3;
+    struct astnode *statement;
+
+    struct ast_iteration_statement *node;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    if (is_rule(rule,
+        AST_FOR, AST_LPAREN, AST_EXPRESSION, AST_SEMICOLON, AST_EXPRESSION,
+        AST_SEMICOLON, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT))
+    {
+        node->expression1 = list_item(&list, 13);
+        node->expression2 = list_item(&list, 9);
+        node->expression3 = list_item(&list, 5);
+        node->statement = list_item(&list, 1);
+    }
+
+    node->type = rule->type;
+    return (struct astnode *)node;
+}
+
+struct astnode *
 create_jump_statement(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;

@@ -83,6 +83,17 @@ struct ast_selection_statement
     struct astnode *statement2;
 };
 
+struct ast_iteration_statement
+{
+    enum astnode_t type;
+    enum astnode_t elided_type;
+
+    struct astnode *expression1;
+    struct astnode *expression2;
+    struct astnode *expression3;
+    struct astnode *statement;
+};
+
 struct ast_compound_statement
 {
     enum astnode_t type;
@@ -256,6 +267,9 @@ create_statement_list(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_selection_statement(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_iteration_statement(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_jump_statement(struct listnode *list, struct rule *rule);

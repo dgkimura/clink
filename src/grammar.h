@@ -720,7 +720,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_STATEMENT,
-        create_,
+        create_elided_node,
         1,
         { AST_ITERATION_STATEMENT }
     },
@@ -876,7 +876,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_ITERATION_STATEMENT,
-        create_,
+        create_iteration_statement,
         9,
         { AST_FOR, AST_LPAREN, AST_EXPRESSION, AST_SEMICOLON, AST_EXPRESSION, AST_SEMICOLON, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT }
     },
