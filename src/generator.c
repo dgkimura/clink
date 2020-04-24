@@ -19,7 +19,8 @@ static FILE *assembly_filename;
 
 static void visit_expression(struct astnode *ast,
                              struct ast_parameter_type_list *parameters,
-                             struct ast_declaration_list *declarations);
+                             struct ast_declaration_list *declarations,
+                             char *label);
 static int
 identifier_offset(char *identifier,
                   struct ast_parameter_type_list *parameters,
@@ -181,9 +182,9 @@ visit_arithmetic_expression(struct astnode *ast,
     assert(ast->elided_type == AST_ADDITIVE_EXPRESSION ||
            ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION);
 
-    visit_expression(ast->left, parameters, declarations);
+    visit_expression(ast->left, parameters, declarations, NULL);
     write_assembly("  push %%rax");
-    visit_expression(ast->right, parameters, declarations);
+    visit_expression(ast->right, parameters, declarations, NULL);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
@@ -237,7 +238,7 @@ visit_function_call(struct ast_expression *ast,
         else if (ast->arguments[i]->kind == IDENTIFIER_VALUE)
         {
             visit_expression((struct astnode *)ast->arguments[i], parameters,
-                             declarations);
+                             declarations, NULL);
             write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
         }
         else if (ast->arguments[i]->kind == FUNCTION_VALUE)
@@ -358,29 +359,29 @@ visit_selection_statement(struct ast_selection_statement *ast,
      * Use 'i' to generate and keep track of a unique label
      */
     static int i = 0;
-
-    visit_expression(ast->expression, parameters, declarations);
+    char label[25];
 
     switch (ast->expression->op)
     {
         case AST_EQ:
         {
+            visit_expression(ast->expression, parameters, declarations, NULL);
             write_assembly("  jne L_ELSE_%d", i);
             break;
         }
         case AST_VERTICALBAR_VERTICALBAR:
         {
-            visit_expression(ast->expression->left, parameters, declarations);
-            write_assembly("  je L_IF_%d", i);
-            visit_expression(ast->expression->right, parameters, declarations);
-            write_assembly("  jne L_ELSE_%d", i);
+            snprintf(label, sizeof(label), "L_IF_%d", i);
+            visit_expression(ast->expression->left, parameters, declarations, label);
+            visit_expression(ast->expression->right, parameters, declarations, label);
+            write_assembly("  jmp L_ELSE_%d", i);
             break;
         }
         case AST_AMPERSAND_AMPERSAND:
         {
-            visit_expression(ast->expression->left, parameters, declarations);
+            visit_expression(ast->expression->left, parameters, declarations, NULL);
             write_assembly("  jne L_ELSE_%d", i);
-            visit_expression(ast->expression->right, parameters, declarations);
+            visit_expression(ast->expression->right, parameters, declarations, NULL);
             write_assembly("  jne L_ELSE_%d", i);
             break;
         }
@@ -395,7 +396,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
      * if block statements
      */
     write_assembly("L_IF_%d:", i);
-    visit_expression(ast->statement1, parameters, declarations);
+    visit_expression(ast->statement1, parameters, declarations, NULL);
     write_assembly("  jmp L_DONE_%d", i);
 
     write_assembly("L_ELSE_%d:", i);
@@ -405,7 +406,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
         /*
          * else block statements
          */
-        visit_expression(ast->statement2, parameters, declarations);
+        visit_expression(ast->statement2, parameters, declarations, NULL);
     }
 
     write_assembly("L_DONE_%d:", i++);
@@ -414,24 +415,51 @@ visit_selection_statement(struct ast_selection_statement *ast,
 static void
 visit_equality_expression(struct astnode *ast,
                           struct ast_parameter_type_list *parameters,
-                          struct ast_declaration_list *declarations)
+                          struct ast_declaration_list *declarations,
+                          char *label)
 {
-    visit_expression(ast->left, parameters, declarations);
+    visit_expression(ast->left, parameters, declarations, NULL);
     write_assembly("  push %%rax");
-    visit_expression(ast->right, parameters, declarations);
+    visit_expression(ast->right, parameters, declarations, NULL);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
+    write_assembly("  cmpl %%eax, %%ecx");
+
+    if (label == NULL)
+    {
+        return;
+    }
 
     switch (ast->op)
     {
         case AST_EQ:
         {
-            write_assembly("  cmpl %%ecx, %%eax");
+            write_assembly("  je %s", label);
+            break;
+        }
+        case AST_GTEQ:
+        {
+            write_assembly("  jge %s", label);
+            break;
+        }
+        case AST_LTEQ:
+        {
+            write_assembly("  jle %s", label);
+            break;
+        }
+        case AST_GT:
+        {
+            write_assembly("  jg %s", label);
+            break;
+        }
+        case AST_LT:
+        {
+            write_assembly("  jl %s", label);
             break;
         }
         default:
         {
-            break;
+            assert(0);
         }
     }
 }
@@ -476,7 +504,7 @@ visit_assignment_expression(struct astnode *ast,
     offset = identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                parameters, declarations);
 
-    visit_expression(ast->right, parameters, declarations);
+    visit_expression(ast->right, parameters, declarations, NULL);
 
     switch (ast->op)
     {
@@ -525,25 +553,27 @@ visit_iteration_statement(struct ast_iteration_statement *ast,
      * Use 'i' to generate and keep track of a unique label
      */
     static int i = 0;
+    char label[25];
 
-    visit_expression(ast->expression1, parameters, declarations);
+    visit_expression(ast->expression1, parameters, declarations, NULL);
     write_assembly("L_FOR_BEGIN_%d:", i);
 
-    visit_expression(ast->expression2, parameters, declarations);
-    write_assembly("  je L_FOR_END_%d", i);
+    snprintf(label, sizeof(label), "L_FOR_END_%d", i);
+    visit_expression(ast->expression2, parameters, declarations, label);
 
-    visit_expression(ast->expression3, parameters, declarations);
-    visit_expression(ast->statement, parameters, declarations);
+    visit_expression(ast->statement, parameters, declarations, NULL);
+    visit_expression(ast->expression3, parameters, declarations, NULL);
 
     write_assembly("  jmp L_FOR_BEGIN_%d", i);
 
-    write_assembly("L_FOR_END_%d:", i);
+    write_assembly("L_FOR_END_%d:", i++);
 }
 
 static void
 visit_expression(struct astnode *ast,
                  struct ast_parameter_type_list *parameters,
-                 struct ast_declaration_list *declarations)
+                 struct ast_declaration_list *declarations,
+                 char *label)
 {
     int i;
 
@@ -582,8 +612,9 @@ visit_expression(struct astnode *ast,
         case AST_LOGICAL_OR_EXPRESSION:
         case AST_LOGICAL_AND_EXPRESSION:
         case AST_EQUALITY_EXPRESSION:
+        case AST_RELATIONAL_EXPRESSION:
         {
-            visit_equality_expression(ast, parameters, declarations);
+            visit_equality_expression(ast, parameters, declarations, label);
             break;
         }
         case AST_ASSIGNMENT_EXPRESSION:
@@ -602,7 +633,7 @@ visit_expression(struct astnode *ast,
 
             for (i=0; i<compound->statements->size; i++)
             {
-                visit_expression(compound->statements->items[i], parameters, declarations);
+                visit_expression(compound->statements->items[i], parameters, declarations, NULL);
             }
             break;
         }
@@ -687,7 +718,7 @@ visit_function_definition(struct ast_function *ast)
         /*
          * Iterate over the statements
          */
-        visit_expression(statement, parameters, compound->declarations);
+        visit_expression(statement, parameters, compound->declarations, NULL);
     }
 
     /*
