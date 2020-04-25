@@ -771,7 +771,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_COMPOUND_STATEMENT,
-        create_,
+        create_compound_statement,
         3,
         { AST_LBRACE, AST_DECLARATION_LIST, AST_RBRACE }
     },

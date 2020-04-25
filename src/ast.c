@@ -261,6 +261,10 @@ create_compound_statement(struct listnode *list, struct rule *rule)
     {
         node->statements = list_item(&list, 3);
     }
+    else if (is_rule(rule, AST_LBRACE, AST_DECLARATION_LIST, AST_RBRACE))
+    {
+        node->declarations = list_item(&list, 3);
+    }
     else if (is_rule(rule,
              AST_LBRACE, AST_DECLARATION_LIST, AST_STATEMENT_LIST, AST_RBRACE))
     {
@@ -530,6 +534,7 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
         memset(node, 0, sizeof(struct ast_declarator));
 
         node->declarator_identifier = child->token->value;
+        node->count = 1;
     }
     else if (rule->length_of_nodes == 3)
     {
@@ -544,6 +549,17 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
             /* { AST_LPAREN, AST_DECLARATOR, AST_RPAREN } */
             node = list_item(&list, 3);
         }
+    }
+    else if (is_rule(rule,
+        AST_DIRECT_DECLARATOR, AST_LBRACKET, AST_CONSTANT_EXPRESSION, AST_RBRACKET))
+    {
+        node = list_item(&list, 7);
+
+        /*
+         * FIXME: Not guaranteed this is a literal int. May have to evaluate
+         * expression...
+         */
+        node->count = ((struct ast_expression *)list_item(&list, 3))->int_value;
     }
     else if (rule->length_of_nodes == 4)
     {

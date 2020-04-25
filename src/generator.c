@@ -650,7 +650,7 @@ visit_function_definition(struct ast_function *ast)
 {
     /* add to local symbol table */
 
-    int i, local_size;
+    int i, j, local_size;
     struct listnode *list;
     struct astnode *statement;
     struct ast_declarator *declarator;
@@ -706,8 +706,11 @@ visit_function_definition(struct ast_function *ast)
     for (i=0; compound->declarations && i<compound->declarations->size; i++)
     {
         declaration = compound->declarations->items[i];
-        local_size += (declaration->declarators_size *
-                      size_of_type(declaration->type_specifiers));
+        for (j=0; j<declaration->declarators_size; j++)
+        {
+            local_size += (declaration->declarators[j]->count *
+                           size_of_type(declaration->type_specifiers));
+        }
     }
     write_assembly("  subq $%d, %%rsp", align16(local_size));
 

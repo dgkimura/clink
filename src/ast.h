@@ -132,6 +132,11 @@ struct ast_declarator
 
     int declarator_value;
 
+    /*
+     * Used to indicate number of objects (i.e. array can have count > 1)
+     */
+    int count;
+
     struct ast_parameter_type_list *declarator_parameter_type_list;
 
     struct astnode *declarator_identifier_list;
