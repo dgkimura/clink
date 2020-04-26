@@ -52,6 +52,11 @@ struct ast_expression
     int int_value;
     char *identifier;
 
+    /*
+     * For indexes expressions, this holds the index value expression
+     */
+    struct ast_expression *extra;
+
     enum kind
     {
         INT_VALUE,

@@ -826,6 +826,12 @@ create_postfix_expression(struct listnode *list, struct rule *rule)
         node->kind = FUNCTION_VALUE;
     }
     else if (is_rule(rule,
+        AST_POSTFIX_EXPRESSION, AST_LBRACKET, AST_EXPRESSION, AST_RBRACKET))
+    {
+        node = list_item(&list, 7);
+        node->extra = list_item(&list, 3);
+    }
+    else if (is_rule(rule,
         AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_ARGUMENT_EXPRESSION_LIST, AST_RPAREN))
     {
         /* index 7 is AST_POSTFIX_EXPRESSION astnode */

@@ -170,7 +170,7 @@ struct rule
     enum astnode_t nodes[MAX_ASTNODES];
 };
 
-#define NUM_RULES 206
+#define NUM_RULES 207
 
 /*
  * item is a rule with a cursor position to indicate how many symbols have been
@@ -219,7 +219,7 @@ struct state
     struct state *links[NUM_SYMBOLS];
 };
 
-#define MAX_STATES 16384
+#define MAX_STATES 32768
 
 /*
  * item inside a parse table row.

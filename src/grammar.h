@@ -1227,6 +1227,12 @@ struct rule grammar[NUM_RULES] =
         AST_POSTFIX_EXPRESSION,
         create_postfix_expression,
         4,
+        { AST_POSTFIX_EXPRESSION, AST_LBRACKET, AST_EXPRESSION, AST_RBRACKET }
+    },
+    {
+        AST_POSTFIX_EXPRESSION,
+        create_postfix_expression,
+        4,
         { AST_POSTFIX_EXPRESSION, AST_LPAREN, AST_ARGUMENT_EXPRESSION_LIST, AST_RPAREN }
     },
     {
