@@ -570,6 +570,36 @@ START_TEST(test_parser_can_parse_struct)
 }
 END_TEST
 
+START_TEST(test_parser_can_parse_arrays)
+{
+    struct astnode *ast;
+    struct listnode *tokens;
+    char *content;
+    list_init(&tokens);
+
+    /*
+     * parse basic array
+     */
+    content = "int an_array[42];"
+              "int another_array[size * 2];";
+    scan(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+
+    /*
+     * parse multi-dimensional array
+     */
+    list_init(&tokens);
+    content = "int a_multi_dimensional_array[42][2];"
+              "int another_multi_dimensional_array[size*2][size*2];";
+    scan(content, strlen(content), &tokens);
+
+    ast = parse(tokens);
+    ck_assert_int_eq(AST_TRANSLATION_UNIT, ast->type);
+}
+END_TEST
+
 START_TEST(test_parser_can_parse_arithmatic_statements)
 {
     struct astnode *ast;
@@ -964,6 +994,7 @@ main(void)
     tcase_add_test(testcase, test_parser_can_parse_function_calls);
     tcase_add_test(testcase, test_parser_can_parse_function_prototype);
     tcase_add_test(testcase, test_parser_can_parse_struct);
+    tcase_add_test(testcase, test_parser_can_parse_arrays);
     tcase_add_test(testcase, test_parser_can_parse_arithmatic_statements);
     tcase_add_test(testcase, test_parser_can_parse_conditional_statements);
     tcase_add_test(testcase, test_parser_can_parse_assigment_operations);

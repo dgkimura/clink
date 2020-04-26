@@ -92,12 +92,14 @@ scan(char *content, size_t content_len, struct listnode **tokens)
 
     for (i=0; i<content_len;)
     {
-        if (isalpha(content[i]))
+        if (isalpha(content[i]) || content[i] == '_')
         {
             tok_start = i;
 
             /* consume characters */
-            while (i < content_len && (isalpha(content[i]) || isdigit(content[i])))
+            while (i < content_len && (isalpha(content[i]) ||
+                                       isdigit(content[i]) ||
+                                       content[i] == '_'))
             {
                 i += 1;
             }
