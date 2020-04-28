@@ -967,8 +967,8 @@ END_TEST
 int
 main(void)
 {
-    Suite *suite = suite_create("fcc");
-    TCase *testcase = tcase_create("fcc");
+    Suite *suite = suite_create("clink");
+    TCase *testcase = tcase_create("clink");
     SRunner *runner = srunner_create(suite);
 
     suite_add_tcase(suite, testcase);
