@@ -431,7 +431,7 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_DECLARATOR,
-        create_,
+        create_declarator,
         2,
         { AST_POINTER, AST_DIRECT_DECLARATOR }
     },
@@ -481,7 +481,7 @@ struct rule grammar[NUM_RULES] =
     /* pointer: */
     {
         AST_POINTER,
-        create_,
+        create_pointer,
         1,
         { AST_ASTERISK }
     },
@@ -1188,13 +1188,13 @@ struct rule grammar[NUM_RULES] =
     },
     {
         AST_UNARY_EXPRESSION,
-        create_,
+        create_unary_expression,
         2,
         { AST_AMPERSAND, AST_CAST_EXPRESSION }
     },
     {
         AST_UNARY_EXPRESSION,
-        create_,
+        create_unary_expression,
         2,
         { AST_ASTERISK, AST_CAST_EXPRESSION }
     },

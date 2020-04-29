@@ -229,6 +229,13 @@ visit_function_call(struct ast_expression *ast,
             write_assembly("  mov $%d, %%%s", ast->arguments[i]->int_value,
                 get_32bit_register(i));
         }
+        if (ast->arguments[i]->kind == PTR_VALUE)
+        {
+            write_assembly("  mov -%d(%%rbp), %%rax",
+                           identifier_offset(ast->arguments[i]->identifier,
+                                             parameters, declarations));
+            write_assembly("  mov (%%rax), %%%s", get_32bit_register(i));
+        }
         else if (ast->arguments[i]->kind == STRING_VALUE)
         {
             write_assembly("  leaq %s(%%rip), %%%s",
@@ -300,8 +307,16 @@ visit_identifier(struct ast_expression *ast,
 
         if (strcmp(ast->identifier, declaration->declarators[0]->declarator_identifier) == 0)
         {
-            snprintf(location, sizeof(location), "  -%d(%%rbp)", offset);
-            write_assembly("  mov %s, %%eax", location);
+            if (ast->kind == PTR_VALUE)
+            {
+                snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
+                write_assembly("  leaq %s, %%rax", location);
+            }
+            else
+            {
+                snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
+                write_assembly("  mov %s, %%eax", location);
+            }
             goto done;
         }
     }
@@ -510,7 +525,7 @@ visit_assignment_expression(struct astnode *ast,
     {
         case AST_EQUAL:
         {
-            write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+            write_assembly("  mov %%rax, -%d(%%rbp)", offset);
             break;
         }
         case AST_PLUS_EQUAL:
@@ -595,17 +610,20 @@ visit_expression(struct astnode *ast,
         {
             if (((struct ast_expression *)ast)->kind == FUNCTION_VALUE)
             {
-                visit_function_call((struct ast_expression *)ast, parameters, declarations);
+                visit_function_call((struct ast_expression *)ast, parameters,
+                                    declarations);
             }
             else
             {
-                visit_identifier((struct ast_expression *)ast, parameters, declarations);
+                visit_identifier((struct ast_expression *)ast, parameters,
+                                 declarations);
             }
             break;
         }
         case AST_SELECTION_STATEMENT:
         {
-            struct ast_selection_statement *statement = (struct ast_selection_statement *)ast;
+            struct ast_selection_statement *statement =
+                (struct ast_selection_statement *)ast;
             visit_selection_statement(statement, parameters, declarations);
             break;
         }
@@ -624,16 +642,19 @@ visit_expression(struct astnode *ast,
         }
         case AST_ITERATION_STATEMENT:
         {
-            visit_iteration_statement((struct ast_iteration_statement *)ast, parameters, declarations);
+            visit_iteration_statement((struct ast_iteration_statement *)ast,
+                                      parameters, declarations);
             break;
         }
         case AST_COMPOUND_STATEMENT:
         {
-            struct ast_compound_statement *compound = (struct ast_compound_statement *)ast;
+            struct ast_compound_statement *compound =
+                (struct ast_compound_statement *)ast;
 
             for (i=0; i<compound->statements->size; i++)
             {
-                visit_expression(compound->statements->items[i], parameters, declarations, NULL);
+                visit_expression(compound->statements->items[i], parameters,
+                                 declarations, NULL);
             }
             break;
         }

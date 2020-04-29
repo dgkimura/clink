@@ -62,7 +62,8 @@ struct ast_expression
         INT_VALUE,
         IDENTIFIER_VALUE,
         FUNCTION_VALUE,
-        STRING_VALUE
+        STRING_VALUE,
+        PTR_VALUE
     } kind;
 
     enum inplace_op
@@ -297,7 +298,13 @@ struct astnode *
 create_init_declarator(struct listnode *list, struct rule *rule);
 
 struct astnode *
+create_declarator(struct listnode *list, struct rule *rule);
+
+struct astnode *
 create_direct_declarator(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_pointer(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_storage_class_specifier(struct listnode *list, struct rule *rule);

@@ -520,6 +520,21 @@ create_init_declarator(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_declarator(struct listnode *list, struct rule *rule)
+{
+    struct ast_declarator *node;
+
+    if (is_rule(rule, AST_POINTER, AST_DIRECT_DECLARATOR))
+    {
+        node = list_item(&list, 1);
+        node->is_pointer = 1;
+    }
+
+    node->type = rule->type;
+    return (struct astnode *)node;
+}
+
+struct astnode *
 create_direct_declarator(struct listnode *list, struct rule *rule)
 {
     struct ast_declarator *node;
@@ -596,6 +611,17 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
 
     node->type = rule->type;
     return (struct astnode *)node;
+}
+
+struct astnode *
+create_pointer(struct listnode *list, struct rule *rule)
+{
+    struct astnode *node;
+    node = malloc(sizeof(struct astnode));
+    memset(node, 0, sizeof(struct astnode));
+
+    node->type = rule->type;
+    return node;
 }
 
 struct astnode *
@@ -809,6 +835,16 @@ create_unary_expression(struct listnode *list, struct rule *rule)
     {
         node = list_item(&list, 1);
         node->inplace_op = PRE_DECREMENT;
+    }
+    else if (is_rule(rule, AST_AMPERSAND, AST_CAST_EXPRESSION))
+    {
+        node = list_item(&list, 1);
+        node->kind = PTR_VALUE;
+    }
+    else if (is_rule(rule, AST_ASTERISK, AST_CAST_EXPRESSION))
+    {
+        node = list_item(&list, 1);
+        node->kind = PTR_VALUE;
     }
 
     node->type = rule->type;
