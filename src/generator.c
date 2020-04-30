@@ -22,7 +22,7 @@ static void visit_expression(struct astnode *ast,
                              struct ast_declaration_list *declarations,
                              char *label);
 static int
-identifier_offset(char *identifier,
+identifier_offset(struct ast_expression *ast,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations);
 
@@ -65,12 +65,6 @@ size_of_type(int type_specifiers)
         assert(0);
     }
     return size;
-}
-
-static int
-align8(int size)
-{
-    return size + ((size % 8 == 0) ?  0 : 8 - (size % 8));
 }
 
 static int
@@ -232,7 +226,7 @@ visit_function_call(struct ast_expression *ast,
         if (ast->arguments[i]->kind == PTR_VALUE)
         {
             write_assembly("  mov -%d(%%rbp), %%rax",
-                           identifier_offset(ast->arguments[i]->identifier,
+                           identifier_offset(ast->arguments[i],
                                              parameters, declarations));
             write_assembly("  mov (%%rax), %%%s", get_32bit_register(i));
         }
@@ -303,10 +297,14 @@ visit_identifier(struct ast_expression *ast,
     {
         declaration = declarations->items[i];
         offset += size_of_type(declaration->type_specifiers);
-        offset = align8(offset);
 
         if (strcmp(ast->identifier, declaration->declarators[0]->declarator_identifier) == 0)
         {
+            if (ast->extra)
+            {
+                offset += (size_of_type(declaration->type_specifiers) * ast->extra->int_value);
+            }
+
             if (ast->kind == PTR_VALUE)
             {
                 snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
@@ -480,7 +478,7 @@ visit_equality_expression(struct astnode *ast,
 }
 
 static int
-identifier_offset(char *identifier,
+identifier_offset(struct ast_expression *ast,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations)
 {
@@ -492,11 +490,15 @@ identifier_offset(char *identifier,
     {
         declaration = declarations->items[i];
         offset += size_of_type(declaration->type_specifiers);
-        offset = align8(offset);
 
-        if (strcmp(identifier,
+        if (strcmp(ast->identifier,
                    declaration->declarators[0]->declarator_identifier) == 0)
         {
+             if (ast->extra != NULL)
+             {
+                 offset += (ast->extra->int_value *
+                            size_of_type(declaration->type_specifiers));
+             }
             break;
         }
     }
@@ -516,7 +518,7 @@ visit_assignment_expression(struct astnode *ast,
      *        assume it is a simple identifier node. It may be part of a
      *        struct..
      */
-    offset = identifier_offset(((struct ast_expression *)ast->left)->identifier,
+    offset = identifier_offset((struct ast_expression *)ast->left,
                                parameters, declarations);
 
     visit_expression(ast->right, parameters, declarations, NULL);
