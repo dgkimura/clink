@@ -312,8 +312,18 @@ visit_identifier(struct ast_expression *ast,
             }
             else
             {
-                snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
-                write_assembly("  mov %s, %%eax", location);
+                if (ast->extra)
+                {
+                    visit_expression((struct astnode *)ast->extra, parameters, declarations, NULL);
+                    write_assembly("  mov %%rax, %%rcx  # index");
+                    write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset);
+                    write_assembly("  mov (%%rdx, %%rcx, 4), %%rax"); /* FIXME: hardcode 4 */
+                }
+                else
+                {
+                    snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
+                    write_assembly("  mov %s, %%eax", location);
+                }
             }
             goto done;
         }
@@ -527,7 +537,19 @@ visit_assignment_expression(struct astnode *ast,
     {
         case AST_EQUAL:
         {
-            write_assembly("  mov %%rax, -%d(%%rbp)", offset);
+            if (((struct ast_expression *)ast->left)->extra != NULL)
+            {
+                write_assembly("  push %%rax");
+                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
+                write_assembly("  mov %%rax, %%rcx  # index");
+                write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset);
+                write_assembly("  pop %%rax");
+                write_assembly("  mov %%rax, (%%rdx, %%rcx, 4)", offset); /* FIXME: hardcode 4 */
+            }
+            else
+            {
+                write_assembly("  mov %%rax, -%d(%%rbp)", offset);
+            }
             break;
         }
         case AST_PLUS_EQUAL:
