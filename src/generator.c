@@ -316,8 +316,8 @@ visit_identifier(struct ast_expression *ast,
                 {
                     visit_expression((struct astnode *)ast->extra, parameters, declarations, NULL);
                     write_assembly("  mov %%rax, %%rcx  # index");
-                    write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset);
-                    write_assembly("  mov (%%rdx, %%rcx, 4), %%rax"); /* FIXME: hardcode 4 */
+                    write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset-4);
+                    write_assembly("  mov (%%rdx, %%rcx, 8), %%rax"); /* FIXME: hardcode 8 */
                 }
                 else
                 {
@@ -542,9 +542,9 @@ visit_assignment_expression(struct astnode *ast,
                 write_assembly("  push %%rax");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
                 write_assembly("  mov %%rax, %%rcx  # index");
-                write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset);
+                write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset-4);
                 write_assembly("  pop %%rax");
-                write_assembly("  mov %%rax, (%%rdx, %%rcx, 4)", offset); /* FIXME: hardcode 4 */
+                write_assembly("  mov %%rax, (%%rdx, %%rcx, 8)", offset); /* FIXME: hardcode 8 */
             }
             else
             {
