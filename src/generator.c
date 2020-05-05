@@ -292,41 +292,31 @@ visit_identifier(struct ast_expression *ast,
         }
     }
 
-    offset = 0;
+    offset = identifier_offset(ast, parameters, declarations);
     for (i=0; i<declarations->size; i++)
     {
-        declaration = declarations->items[i];
-        offset += size_of_type(declaration->type_specifiers);
-
-        if (strcmp(ast->identifier, declaration->declarators[0]->declarator_identifier) == 0)
+        if (ast->kind == PTR_VALUE)
+        {
+            snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
+            write_assembly("  leaq %s, %%rax", location);
+        }
+        else
         {
             if (ast->extra)
             {
-                offset += (size_of_type(declaration->type_specifiers) * ast->extra->int_value);
-            }
-
-            if (ast->kind == PTR_VALUE)
-            {
-                snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
-                write_assembly("  leaq %s, %%rax", location);
+                visit_expression((struct astnode *)ast->extra, parameters, declarations, NULL);
+                write_assembly("  mov %%rax, %%rcx");
+                write_assembly("  leaq -%d(%%rbp), %%rdx", offset);
+                write_assembly("  movq (%%rdx, %%rcx, %d), %%rax",
+                               size_of_type(declarations->items[i]->type_specifiers));
             }
             else
             {
-                if (ast->extra)
-                {
-                    visit_expression((struct astnode *)ast->extra, parameters, declarations, NULL);
-                    write_assembly("  mov %%rax, %%rcx  # index");
-                    write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset-4);
-                    write_assembly("  mov (%%rdx, %%rcx, 8), %%rax"); /* FIXME: hardcode 8 */
-                }
-                else
-                {
-                    snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
-                    write_assembly("  mov %s, %%eax", location);
-                }
+                snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
+                write_assembly("  movq %s, %%rax", location);
             }
-            goto done;
         }
+        goto done;
     }
 
 done:
@@ -492,8 +482,22 @@ identifier_offset(struct ast_expression *ast,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations)
 {
-    int i, offset = 0;
+    int i, j, local_size, offset = 0;
     struct ast_declaration *declaration;
+
+    /*
+     * Caculate start of local variables offset from block pointer.
+     */
+    local_size = 4;
+    for (i=0; declarations && i<declarations->size; i++)
+    {
+        declaration = declarations->items[i];
+        for (j=0; j<declaration->declarators_size; j++)
+        {
+            local_size += (declaration->declarators[j]->count *
+                           size_of_type(declaration->type_specifiers));
+        }
+    }
 
     offset = 0;
     for (i=0; i<declarations->size; i++)
@@ -513,7 +517,7 @@ identifier_offset(struct ast_expression *ast,
         }
     }
 
-    return offset;
+    return local_size - offset;
 }
 
 static void
@@ -541,10 +545,10 @@ visit_assignment_expression(struct astnode *ast,
             {
                 write_assembly("  push %%rax");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
-                write_assembly("  mov %%rax, %%rcx  # index");
-                write_assembly("  lea -%d(%%rbp), %%rdx  # array ", offset-4);
+                write_assembly("  mov %%rax, %%rcx");
+                write_assembly("  lea -%d(%%rbp), %%rdx", offset);
                 write_assembly("  pop %%rax");
-                write_assembly("  mov %%rax, (%%rdx, %%rcx, 8)", offset); /* FIXME: hardcode 8 */
+                write_assembly("  mov %%rax, (%%rdx, %%rcx, 4)"); /* FIXME: hardcode 4 declaration->type_specifiers */
             }
             else
             {
