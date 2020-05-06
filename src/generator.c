@@ -508,11 +508,6 @@ identifier_offset(struct ast_expression *ast,
         if (strcmp(ast->identifier,
                    declaration->declarators[0]->declarator_identifier) == 0)
         {
-             if (ast->extra != NULL)
-             {
-                 offset += (ast->extra->int_value *
-                            size_of_type(declaration->type_specifiers));
-             }
             break;
         }
     }
