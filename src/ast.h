@@ -84,7 +84,7 @@ struct ast_selection_statement
     enum astnode_t type;
     enum astnode_t elided_type;
 
-    struct astnode *expression;
+    struct ast_binary_op *expression;
     struct astnode *statement1;
     struct astnode *statement2;
 };
@@ -162,8 +162,6 @@ struct ast_declaration
     enum astnode_t type;
     enum astnode_t elided_type;
 
-    struct token *token; /* XXX: Why is this needed? */
-
     /*
      * Storage specifiers - there are 5 specifiers in ast.h:
      *     AUTO, REGISTER, STATIC, EXTERN, TYPEDEF
@@ -224,6 +222,16 @@ struct ast_translation_unit
     struct astnode *translation_unit_items[0];
 };
 
+struct ast_binary_op
+{
+    enum astnode_t type;
+    enum astnode_t elided_type;
+
+    enum astnode_t op;
+    struct astnode *left;
+    struct astnode *right;
+};
+
 struct astnode
 {
     enum astnode_t type;
@@ -234,16 +242,6 @@ struct astnode
      */
     enum astnode_t elided_type;
     struct token *token;
-
-    union
-    {
-        struct
-        {
-            enum astnode_t op;
-            struct astnode *left;
-            struct astnode *right;
-        };
-    };
 };
 
 struct astnode *

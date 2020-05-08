@@ -169,7 +169,7 @@ visit_constant(struct ast_expression *ast, enum scope scope)
 }
 
 static void
-visit_arithmetic_expression(struct astnode *ast,
+visit_arithmetic_expression(struct ast_binary_op *ast,
                             struct ast_parameter_type_list *parameters,
                             struct ast_declaration_list *declarations)
 {
@@ -378,7 +378,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
     {
         case AST_EQ:
         {
-            visit_expression(ast->expression, parameters, declarations, NULL);
+            visit_expression((struct astnode *)ast->expression, parameters, declarations, NULL);
             write_assembly("  jne L_ELSE_%d", i);
             break;
         }
@@ -426,7 +426,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
 }
 
 static void
-visit_equality_expression(struct astnode *ast,
+visit_equality_expression(struct ast_binary_op *ast,
                           struct ast_parameter_type_list *parameters,
                           struct ast_declaration_list *declarations,
                           char *label)
@@ -516,7 +516,7 @@ identifier_offset(struct ast_expression *ast,
 }
 
 static void
-visit_assignment_expression(struct astnode *ast,
+visit_assignment_expression(struct ast_binary_op *ast,
                             struct ast_parameter_type_list *parameters,
                             struct ast_declaration_list *declarations)
 {
@@ -620,7 +620,8 @@ visit_expression(struct astnode *ast,
         case AST_ADDITIVE_EXPRESSION:
         case AST_MULTIPLICATIVE_EXPRESSION:
         {
-            visit_arithmetic_expression(ast, parameters, declarations);
+            visit_arithmetic_expression((struct ast_binary_op *)ast,
+                                        parameters, declarations);
             break;
         }
         case AST_INTEGER_CONSTANT:
@@ -655,12 +656,14 @@ visit_expression(struct astnode *ast,
         case AST_EQUALITY_EXPRESSION:
         case AST_RELATIONAL_EXPRESSION:
         {
-            visit_equality_expression(ast, parameters, declarations, label);
+            visit_equality_expression((struct ast_binary_op *)ast, parameters,
+                                      declarations, label);
             break;
         }
         case AST_ASSIGNMENT_EXPRESSION:
         {
-            visit_assignment_expression(ast, parameters, declarations);
+            visit_assignment_expression((struct ast_binary_op *)ast, parameters,
+                                        declarations);
             break;
         }
         case AST_ITERATION_STATEMENT:

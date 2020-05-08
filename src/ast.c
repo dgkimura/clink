@@ -31,7 +31,8 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
 
     if (is_rule(rule, AST_EXTERNAL_DECLARATION))
     {
-        node_size = sizeof(struct astnode) + (sizeof(struct astnode *));
+        node_size = sizeof(struct ast_translation_unit) +
+                    sizeof(struct ast_translation_unit *);
         node = malloc(node_size);
         memset(node, 0, node_size);
 
@@ -46,8 +47,9 @@ create_translation_unit_node(struct listnode *list, struct rule *rule)
         /* index 2 is AST_TRANSLATION_UNIT state */
         node = list_item(&list, 3);
 
-        node_size = sizeof(struct astnode) +
-            sizeof(struct astnode *) * (node->translation_unit_items_size + 1);
+        node_size = sizeof(struct ast_translation_unit) +
+            sizeof(struct ast_translation_unit *) *
+            (node->translation_unit_items_size + 1);
         node = realloc(node, node_size);
 
         /* index 1 is AST_EXTERNAL_DECLARATION astnode */
@@ -127,7 +129,8 @@ create_declaration(struct listnode *list, struct rule *rule)
         child = list_item(&list, 3);
 
         node->declarators_size = child->declarators_size;
-        memcpy(node->declarators, child->declarators, sizeof(struct astnode *) * child->declarators_size);
+        memcpy(node->declarators, child->declarators,
+               sizeof(struct ast_declarator *) * child->declarators_size);
     }
 
     node->type = rule->type;
@@ -158,7 +161,8 @@ create_declaration_list(struct listnode *list, struct rule *rule)
     else if (is_rule(rule, AST_DECLARATION))
     {
         /* index 1 is AST_DECLARATION astnode */
-        node_size = sizeof(struct astnode) + sizeof(struct astnode *);
+        node_size = sizeof(struct ast_declaration) +
+                    sizeof(struct ast_declaration *);
         node = malloc(node_size);
 
         node->items[0] = list_item(&list, 1);
@@ -182,8 +186,8 @@ create_parameter_list(struct listnode *list, struct rule *rule)
         /* index 1 is AST_PARAMETER_DECLARATION astnode */
         node = list_item(&list, 5);
 
-        node_size = sizeof(struct astnode) + sizeof(struct astnode *) *
-            (node->size + 1);
+        node_size = sizeof(struct ast_declaration) +
+                    sizeof(struct ast_declaration *) * (node->size + 1);
         node = realloc(node, node_size);
         child = list_item(&list, 1);
 
@@ -195,7 +199,8 @@ create_parameter_list(struct listnode *list, struct rule *rule)
         /* index 1 is AST_PARAMETER_DECLARATION astnode */
         child = list_item(&list, 1);
 
-        node_size = sizeof(struct astnode) + sizeof(struct astnode *);
+        node_size = sizeof(struct ast_declaration) +
+                    sizeof(struct ast_declaration *);
         node = malloc(node_size);
 
         node->items[0] = child;
@@ -319,8 +324,8 @@ create_selection_statement(struct listnode *list, struct rule *rule)
     struct astnode *statement1;
 
     struct ast_selection_statement *node;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    node = malloc(sizeof(struct ast_selection_statement));
+    memset(node, 0, sizeof(struct ast_selection_statement));
 
     if (is_rule(rule,
         AST_IF, AST_LPAREN, AST_EXPRESSION, AST_RPAREN, AST_STATEMENT))
@@ -350,8 +355,8 @@ create_iteration_statement(struct listnode *list, struct rule *rule)
     struct astnode *statement;
 
     struct ast_iteration_statement *node;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    node = malloc(sizeof(struct ast_iteration_statement));
+    memset(node, 0, sizeof(struct ast_iteration_statement));
 
     if (is_rule(rule,
         AST_FOR, AST_LPAREN, AST_EXPRESSION, AST_SEMICOLON, AST_EXPRESSION,
@@ -389,9 +394,9 @@ create_assignment_expression(struct listnode *list, struct rule *rule)
      * necessary?
      */
 
-    struct astnode *node;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    struct ast_binary_op *node;
+    node = malloc(sizeof(struct ast_binary_op));
+    memset(node, 0, sizeof(struct ast_binary_op));
 
     /* index 1 is right astnode */
     /* index 3 is operator astnode */
@@ -402,7 +407,7 @@ create_assignment_expression(struct listnode *list, struct rule *rule)
 
     node->elided_type = rule->type;
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
@@ -412,8 +417,8 @@ create_declaration_specifiers(struct listnode *list, struct rule *rule)
 
     if (rule->length_of_nodes == 1)
     {
-        node = malloc(sizeof(struct astnode));
-        memset(node, 0, sizeof(struct astnode));
+        node = malloc(sizeof(struct ast_declaration));
+        memset(node, 0, sizeof(struct ast_declaration));
         child = list_item(&list, 1);
     }
     else if (rule->length_of_nodes == 2)
@@ -494,7 +499,7 @@ create_init_declarator_list(struct listnode *list, struct rule *rule)
 
         node->declarators_size = init_declarator_list->declarators_size + 1;
         memcpy(node->declarators, init_declarator_list->declarators,
-            sizeof(struct astnode *) * init_declarator_list->declarators_size);
+            sizeof(struct ast_declarator *) * init_declarator_list->declarators_size);
         node->declarators[node->declarators_size - 1] = init_declarator;
     }
 
@@ -538,7 +543,7 @@ struct astnode *
 create_direct_declarator(struct listnode *list, struct rule *rule)
 {
     struct ast_declarator *node;
-    struct ast_declaration *child;
+    struct astnode *child;
 
     if (is_rule(rule, AST_IDENTIFIER))
     {
@@ -805,9 +810,9 @@ create_(struct listnode *list, struct rule *rule)
 struct astnode *
 create_binary_op(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node;
-    node = malloc(sizeof(struct astnode));
-    memset(node, 0, sizeof(struct astnode));
+    struct ast_binary_op *node;
+    node = malloc(sizeof(struct ast_binary_op));
+    memset(node, 0, sizeof(struct ast_binary_op));
 
     /* index 1 is right astnode */
     /* index 3 is operator astnode */
@@ -818,7 +823,7 @@ create_binary_op(struct listnode *list, struct rule *rule)
 
     node->elided_type = rule->type;
     node->type = rule->type;
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *
@@ -901,8 +906,8 @@ create_primary_expression(struct listnode *list, struct rule *rule)
 
     if (is_rule(rule, AST_IDENTIFIER))
     {
-        node = malloc(sizeof(struct astnode));
-        memset(node, 0, sizeof(struct astnode));
+        node = malloc(sizeof(struct ast_expression));
+        memset(node, 0, sizeof(struct ast_expression));
 
         child = list_item(&list, 1);
         node->identifier = child->token->value;
@@ -910,8 +915,8 @@ create_primary_expression(struct listnode *list, struct rule *rule)
     }
     else if (is_rule(rule, AST_STRING_CONSTANT))
     {
-        node = malloc(sizeof(struct astnode));
-        memset(node, 0, sizeof(struct astnode));
+        node = malloc(sizeof(struct ast_expression));
+        memset(node, 0, sizeof(struct ast_expression));
 
         child = list_item(&list, 1);
         node->identifier = child->token->value;
