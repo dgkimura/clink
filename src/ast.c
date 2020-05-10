@@ -224,17 +224,18 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
         node->type = rule->type;
         return (struct astnode *)node;
     }
+    else if (is_rule(rule, AST_DECLARATION_SPECIFIERS, AST_DECLARATOR) ||
+             is_rule(rule, AST_DECLARATION_SPECIFIERS, AST_ABSTRACT_DECLARATOR))
+    {
+        /* index 3 is AST_DECLARATION_SPECIFIERS astnode */
+        node = list_item(&list, 3);
 
-    assert(rule->length_of_nodes == 2);
+        /* index 1 is [ AST_DECLARATOR | AST_ABSTRACT_DECLARATOR ] astnode */
+        child = list_item(&list, 1);
 
-    /* index 3 is AST_DECLARATION_SPECIFIERS astnode */
-    node = list_item(&list, 3);
-
-    /* index 1 is [ AST_DECLARATOR | AST_ABSTRACT_DECLARATOR ] astnode */
-    child = list_item(&list, 1);
-
-    node->declarators[0] = child;
-    node->declarators_size = 1;
+        node->declarators[0] = child;
+        node->declarators_size = 1;
+    }
 
     node->type = rule->type;
     return (struct astnode *)node;
@@ -937,7 +938,7 @@ create_argument_expression_list(struct listnode *list, struct rule *rule)
     unsigned int node_size;
     struct ast_expression *node;
 
-    if (rule->length_of_nodes == 1)
+    if (is_rule(rule, AST_ASSIGNMENT_EXPRESSION))
     {
         node_size = sizeof(struct ast_expression) + (sizeof(struct ast_expression *));
         node = malloc(node_size);
@@ -946,7 +947,8 @@ create_argument_expression_list(struct listnode *list, struct rule *rule)
         node->arguments[0] = list_item(&list, 1);
         node->arguments_size = 1;
     }
-    else
+    else if (is_rule(rule,
+             AST_ARGUMENT_EXPRESSION_LIST, AST_COMMA, AST_ASSIGNMENT_EXPRESSION))
     {
         node = list_item(&list, 5);
 

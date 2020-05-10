@@ -520,7 +520,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
                             struct ast_parameter_type_list *parameters,
                             struct ast_declaration_list *declarations)
 {
-    int i, offset;
+    int offset;
 
     /*
      * FIXME: Need to evaluate ast->left to find location. Should not
