@@ -487,32 +487,56 @@ identifier_offset(struct ast_expression *ast,
 
     /*
      * Caculate start of local variables offset from block pointer.
+     *
+     * Local variables are offset from the frame pointer (rbp) based on
+     * declaration position in the function. In the following function, 'i' is
+     * declared first so it is immediately below the frame pointer in the
+     * stack.
+     *
+     * ```
+     * void f()
+     * {
+     *     int i;
+     *     int a[3];
+     * }
+     * ```
+     *
+     * In this case 'i' would be at  4 off frame pointer and 'a' would be 16
+     * off frame pointer (16 == 4 + 3 * 4).
+     *
+     *  rbp -->     ---------   High memory
+     *             |   ret   |
+     *              ---------
+     *             |   i     |
+     *  rbp-4  ->   ---------
+     *             |         |
+     *             |   a     |
+     *             |         |
+     *  rbp-16 ->   ---------   Low memory (top of stack)
      */
-    local_size = 4;
-    for (i=0; declarations && i<declarations->size; i++)
-    {
-        declaration = declarations->items[i];
-        for (j=0; j<declaration->declarators_size; j++)
-        {
-            local_size += (declaration->declarators[j]->count *
-                           size_of_type(declaration->type_specifiers));
-        }
-    }
-
-    offset = 0;
+    offset = 4;
     for (i=0; i<declarations->size; i++)
     {
         declaration = declarations->items[i];
-        offset += size_of_type(declaration->type_specifiers);
+
+        for (j=0; j<declaration->declarators_size; j++)
+        {
+            offset += (declaration->declarators[j]->count *
+                       size_of_type(declaration->type_specifiers));
+        }
 
         if (strcmp(ast->identifier,
                    declaration->declarators[0]->declarator_identifier) == 0)
         {
             break;
         }
+        /*
+         * FIXME: Why is this necessary?
+         */
+        offset += 8;
     }
 
-    return local_size - offset;
+    return offset;
 }
 
 static void
