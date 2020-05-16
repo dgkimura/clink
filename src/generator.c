@@ -201,6 +201,7 @@ visit_arithmetic_expression(struct ast_binary_op *ast,
         }
         default:
         {
+            assert(0);
             break;
         }
     }
@@ -223,7 +224,7 @@ visit_function_call(struct ast_expression *ast,
             write_assembly("  mov $%d, %%%s", ast->arguments[i]->int_value,
                 get_32bit_register(i));
         }
-        if (ast->arguments[i]->kind == PTR_VALUE)
+        else if (ast->arguments[i]->kind == PTR_VALUE)
         {
             write_assembly("  mov -%d(%%rbp), %%rax",
                            identifier_offset(ast->arguments[i],
@@ -264,6 +265,34 @@ visit_function_call(struct ast_expression *ast,
             }
 
             write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
+        }
+        else if (argument->elided_type == AST_ADDITIVE_EXPRESSION)
+        {
+            /*
+             * Save registers that have updated. Since we are about to perform
+             * another function call we may need the registers.
+             */
+            for (j=0; j<i; j++)
+            {
+                write_assembly("  push %%%s", get_64bit_register(j));
+            }
+            visit_expression((struct astnode *)argument, parameters,
+                             declarations, NULL);
+
+            /*
+             * Re-apply registers. Since registers are stored on the stack they
+             * need to be pop'd in the opposite order that they were push'd.
+             */
+            for (j=i-1; j>=0; j--)
+            {
+                write_assembly("  pop %%%s", get_64bit_register(j));
+            }
+
+            write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
+        }
+        else
+        {
+            assert(0);
         }
     }
     write_assembly("  call _%s", ast->identifier);
