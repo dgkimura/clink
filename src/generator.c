@@ -628,10 +628,24 @@ visit_assignment_expression(struct ast_binary_op *ast,
         }
         case AST_MINUS_EQUAL:
         {
-            write_assembly("  mov %%eax, %%ecx");
-            write_assembly("  mov -%d(%%rbp), %%eax", offset);
-            write_assembly("  sub %%ecx, %%eax");
-            write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+            if (((struct ast_expression *)ast->left)->extra != NULL)
+            {
+                write_assembly("  push %%rax");
+                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
+                write_assembly("  mov %%rax, %%rdi");
+                write_assembly("  lea -%d(%%rbp), %%rdx", offset);
+                write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
+                write_assembly("  pop %%rax");
+                write_assembly("  sub %%ecx, %%eax");
+                write_assembly("  mov %%rax, (%%rdx, %%rdi, 4)"); /* FIXME: hardcode 4 declaration->type_specifiers */
+            }
+            else
+            {
+                write_assembly("  mov %%eax, %%ecx");
+                write_assembly("  mov -%d(%%rbp), %%eax", offset);
+                write_assembly("  sub %%ecx, %%eax");
+                write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+            }
             break;
         }
         case AST_ASTERISK_EQUAL:
