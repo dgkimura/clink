@@ -636,8 +636,8 @@ visit_assignment_expression(struct ast_binary_op *ast,
                 write_assembly("  lea -%d(%%rbp), %%rdx", offset);
                 write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
                 write_assembly("  pop %%rax");
-                write_assembly("  sub %%ecx, %%eax");
-                write_assembly("  mov %%rax, (%%rdx, %%rdi, 4)"); /* FIXME: hardcode 4 declaration->type_specifiers */
+                write_assembly("  sub %%eax, %%ecx");
+                write_assembly("  mov %%rcx, (%%rdx, %%rdi, 4)"); /* FIXME: hardcode 4 declaration->type_specifiers */
             }
             else
             {
