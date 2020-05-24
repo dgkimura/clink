@@ -686,20 +686,21 @@ visit_iteration_statement(struct ast_iteration_statement *ast,
      * Use 'i' to generate and keep track of a unique label
      */
     static int i = 0;
+    int ilocal = i++;
     char label[25];
 
     visit_expression(ast->expression1, parameters, declarations, NULL);
-    write_assembly("L_FOR_BEGIN_%d:", i);
+    write_assembly("L_FOR_BEGIN_%d:", ilocal);
 
-    snprintf(label, sizeof(label), "L_FOR_END_%d", i);
+    snprintf(label, sizeof(label), "L_FOR_END_%d", ilocal);
     visit_expression(ast->expression2, parameters, declarations, label);
 
     visit_expression(ast->statement, parameters, declarations, NULL);
     visit_expression(ast->expression3, parameters, declarations, NULL);
 
-    write_assembly("  jmp L_FOR_BEGIN_%d", i);
+    write_assembly("  jmp L_FOR_BEGIN_%d", ilocal);
 
-    write_assembly("L_FOR_END_%d:", i++);
+    write_assembly("L_FOR_END_%d:", ilocal);
 }
 
 static void
