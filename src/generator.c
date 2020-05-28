@@ -486,7 +486,7 @@ visit_equality_expression(struct ast_binary_op *ast,
         }
         case AST_LTEQ:
         {
-            write_assembly("  jle %s", label);
+            write_assembly("  jl %s", label);
             break;
         }
         case AST_GT:
@@ -496,7 +496,7 @@ visit_equality_expression(struct ast_binary_op *ast,
         }
         case AST_LT:
         {
-            write_assembly("  jl %s", label);
+            write_assembly("  jle %s", label);
             break;
         }
         default:
