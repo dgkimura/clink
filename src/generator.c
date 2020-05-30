@@ -427,6 +427,17 @@ visit_selection_statement(struct ast_selection_statement *ast,
             write_assembly("  jne L_ELSE_%d", i);
             break;
         }
+        case AST_LTEQ:
+        {
+            visit_expression(ast->expression->left, parameters, declarations, NULL);
+            write_assembly("  push %%rax");
+            visit_expression(ast->expression->right, parameters, declarations, NULL);
+            write_assembly("  mov %%eax, %%ecx");
+            write_assembly("  pop %%rax");
+            write_assembly("  cmp %%eax, %%ecx");
+            write_assembly("  jle L_ELSE_%d", i);
+            break;
+        }
         default:
         {
             assert(0);
