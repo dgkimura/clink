@@ -403,47 +403,9 @@ visit_selection_statement(struct ast_selection_statement *ast,
     static int i = 0;
     char label[25];
 
-    switch (ast->expression->op)
-    {
-        case AST_EQ:
-        {
-            visit_expression((struct astnode *)ast->expression, parameters, declarations, NULL);
-            write_assembly("  jne L_ELSE_%d", i);
-            break;
-        }
-        case AST_VERTICALBAR_VERTICALBAR:
-        {
-            snprintf(label, sizeof(label), "L_IF_%d", i);
-            visit_expression(ast->expression->left, parameters, declarations, label);
-            visit_expression(ast->expression->right, parameters, declarations, label);
-            write_assembly("  jmp L_ELSE_%d", i);
-            break;
-        }
-        case AST_AMPERSAND_AMPERSAND:
-        {
-            visit_expression(ast->expression->left, parameters, declarations, NULL);
-            write_assembly("  jne L_ELSE_%d", i);
-            visit_expression(ast->expression->right, parameters, declarations, NULL);
-            write_assembly("  jne L_ELSE_%d", i);
-            break;
-        }
-        case AST_LTEQ:
-        {
-            visit_expression(ast->expression->left, parameters, declarations, NULL);
-            write_assembly("  push %%rax");
-            visit_expression(ast->expression->right, parameters, declarations, NULL);
-            write_assembly("  mov %%eax, %%ecx");
-            write_assembly("  pop %%rax");
-            write_assembly("  cmp %%eax, %%ecx");
-            write_assembly("  jle L_ELSE_%d", i);
-            break;
-        }
-        default:
-        {
-            assert(0);
-            break;
-        }
-    }
+    visit_expression((struct astnode *)ast->expression, parameters, declarations, NULL);
+    write_assembly("  cmpl $1, %%eax");
+    write_assembly("  jne L_ELSE_%d", i);
 
     /*
      * if block statements
@@ -471,49 +433,72 @@ visit_equality_expression(struct ast_binary_op *ast,
                           struct ast_declaration_list *declarations,
                           char *label)
 {
+    static int i = 0;
+    int ilocal = i++;
+
     visit_expression(ast->left, parameters, declarations, NULL);
     write_assembly("  push %%rax");
     visit_expression(ast->right, parameters, declarations, NULL);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
-    write_assembly("  cmpl %%eax, %%ecx");
 
-    if (label == NULL)
+    if (ast->op == AST_EQ)
     {
-        return;
+        write_assembly("  cmpl %%ecx, %%eax");
+        write_assembly("  je L_EQ_%d", ilocal);
+        write_assembly("  mov $0, %%eax");
+        write_assembly("  jmp L_EQ_DONE_%d", ilocal);
+        write_assembly("L_EQ_%d:", ilocal);
+        write_assembly("  mov $1, %%eax");
+        write_assembly("L_EQ_DONE_%d:", ilocal);
     }
-
-    switch (ast->op)
+    else if (ast->op == AST_LTEQ)
     {
-        case AST_EQ:
-        {
-            write_assembly("  je %s", label);
-            break;
-        }
-        case AST_GTEQ:
-        {
-            write_assembly("  jge %s", label);
-            break;
-        }
-        case AST_LTEQ:
-        {
-            write_assembly("  jl %s", label);
-            break;
-        }
-        case AST_GT:
-        {
-            write_assembly("  jg %s", label);
-            break;
-        }
-        case AST_LT:
-        {
-            write_assembly("  jle %s", label);
-            break;
-        }
-        default:
-        {
-            assert(0);
-        }
+        write_assembly("  cmpl %%ecx, %%eax");
+        write_assembly("  jle L_EQ_%d", ilocal);
+        write_assembly("  mov $0, %%eax");
+        write_assembly("  jmp L_EQ_DONE_%d", ilocal);
+        write_assembly("L_EQ_%d:", ilocal);
+        write_assembly("  mov $1, %%eax");
+        write_assembly("L_EQ_DONE_%d:", ilocal);
+    }
+    else if (ast->op == AST_LT)
+    {
+        write_assembly("  cmpl %%ecx, %%eax");
+        write_assembly("  jl L_EQ_%d", ilocal);
+        write_assembly("  mov $0, %%eax");
+        write_assembly("  jmp L_EQ_DONE_%d", ilocal);
+        write_assembly("L_EQ_%d:", ilocal);
+        write_assembly("  mov $1, %%eax");
+        write_assembly("L_EQ_DONE_%d:", ilocal);
+    }
+    else if (ast->op == AST_AMPERSAND_AMPERSAND)
+    {
+        write_assembly("  cmpl $0, %%eax");
+        write_assembly("  je L_NEQ_%d", ilocal);
+        write_assembly("  cmpl $0, %%ecx");
+        write_assembly("  je L_NEQ_%d", ilocal);
+        write_assembly("  mov $1, %%eax");
+        write_assembly("  jmp L_EQ_DONE_%d", ilocal);
+        write_assembly("L_NEQ_%d:", ilocal);
+        write_assembly("  mov $0, %%eax");
+        write_assembly("L_EQ_DONE_%d:", ilocal);
+    }
+    else if (ast->op == AST_VERTICALBAR_VERTICALBAR)
+    {
+        write_assembly("  cmpl $1, %%eax");
+        write_assembly("  je L_EQ_%d", ilocal);
+        write_assembly("  cmpl $1, %%ecx");
+        write_assembly("  je L_EQ_%d", ilocal);
+        write_assembly("  mov $0, %%eax");
+        write_assembly("  jmp L_EQ_DONE_%d", ilocal);
+        write_assembly("L_EQ_%d:", ilocal);
+        write_assembly("  mov $1, %%eax");
+        write_assembly("L_EQ_DONE_%d:", ilocal);
+    }
+    else
+    {
+        assert(0);
     }
 }
 
@@ -705,6 +690,8 @@ visit_iteration_statement(struct ast_iteration_statement *ast,
 
     snprintf(label, sizeof(label), "L_FOR_END_%d", ilocal);
     visit_expression(ast->expression2, parameters, declarations, label);
+    write_assembly("  cmpl $1, %%eax");
+    write_assembly("  jne L_FOR_END_%d", ilocal);
 
     visit_expression(ast->statement, parameters, declarations, NULL);
     visit_expression(ast->expression3, parameters, declarations, NULL);
