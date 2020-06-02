@@ -19,8 +19,7 @@ static FILE *assembly_filename;
 
 static void visit_expression(struct astnode *ast,
                              struct ast_parameter_type_list *parameters,
-                             struct ast_declaration_list *declarations,
-                             char *label);
+                             struct ast_declaration_list *declarations);
 static int
 identifier_offset(struct ast_expression *ast,
                   struct ast_parameter_type_list *parameters,
@@ -176,9 +175,9 @@ visit_arithmetic_expression(struct ast_binary_op *ast,
     assert(ast->elided_type == AST_ADDITIVE_EXPRESSION ||
            ast->elided_type == AST_MULTIPLICATIVE_EXPRESSION);
 
-    visit_expression(ast->left, parameters, declarations, NULL);
+    visit_expression(ast->left, parameters, declarations);
     write_assembly("  push %%rax");
-    visit_expression(ast->right, parameters, declarations, NULL);
+    visit_expression(ast->right, parameters, declarations);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
@@ -240,7 +239,7 @@ visit_function_call(struct ast_expression *ast,
         else if (ast->arguments[i]->kind == IDENTIFIER_VALUE)
         {
             visit_expression((struct astnode *)ast->arguments[i], parameters,
-                             declarations, NULL);
+                             declarations);
             write_assembly("  mov %%eax, %%%s", get_32bit_register(i));
         }
         else if (ast->arguments[i]->kind == FUNCTION_VALUE)
@@ -277,7 +276,7 @@ visit_function_call(struct ast_expression *ast,
                 write_assembly("  push %%%s", get_64bit_register(j));
             }
             visit_expression((struct astnode *)argument, parameters,
-                             declarations, NULL);
+                             declarations);
 
             /*
              * Re-apply registers. Since registers are stored on the stack they
@@ -333,7 +332,7 @@ visit_identifier(struct ast_expression *ast,
         {
             if (ast->extra)
             {
-                visit_expression((struct astnode *)ast->extra, parameters, declarations, NULL);
+                visit_expression((struct astnode *)ast->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rcx");
                 write_assembly("  leaq -%d(%%rbp), %%rdx", offset);
                 write_assembly("  movq (%%rdx, %%rcx, %d), %%rax",
@@ -403,7 +402,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
     static int i = 0;
     char label[25];
 
-    visit_expression((struct astnode *)ast->expression, parameters, declarations, NULL);
+    visit_expression((struct astnode *)ast->expression, parameters, declarations);
     write_assembly("  cmpl $1, %%eax");
     write_assembly("  jne L_ELSE_%d", i);
 
@@ -411,7 +410,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
      * if block statements
      */
     write_assembly("L_IF_%d:", i);
-    visit_expression(ast->statement1, parameters, declarations, NULL);
+    visit_expression(ast->statement1, parameters, declarations);
     write_assembly("  jmp L_DONE_%d", i);
 
     write_assembly("L_ELSE_%d:", i);
@@ -421,7 +420,7 @@ visit_selection_statement(struct ast_selection_statement *ast,
         /*
          * else block statements
          */
-        visit_expression(ast->statement2, parameters, declarations, NULL);
+        visit_expression(ast->statement2, parameters, declarations);
     }
 
     write_assembly("L_DONE_%d:", i++);
@@ -430,15 +429,14 @@ visit_selection_statement(struct ast_selection_statement *ast,
 static void
 visit_equality_expression(struct ast_binary_op *ast,
                           struct ast_parameter_type_list *parameters,
-                          struct ast_declaration_list *declarations,
-                          char *label)
+                          struct ast_declaration_list *declarations)
 {
     static int i = 0;
     int ilocal = i++;
 
-    visit_expression(ast->left, parameters, declarations, NULL);
+    visit_expression(ast->left, parameters, declarations);
     write_assembly("  push %%rax");
-    visit_expression(ast->right, parameters, declarations, NULL);
+    visit_expression(ast->right, parameters, declarations);
     write_assembly("  mov %%rax, %%rcx");
     write_assembly("  pop %%rax");
 
@@ -579,7 +577,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
     offset = identifier_offset((struct ast_expression *)ast->left,
                                parameters, declarations);
 
-    visit_expression(ast->right, parameters, declarations, NULL);
+    visit_expression(ast->right, parameters, declarations);
 
     switch (ast->op)
     {
@@ -588,7 +586,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
                 write_assembly("  push %%rax");
-                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
+                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
                 write_assembly("  lea -%d(%%rbp), %%rdx", offset);
                 write_assembly("  pop %%rax");
@@ -605,7 +603,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
                 write_assembly("  push %%rax");
-                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
+                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
                 write_assembly("  lea -%d(%%rbp), %%rdx", offset);
                 write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
@@ -627,7 +625,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
                 write_assembly("  push %%rax");
-                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
+                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
                 write_assembly("  lea -%d(%%rbp), %%rdx", offset);
                 write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
@@ -649,7 +647,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
                 write_assembly("  push %%rax");
-                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations, NULL);
+                visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
                 write_assembly("  lea -%d(%%rbp), %%rdx", offset);
                 write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
@@ -683,18 +681,16 @@ visit_iteration_statement(struct ast_iteration_statement *ast,
      */
     static int i = 0;
     int ilocal = i++;
-    char label[25];
 
-    visit_expression(ast->expression1, parameters, declarations, NULL);
+    visit_expression(ast->expression1, parameters, declarations);
     write_assembly("L_FOR_BEGIN_%d:", ilocal);
 
-    snprintf(label, sizeof(label), "L_FOR_END_%d", ilocal);
-    visit_expression(ast->expression2, parameters, declarations, label);
+    visit_expression(ast->expression2, parameters, declarations);
     write_assembly("  cmpl $1, %%eax");
     write_assembly("  jne L_FOR_END_%d", ilocal);
 
-    visit_expression(ast->statement, parameters, declarations, NULL);
-    visit_expression(ast->expression3, parameters, declarations, NULL);
+    visit_expression(ast->statement, parameters, declarations);
+    visit_expression(ast->expression3, parameters, declarations);
 
     write_assembly("  jmp L_FOR_BEGIN_%d", ilocal);
 
@@ -704,8 +700,7 @@ visit_iteration_statement(struct ast_iteration_statement *ast,
 static void
 visit_expression(struct astnode *ast,
                  struct ast_parameter_type_list *parameters,
-                 struct ast_declaration_list *declarations,
-                 char *label)
+                 struct ast_declaration_list *declarations)
 {
     int i;
 
@@ -751,7 +746,7 @@ visit_expression(struct astnode *ast,
         case AST_RELATIONAL_EXPRESSION:
         {
             visit_equality_expression((struct ast_binary_op *)ast, parameters,
-                                      declarations, label);
+                                      declarations);
             break;
         }
         case AST_ASSIGNMENT_EXPRESSION:
@@ -774,7 +769,7 @@ visit_expression(struct astnode *ast,
             for (i=0; i<compound->statements->size; i++)
             {
                 visit_expression(compound->statements->items[i], parameters,
-                                 declarations, NULL);
+                                 declarations);
             }
             break;
         }
@@ -862,7 +857,7 @@ visit_function_definition(struct ast_function *ast)
         /*
          * Iterate over the statements
          */
-        visit_expression(statement, parameters, compound->declarations, NULL);
+        visit_expression(statement, parameters, compound->declarations);
     }
 
     /*
