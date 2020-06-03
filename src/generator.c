@@ -786,7 +786,7 @@ visit_function_definition(struct ast_function *ast)
 {
     /* add to local symbol table */
 
-    int i, j, local_size;
+    int i, j;
     struct listnode *list;
     struct astnode *statement;
     struct ast_declarator *declarator;
@@ -817,19 +817,20 @@ visit_function_definition(struct ast_function *ast)
      * arguments are passed through registers. The remainder is pushed on the
      * stack.
      */
+    /*
+     * TODO: This is not implemented yet. Revisit when functions support more
+     *       than 6 arguments.
     local_size = 4;
     for (i=6; parameters && i<parameters->size; i++)
     {
         parameter = parameters->items[i];
 
-        /*
-         * Add up the size of all parameters and push onto the stack
-         */
         write_assembly("  movl %%%s, -%d(%%rbp)",
                 get_32bit_register(i),
                 local_size);
         local_size += size_of_type(parameter->type_specifiers);
     }
+    */
 
     /*
      * Reserve stack space for local variables in this function so that if this
@@ -844,11 +845,12 @@ visit_function_definition(struct ast_function *ast)
         declaration = compound->declarations->items[i];
         for (j=0; j<declaration->declarators_size; j++)
         {
-            local_size += (declaration->declarators[j]->count *
-                           size_of_type(declaration->type_specifiers));
+            write_assembly("  subq $%d, %%rsp",
+                    declaration->declarators[j]->count *
+                    size_of_type(declaration->type_specifiers));
         }
     }
-    write_assembly("  subq $%d, %%rsp", align16(local_size));
+    write_assembly("  andq $0xFFFFFFFFFFFFFFF0, %%rsp");
 
     for (i=0; compound->statements && i<compound->statements->size; i++)
     {
@@ -863,7 +865,7 @@ visit_function_definition(struct ast_function *ast)
     /*
      * Return registers and stack to state before called.
      */
-    write_assembly("  addq $%d, %%rsp", align16(local_size));
+    write_assembly("  movq %%rbp, %%rsp");
     write_assembly("  popq %%rbp");
     write_assembly("  retq");
 }
