@@ -817,6 +817,7 @@ visit_function_definition(struct ast_function *ast)
      * arguments are passed through registers. The remainder is pushed on the
      * stack.
      */
+    write_assembly("  subq $4, %%rsp");
     /*
      * TODO: This is not implemented yet. Revisit when functions support more
      *       than 6 arguments.
