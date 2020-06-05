@@ -20,7 +20,7 @@ static FILE *assembly_filename;
 static void visit_expression(struct astnode *ast,
                              struct ast_parameter_type_list *parameters,
                              struct ast_declaration_list *declarations);
-static int
+static void
 identifier_offset(struct ast_expression *ast,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations);
@@ -225,9 +225,8 @@ visit_function_call(struct ast_expression *ast,
         }
         else if (ast->arguments[i]->kind == PTR_VALUE)
         {
-            write_assembly("  mov -%d(%%rbp), %%rax",
-                           identifier_offset(ast->arguments[i],
-                                             parameters, declarations));
+            identifier_offset(ast->arguments[i], parameters, declarations);
+            write_assembly("  mov (%%rbx), %%rax");
             write_assembly("  mov (%%rax), %%%s", get_32bit_register(i));
         }
         else if (ast->arguments[i]->kind == STRING_VALUE)
@@ -302,7 +301,7 @@ visit_identifier(struct ast_expression *ast,
                  struct ast_parameter_type_list *parameters,
                  struct ast_declaration_list *declarations)
 {
-    int i, offset;
+    int i;
     struct ast_declaration *parameter, *declaration;
     char location[25];
 
@@ -320,30 +319,33 @@ visit_identifier(struct ast_expression *ast,
         }
     }
 
-    offset = identifier_offset(ast, parameters, declarations);
     for (i=0; i<declarations->size; i++)
     {
         if (ast->kind == PTR_VALUE)
         {
-            snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
-            write_assembly("  leaq %s, %%rax", location);
+            identifier_offset(ast, parameters, declarations);
+            write_assembly("  leaq (%%rbx), %%rax");
         }
         else
         {
             if (ast->extra)
             {
                 visit_expression((struct astnode *)ast->extra, parameters, declarations);
+                write_assembly("  push %%rax");
+                identifier_offset(ast, parameters, declarations);
+                write_assembly("  pop %%rax");
                 write_assembly("  mov %%rax, %%rcx");
-                write_assembly("  leaq -%d(%%rbp), %%rdx", offset);
+                write_assembly("  leaq (%%rbx), %%rdx");
                 write_assembly("  movq (%%rdx, %%rcx, %d), %%rax",
                                size_of_type(declarations->items[i]->type_specifiers));
             }
             else
             {
-                snprintf(location, sizeof(location), "-%d(%%rbp)", offset);
-                write_assembly("  movq %s, %%rax", location);
+                identifier_offset(ast, parameters, declarations);
+                write_assembly("  movq (%%rbx), %%rax");
             }
         }
+        snprintf(location, sizeof(location), "(%%rbx)");
         goto done;
     }
 
@@ -500,7 +502,7 @@ visit_equality_expression(struct ast_binary_op *ast,
     }
 }
 
-static int
+static void
 identifier_offset(struct ast_expression *ast,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations)
@@ -559,7 +561,8 @@ identifier_offset(struct ast_expression *ast,
         offset += 8;
     }
 
-    return offset;
+    write_assembly("  movq %%rbp, %%rbx");
+    write_assembly("  subq $%d, %%rbx", offset);
 }
 
 static void
@@ -567,34 +570,32 @@ visit_assignment_expression(struct ast_binary_op *ast,
                             struct ast_parameter_type_list *parameters,
                             struct ast_declaration_list *declarations)
 {
-    int offset;
-
-    /*
-     * FIXME: Need to evaluate ast->left to find location. Should not
-     *        assume it is a simple identifier node. It may be part of a
-     *        struct..
-     */
-    offset = identifier_offset((struct ast_expression *)ast->left,
-                               parameters, declarations);
-
-    visit_expression(ast->right, parameters, declarations);
-
     switch (ast->op)
     {
         case AST_EQUAL:
         {
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
+                visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
-                write_assembly("  lea -%d(%%rbp), %%rdx", offset);
+                write_assembly("  pop %%rbx");
+                write_assembly("  lea (%%rbx), %%rdx");
                 write_assembly("  pop %%rax");
                 write_assembly("  movl %%eax, (%%rdx, %%rdi, 4)"); /* FIXME: hardcode 4 declaration->type_specifiers */
             }
             else
             {
-                write_assembly("  mov %%rax, -%d(%%rbp)", offset);
+                visit_expression(ast->right, parameters, declarations);
+                write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  pop %%rax");
+                write_assembly("  mov %%rax, (%%rbx)");
             }
             break;
         }
@@ -602,10 +603,15 @@ visit_assignment_expression(struct ast_binary_op *ast,
         {
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
+                visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
-                write_assembly("  lea -%d(%%rbp), %%rdx", offset);
+                write_assembly("  pop %%rbx");
+                write_assembly("  lea (%%rbx), %%rdx");
                 write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
                 write_assembly("  pop %%rax");
                 write_assembly("  add %%ecx, %%eax");
@@ -613,10 +619,15 @@ visit_assignment_expression(struct ast_binary_op *ast,
             }
             else
             {
+                visit_expression(ast->right, parameters, declarations);
+                write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  pop %%rax");
                 write_assembly("  mov %%eax, %%ecx");
-                write_assembly("  mov -%d(%%rbp), %%eax", offset);
+                write_assembly("  mov (%%rbx), %%eax");
                 write_assembly("  add %%ecx, %%eax");
-                write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+                write_assembly("  mov %%eax, (%%rbx)");
             }
             break;
         }
@@ -624,10 +635,15 @@ visit_assignment_expression(struct ast_binary_op *ast,
         {
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
+                visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
-                write_assembly("  lea -%d(%%rbp), %%rdx", offset);
+                write_assembly("  pop %%rbx");
+                write_assembly("  lea (%%rbx), %%rdx");
                 write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
                 write_assembly("  pop %%rax");
                 write_assembly("  sub %%eax, %%ecx");
@@ -635,10 +651,15 @@ visit_assignment_expression(struct ast_binary_op *ast,
             }
             else
             {
+                visit_expression(ast->right, parameters, declarations);
+                write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  pop %%rax");
                 write_assembly("  mov %%eax, %%ecx");
-                write_assembly("  mov -%d(%%rbp), %%eax", offset);
+                write_assembly("  mov (%%rbx), %%eax");
                 write_assembly("  sub %%ecx, %%eax");
-                write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+                write_assembly("  mov %%eax, (%%rbx)");
             }
             break;
         }
@@ -646,10 +667,15 @@ visit_assignment_expression(struct ast_binary_op *ast,
         {
             if (((struct ast_expression *)ast->left)->extra != NULL)
             {
+                visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
                 write_assembly("  mov %%rax, %%rdi");
-                write_assembly("  lea -%d(%%rbp), %%rdx", offset);
+                write_assembly("  pop %%rbx");
+                write_assembly("  lea (%%rbx), %%rdx");
                 write_assembly("  mov (%%rdx, %%rdi, 4), %%rcx"); /* FIXME: hardcode 4 declaration->type_specifiers */
                 write_assembly("  pop %%rax");
                 write_assembly("  imul %%eax, %%ecx");
@@ -657,10 +683,15 @@ visit_assignment_expression(struct ast_binary_op *ast,
             }
             else
             {
+                visit_expression(ast->right, parameters, declarations);
+                write_assembly("  push %%rax");
+                identifier_offset((struct ast_expression *)ast->left,
+                                   parameters, declarations);
+                write_assembly("  pop %%rax");
                 write_assembly("  mov %%eax, %%ecx");
-                write_assembly("  mov -%d(%%rbp), %%eax", offset);
+                write_assembly("  mov (%%rbx), %%eax");
                 write_assembly("  imul %%ecx, %%eax");
-                write_assembly("  mov %%eax, -%d(%%rbp)", offset);
+                write_assembly("  mov %%eax, (%%rbx)");
             }
             break;
         }
