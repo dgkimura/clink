@@ -67,9 +67,9 @@ size_of_type(int type_specifiers)
 }
 
 static int
-align16(int size)
+align8(int size)
 {
-    return size + ((size % 16 == 0) ?  0 : 16 - (size % 16));
+    return size + ((size % 8 == 0) ?  0 : 8 - (size % 8));
 }
 
 /*
@@ -342,7 +342,7 @@ visit_identifier(struct ast_expression *ast,
             else
             {
                 identifier_offset(ast, parameters, declarations);
-                write_assembly("  movq (%%rbx), %%rax");
+                write_assembly("  mov (%%rbx), %%eax");
             }
         }
         snprintf(location, sizeof(location), "(%%rbx)");
@@ -539,15 +539,15 @@ identifier_offset(struct ast_expression *ast,
      *             |         |
      *  rbp-16 ->   ---------   Low memory (top of stack)
      */
-    offset = 4;
+    offset = 8;
     for (i=0; i<declarations->size; i++)
     {
         declaration = declarations->items[i];
 
         for (j=0; j<declaration->declarators_size; j++)
         {
-            offset += (declaration->declarators[j]->count *
-                       size_of_type(declaration->type_specifiers));
+            offset += align8(declaration->declarators[j]->count *
+                              size_of_type(declaration->type_specifiers));
         }
 
         if (strcmp(ast->identifier,
@@ -555,10 +555,6 @@ identifier_offset(struct ast_expression *ast,
         {
             break;
         }
-        /*
-         * FIXME: Why is this necessary?
-         */
-        offset += 8;
     }
 
     write_assembly("  movq %%rbp, %%rbx");
@@ -848,7 +844,7 @@ visit_function_definition(struct ast_function *ast)
      * arguments are passed through registers. The remainder is pushed on the
      * stack.
      */
-    write_assembly("  subq $4, %%rsp");
+    write_assembly("  subq $8, %%rsp");
     /*
      * TODO: This is not implemented yet. Revisit when functions support more
      *       than 6 arguments.
@@ -878,8 +874,8 @@ visit_function_definition(struct ast_function *ast)
         for (j=0; j<declaration->declarators_size; j++)
         {
             write_assembly("  subq $%d, %%rsp",
-                    declaration->declarators[j]->count *
-                    size_of_type(declaration->type_specifiers));
+                           align8(declaration->declarators[j]->count *
+                                   size_of_type(declaration->type_specifiers)));
         }
     }
     write_assembly("  andq $0xFFFFFFFFFFFFFFF0, %%rsp");
