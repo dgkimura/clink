@@ -141,7 +141,7 @@ struct ast_declarator
     /*
      * Used to indicate number of objects (i.e. array can have count > 1)
      */
-    int count;
+    struct ast_expression *count;
 
     struct ast_parameter_type_list *declarator_parameter_type_list;
 

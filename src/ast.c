@@ -555,7 +555,7 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
         memset(node, 0, sizeof(struct ast_declarator));
 
         node->declarator_identifier = child->token->value;
-        node->count = 1;
+        node->count = NULL;
     }
     else if (rule->length_of_nodes == 3)
     {
@@ -580,7 +580,7 @@ create_direct_declarator(struct listnode *list, struct rule *rule)
          * FIXME: Not guaranteed this is a literal int. May have to evaluate
          * expression...
          */
-        node->count = ((struct ast_expression *)list_item(&list, 3))->int_value;
+        node->count = (struct ast_expression *)list_item(&list, 3);
     }
     else if (rule->length_of_nodes == 4)
     {

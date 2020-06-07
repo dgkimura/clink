@@ -507,7 +507,7 @@ identifier_offset(struct ast_expression *ast,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations)
 {
-    int i, j, local_size, offset = 0;
+    int i, j, local_size;
     struct ast_declaration *declaration;
 
     /*
@@ -539,15 +539,29 @@ identifier_offset(struct ast_expression *ast,
      *             |         |
      *  rbp-16 ->   ---------   Low memory (top of stack)
      */
-    offset = 8;
+    write_assembly("  mov $8, %%rcx");
     for (i=0; i<declarations->size; i++)
     {
         declaration = declarations->items[i];
 
         for (j=0; j<declaration->declarators_size; j++)
         {
-            offset += align8(declaration->declarators[j]->count *
-                              size_of_type(declaration->type_specifiers));
+            if (declaration->declarators[j]->count != NULL)
+            {
+                write_assembly("  push %%rcx");
+                visit_expression(
+                    (struct astnode *)declaration->declarators[j]->count,
+                    parameters, declarations);
+                write_assembly("  imul $%d, %%rax",
+                               align8(size_of_type(declaration->type_specifiers)));
+                write_assembly("  pop %%rcx");
+                write_assembly("  add %%rax, %%rcx");
+            }
+            else
+            {
+                write_assembly("  add $%d, %%rcx",
+                               align8(size_of_type(declaration->type_specifiers)));
+            }
         }
 
         if (strcmp(ast->identifier,
@@ -558,7 +572,7 @@ identifier_offset(struct ast_expression *ast,
     }
 
     write_assembly("  movq %%rbp, %%rbx");
-    write_assembly("  subq $%d, %%rbx", offset);
+    write_assembly("  subq %%rcx, %%rbx");
 }
 
 static void
@@ -873,9 +887,21 @@ visit_function_definition(struct ast_function *ast)
         declaration = compound->declarations->items[i];
         for (j=0; j<declaration->declarators_size; j++)
         {
-            write_assembly("  subq $%d, %%rsp",
-                           align8(declaration->declarators[j]->count *
-                                   size_of_type(declaration->type_specifiers)));
+            if (declaration->declarators[j]->count != NULL)
+            {
+                visit_expression(
+                    (struct astnode *)declaration->declarators[j]->count,
+                    parameters,
+                    compound->declarations);
+                write_assembly("  imul $%d, %%eax",
+                               align8(size_of_type(declaration->type_specifiers)));
+                write_assembly("  subq %%rax, %%rsp");
+            }
+            else
+            {
+                write_assembly("  subq $%d, %%rsp",
+                               align8(size_of_type(declaration->type_specifiers)));
+            }
         }
     }
     write_assembly("  andq $0xFFFFFFFFFFFFFFF0, %%rsp");
