@@ -522,22 +522,22 @@ identifier_offset(struct ast_expression *ast,
      * void f()
      * {
      *     int i;
-     *     int a[3];
+     *     int a[4];
      * }
      * ```
      *
-     * In this case 'i' would be at  4 off frame pointer and 'a' would be 16
-     * off frame pointer (16 == 4 + 3 * 4).
+     * In this case 'i' would be at  8 off frame pointer and 'a' would be 24
+     * off frame pointer (24 == 8 + 4 * 4).
      *
-     *  rbp -->     ---------   High memory
+     *              ---------   High memory
      *             |   ret   |
-     *              ---------
+     *  rbp    ->   ---------
      *             |   i     |
-     *  rbp-4  ->   ---------
+     *  rbp-8  ->   ---------
      *             |         |
      *             |   a     |
      *             |         |
-     *  rbp-16 ->   ---------   Low memory (top of stack)
+     *  rbp-24 ->   ---------   Low memory (top of stack)
      */
     write_assembly("  mov $8, %%rcx");
     for (i=0; i<declarations->size; i++)
