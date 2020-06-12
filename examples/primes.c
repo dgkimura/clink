@@ -1,22 +1,19 @@
-/*
- * TODO allow n through function arguments
- */
 void print_primes(int n)
 {
     int i;
     int j;
-    int array[100];
-    for (i=0; i<100; i++) {
+    int array[n];
+    for (i=0; i<n; i++) {
         array[i] = 1;
     }
 
-    for (i=2; i<100; i++) {
-        for (j=i*2; j<100; j+=i) {
+    for (i=2; i<n; i++) {
+        for (j=i*2; j<n; j+=i) {
             array[j] = 0;
         }
     }
 
-    for (i=0; i<100; i++) {
+    for (i=0; i<n; i++) {
         if (array[i] == 1)
         {
             printf("%d\n", i);

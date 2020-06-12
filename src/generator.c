@@ -214,6 +214,9 @@ visit_function_call(struct ast_expression *ast,
     int i, j;
     struct ast_expression *argument;
 
+    /*
+     * Set up the parameters to pass to the next function.
+     */
     for (i=0; i<ast->arguments_size; i++)
     {
         argument = ast->arguments[i];
@@ -313,8 +316,8 @@ visit_identifier(struct ast_expression *ast,
 
         if (strcmp(ast->identifier, parameter->declarators[0]->declarator_identifier) == 0)
         {
-            snprintf(location, sizeof(location), "%%%s", get_32bit_register(i));
-            write_assembly("  movl %%%s, %%eax", get_32bit_register(i));
+            identifier_offset(ast, parameters, declarations);
+            write_assembly("  mov (%%rbx), %%eax");
             goto done;
         }
     }
@@ -508,6 +511,7 @@ identifier_offset(struct ast_expression *ast,
                   struct ast_declaration_list *declarations)
 {
     int i, j, local_size;
+    struct ast_declaration *parameter;
     struct ast_declaration *declaration;
 
     /*
@@ -540,6 +544,19 @@ identifier_offset(struct ast_expression *ast,
      *  rbp-24 ->   ---------   Low memory (top of stack)
      */
     write_assembly("  mov $8, %%rcx");
+    for (i=0; parameters && i<parameters->size; i++)
+    {
+        parameter = parameters->items[i];
+
+        write_assembly("  add $%d, %%rcx",
+                       align8(size_of_type(parameter->type_specifiers)));
+        if (strcmp(ast->identifier,
+                   parameter->declarators[0]->declarator_identifier) == 0)
+        {
+            goto end;
+        }
+    }
+
     for (i=0; i<declarations->size; i++)
     {
         declaration = declarations->items[i];
@@ -567,10 +584,11 @@ identifier_offset(struct ast_expression *ast,
         if (strcmp(ast->identifier,
                    declaration->declarators[0]->declarator_identifier) == 0)
         {
-            break;
+            goto end;
         }
     }
 
+end:
     write_assembly("  movq %%rbp, %%rbx");
     write_assembly("  subq %%rcx, %%rbx");
 }
@@ -852,27 +870,19 @@ visit_function_definition(struct ast_function *ast)
     write_assembly("  movq %%rsp, %%rbp");
 
     /*
-     * Begin local_size 4 as old ebp push is on the stack.
+     * Begin at 8 as old rbp push is on the stack.
      *
      * NOTE: System-V AMD64 ABI specifies in section 3.2.3 that the 6 function
      * arguments are passed through registers. The remainder is pushed on the
      * stack.
      */
     write_assembly("  subq $8, %%rsp");
-    /*
-     * TODO: This is not implemented yet. Revisit when functions support more
-     *       than 6 arguments.
-    local_size = 4;
-    for (i=6; parameters && i<parameters->size; i++)
+    for (i=0; parameters && i<parameters->size; i++)
     {
         parameter = parameters->items[i];
 
-        write_assembly("  movl %%%s, -%d(%%rbp)",
-                get_32bit_register(i),
-                local_size);
-        local_size += size_of_type(parameter->type_specifiers);
+        write_assembly("  pushq %%%s", get_64bit_register(i));
     }
-    */
 
     /*
      * Reserve stack space for local variables in this function so that if this
