@@ -322,7 +322,7 @@ visit_identifier(struct ast_expression *ast,
         }
     }
 
-    for (i=0; i<declarations->size; i++)
+    for (i=0; declarations && i<declarations->size; i++)
     {
         if (ast->kind == PTR_VALUE)
         {
