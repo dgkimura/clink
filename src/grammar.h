@@ -577,7 +577,7 @@ struct rule grammar[NUM_RULES] =
     /* initializer: */
     {
         AST_INITIALIZER,
-        create_,
+        create_initializer,
         1,
         { AST_ASSIGNMENT_EXPRESSION }
     },

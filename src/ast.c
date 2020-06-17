@@ -242,6 +242,21 @@ create_parameter_declaration(struct listnode *list, struct rule *rule)
 }
 
 struct astnode *
+create_initializer(struct listnode *list, struct rule *rule)
+{
+    struct ast_initializer *node;
+
+    if (is_rule(rule, AST_ASSIGNMENT_EXPRESSION))
+    {
+        node = malloc(sizeof(struct ast_initializer));
+        node->expression = list_item(&list, 1);
+    }
+
+    node->type = rule->type;
+    return (struct astnode *)node;
+}
+
+struct astnode *
 create_expression_statement(struct listnode *list, struct rule *rule)
 {
     struct astnode *node;
@@ -511,7 +526,7 @@ create_init_declarator_list(struct listnode *list, struct rule *rule)
 struct astnode *
 create_init_declarator(struct listnode *list, struct rule *rule)
 {
-    struct astnode *node;
+    struct ast_declarator *node;
     assert(rule->length_of_nodes == 3);
 
 
@@ -521,8 +536,9 @@ create_init_declarator(struct listnode *list, struct rule *rule)
         /* index 3 is AST_EQUAL astnode */
         /* index 1 is AST_INITIALIZER astnode */
         node = list_item(&list, 5);
+        node->initializer = list_item(&list, 1);
     }
-    return node;
+    return (struct astnode *)node;
 }
 
 struct astnode *

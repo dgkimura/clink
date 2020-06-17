@@ -127,6 +127,14 @@ struct ast_declaration_list
     struct ast_declaration *items[0];
 };
 
+struct ast_initializer
+{
+    enum astnode_t type;
+    enum astnode_t elided_type;
+
+    struct ast_expression *expression;
+};
+
 struct ast_declarator
 {
     enum astnode_t type;
@@ -136,7 +144,10 @@ struct ast_declarator
 
     char *declarator_identifier;
 
+    /*TODO: remove declarator_value; it should be replaced by initializer*/
     int declarator_value;
+
+    struct ast_initializer *initializer;
 
     /*
      * Used to indicate number of objects (i.e. array can have count > 1)
@@ -264,6 +275,9 @@ create_parameter_list(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_parameter_declaration(struct listnode *list, struct rule *rule);
+
+struct astnode *
+create_initializer(struct listnode *list, struct rule *rule);
 
 struct astnode *
 create_expression_statement(struct listnode *list, struct rule *rule);
