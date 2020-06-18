@@ -118,6 +118,9 @@ write_assembly(char *format, ...)
     fprintf(assembly_filename, "\n");
 }
 
+int globals_index = 0;
+char *globals[256];
+
 static void
 visit_declaration(struct ast_declaration *ast, enum scope scope)
 {
@@ -129,18 +132,19 @@ visit_declaration(struct ast_declaration *ast, enum scope scope)
     for (i=0; i<ast->declarators_size; i++)
     {
         next = ast->declarators[i];
-        /* TODO: Write the location of the declaration */
 
         if (ast->type_specifiers & INT)
         {
             write_assembly("_%s:", next->declarator_identifier);
-            write_assembly(".long %d", next->declarator_value);
+            write_assembly(".long %d", next->initializer->expression->int_value);
         }
         else if (ast->type_specifiers & CHAR)
         {
             write_assembly("_%s:", next->declarator_identifier);
             write_assembly(".byte %d", next->declarator_value);
         }
+
+        globals[globals_index++] = ast->declarators[i]->declarator_identifier;
     }
 }
 
@@ -324,6 +328,13 @@ visit_identifier(struct ast_expression *ast,
 
     for (i=0; declarations && i<declarations->size; i++)
     {
+        if (strcmp(ast->identifier,
+                   declarations->items[i]->declarators[0]->declarator_identifier)
+            != 0)
+        {
+            continue;
+        }
+
         if (ast->kind == PTR_VALUE)
         {
             identifier_offset(ast, parameters, declarations);
@@ -350,6 +361,15 @@ visit_identifier(struct ast_expression *ast,
         }
         snprintf(location, sizeof(location), "(%%rbx)");
         goto done;
+    }
+
+    for (i=0; i<globals_index; i++)
+    {
+        if (strcmp(ast->identifier, globals[i]) == 0)
+        {
+            write_assembly("  movl _%s(%%rip), %%eax", ast->identifier);
+            goto done;
+        }
     }
 
 done:
