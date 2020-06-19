@@ -577,7 +577,7 @@ identifier_offset(struct ast_expression *ast,
         }
     }
 
-    for (i=0; i<declarations->size; i++)
+    for (i=0; declarations && i<declarations->size; i++)
     {
         declaration = declarations->items[i];
 
