@@ -135,8 +135,15 @@ visit_declaration(struct ast_declaration *ast, enum scope scope)
 
         if (ast->type_specifiers & INT)
         {
-            write_assembly("_%s:", next->declarator_identifier);
-            write_assembly(".long %d", next->initializer->expression->int_value);
+            if (next->initializer)
+            {
+                write_assembly("_%s:", next->declarator_identifier);
+                write_assembly(".long %d", next->initializer->expression->int_value);
+            }
+            else
+            {
+                write_assembly(".comm _%s,4,2", next->declarator_identifier);
+            }
         }
         else if (ast->type_specifiers & CHAR)
         {
