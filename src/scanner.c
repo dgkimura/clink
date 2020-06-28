@@ -116,7 +116,7 @@ scan(char *content, size_t content_len, struct listnode **tokens)
             if (tok->type == TOK_EOF)
             {
                 tok->type = TOK_IDENTIFIER;
-                tok->value = (char *)malloc(sizeof(char) * tok_size);
+                tok->value = (char *)malloc(sizeof(char) * tok_size + 1);
                 strncpy(tok->value, content + tok_start, tok_size);
                 tok->value[tok_size] = '\0';
             }
