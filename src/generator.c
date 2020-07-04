@@ -21,7 +21,7 @@ static void visit_expression(struct astnode *ast,
                              struct ast_parameter_type_list *parameters,
                              struct ast_declaration_list *declarations);
 static void
-identifier_offset(struct ast_expression *ast,
+identifier_offset(char *identifier,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations);
 
@@ -239,7 +239,8 @@ visit_function_call(struct ast_expression *ast,
         }
         else if (ast->arguments[i]->kind == PTR_VALUE)
         {
-            identifier_offset(ast->arguments[i], parameters, declarations);
+            identifier_offset(ast->arguments[i]->identifier,
+                              parameters, declarations);
             write_assembly("  mov (%%rbx), %%rax");
             write_assembly("  mov (%%rax), %%%s", get_32bit_register(i));
         }
@@ -327,7 +328,7 @@ visit_identifier(struct ast_expression *ast,
 
         if (strcmp(ast->identifier, parameter->declarators[0]->declarator_identifier) == 0)
         {
-            identifier_offset(ast, parameters, declarations);
+            identifier_offset(ast->identifier, parameters, declarations);
             write_assembly("  mov (%%rbx), %%eax");
             goto done;
         }
@@ -344,7 +345,7 @@ visit_identifier(struct ast_expression *ast,
 
         if (ast->kind == PTR_VALUE)
         {
-            identifier_offset(ast, parameters, declarations);
+            identifier_offset(ast->identifier, parameters, declarations);
             write_assembly("  leaq (%%rbx), %%rax");
         }
         else
@@ -353,7 +354,7 @@ visit_identifier(struct ast_expression *ast,
             {
                 visit_expression((struct astnode *)ast->extra, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset(ast, parameters, declarations);
+                identifier_offset(ast->identifier, parameters, declarations);
                 write_assembly("  pop %%rax");
                 write_assembly("  mov %%rax, %%rcx");
                 write_assembly("  leaq (%%rbx), %%rdx");
@@ -362,7 +363,7 @@ visit_identifier(struct ast_expression *ast,
             }
             else
             {
-                identifier_offset(ast, parameters, declarations);
+                identifier_offset(ast->identifier, parameters, declarations);
                 write_assembly("  mov (%%rbx), %%eax");
             }
         }
@@ -533,7 +534,7 @@ visit_equality_expression(struct ast_binary_op *ast,
 }
 
 static void
-identifier_offset(struct ast_expression *ast,
+identifier_offset(char *identifier,
                   struct ast_parameter_type_list *parameters,
                   struct ast_declaration_list *declarations)
 {
@@ -577,7 +578,7 @@ identifier_offset(struct ast_expression *ast,
 
         write_assembly("  add $%d, %%rcx",
                        align8(size_of_type(parameter->type_specifiers)));
-        if (strcmp(ast->identifier,
+        if (strcmp(identifier,
                    parameter->declarators[0]->declarator_identifier) == 0)
         {
             goto end;
@@ -608,7 +609,7 @@ identifier_offset(struct ast_expression *ast,
             }
         }
 
-        if (strcmp(ast->identifier,
+        if (strcmp(identifier,
                    declaration->declarators[0]->declarator_identifier) == 0)
         {
             goto end;
@@ -633,7 +634,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
@@ -647,7 +648,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  pop %%rax");
                 write_assembly("  mov %%rax, (%%rbx)");
@@ -660,7 +661,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
@@ -676,7 +677,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  pop %%rax");
                 write_assembly("  mov %%eax, %%ecx");
@@ -692,7 +693,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
@@ -708,7 +709,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  pop %%rax");
                 write_assembly("  mov %%eax, %%ecx");
@@ -724,7 +725,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  push %%rbx");
                 visit_expression((struct astnode *)((struct ast_expression *)ast->left)->extra, parameters, declarations);
@@ -740,7 +741,7 @@ visit_assignment_expression(struct ast_binary_op *ast,
             {
                 visit_expression(ast->right, parameters, declarations);
                 write_assembly("  push %%rax");
-                identifier_offset((struct ast_expression *)ast->left,
+                identifier_offset(((struct ast_expression *)ast->left)->identifier,
                                    parameters, declarations);
                 write_assembly("  pop %%rax");
                 write_assembly("  mov %%eax, %%ecx");
