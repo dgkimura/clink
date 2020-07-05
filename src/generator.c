@@ -940,6 +940,21 @@ visit_function_definition(struct ast_function *ast)
                 write_assembly("  subq $%d, %%rsp",
                                align8(size_of_type(declaration->type_specifiers)));
             }
+
+            if (declaration->declarators[j]->initializer)
+            {
+                visit_expression(
+                    (struct astnode *)declaration->declarators[j]->initializer->expression,
+                    parameters,
+                    compound->declarations);
+                write_assembly("  push %%rax");
+                identifier_offset(
+                     declaration->declarators[j]->declarator_identifier,
+                     parameters,
+                     compound->declarations);
+                write_assembly("  pop %%rax");
+                write_assembly("  mov %%rax, (%%rbx)");
+            }
         }
     }
     write_assembly("  andq $0xFFFFFFFFFFFFFFF0, %%rsp");
