@@ -77,7 +77,8 @@ align8(int size)
  * later be appended to the end of the assembly file.
  */
 static int cursor = 0;
-static char string_literal_buffer[512];
+#define MAX_LITERAL_BUFFER_LEN 4096
+static char string_literal_buffer[MAX_LITERAL_BUFFER_LEN];
 
 static char *
 create_string_literal(char *string)
@@ -103,6 +104,8 @@ create_string_literal(char *string)
     }
     string_literal_buffer[cursor++] = '"';
     string_literal_buffer[cursor++] = '\n';
+
+    assert(cursor < MAX_LITERAL_BUFFER_LEN);
 
     i += 1;
     return label;
